@@ -1,0 +1,259 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "GameFramework/Actor.h"
+
+#include "Misc/NaEnums.h"
+
+#include "NaRegion.h"
+#include "Map/NaMap.h"
+#include "Generation/NaWorldGenerator.h"
+
+#include "World/NaWorldDefinition.h"
+
+#include "NaWorld.generated.h"
+
+class UNaWorldAsset;
+class UNaEntity;
+class UNaEntityPlayer;
+class UNaTurnActionComponent;
+class UNaEventManager;
+
+USTRUCT()
+struct FNaMapEntry
+{
+	GENERATED_BODY()
+
+	//! 固有ID
+	UPROPERTY()
+	int32		MapID;
+	//! 配置チャンク座標
+	UPROPERTY()
+	FIntVector	Location;
+	//! 配置範囲
+	UPROPERTY()
+	FIntVector	Range;
+};
+
+class INaWorldDataAccessor
+{
+	//! リージョンデータ読み込み
+	virtual bool	ReadRegionData( FIntVector pos, TArray<uint8>& outVal )			{ return false; }
+	//! リージョンデータ書き込み
+	virtual bool	WriteRegionData( FIntVector pos, const TArray<uint8>& inVal )	{ return false; }
+};
+
+/**
+ * 
+ */
+UCLASS()
+class NANRPG_API UNaWorld : public UObject, public INaWorldDataAccessor
+{
+	GENERATED_BODY()
+
+public:
+	// ワールドオープン
+	static UNaWorld*	Open( int32 worldID );
+	// ワールド生成
+	static UNaWorld*	Create( int32 worldID );
+	
+public:
+	// コンストラクタ
+	UNaWorld();
+
+	//! 初期化
+	virtual void	Initialize( UWorld* world );
+	//! 更新
+	virtual void	Tick( float DeltaTime );
+
+	// 開く
+	bool	OpenWorld( int32 worldID );
+	// 新規作成
+	bool	CreateWorld( int32 worldID, UNaWorldAsset* asset );
+	// 閉じる
+	void	CloseWorld();
+
+	//! ワールドジェネレータ取得
+	UNaWorldGenerator*	GetGenerator() const	{ return m_Generator; }
+
+	// シリアライズ //
+	virtual void	Serialize( FArchive& ar ) override;
+
+	//! 
+	void		SetChunkRange( FIntVector range );
+	// カレント座標設定
+	void		SetCurrentPosition( const FIntVector& pos );
+	// カレント座標取得
+	FIntVector	GetCurrentPosition() const	{return m_CurrentWorldPos;}
+
+	// 更新
+	virtual void	UpdateWorld();
+
+	//
+	void	AdvanceTurn();
+	//
+	void	InsertActionChain( UNaTurnActionComponent* tac );
+
+	// リージョン取得
+	UNaRegion*	GetRegion( const FIntVector& worldPos );
+	// チャンク取得
+	UNaChunk*	GetChunk( const FIntVector& chunkPos );
+	// チャンク取得（ワールド座標）
+	UNaChunk*	GetChunkFromWorld( FIntVector worldPos );
+
+	//! ブロック設定
+	virtual void	SetBlock( FIntVector pos, FNaWorldBlockWork& block );
+	//! ブロック情報取得
+	bool			GetBlock( FIntVector worldPos, FNaWorldBlockWork& outVal );
+	// 接地セル検索
+	bool			FindGroundPos( FIntVector startPos, FIntVector& outPos );
+	// 天井セル検索
+	bool			FindCeilPos( FIntVector startPos, FIntVector& outPos );
+
+	//! リージョンデータ読み込み
+	virtual bool	ReadRegionData( FIntVector pos, TArray<uint8>& outVal ) override;
+	//! リージョンデータ書き込み
+	virtual bool	WriteRegionData( FIntVector pos, const TArray<uint8>& inVal ) override;
+
+
+	// エンティティ検索
+	bool		FindEntity( FIntVector worldPos, TArray<UNaEntity*>& outVal );
+	// エンティティリスト取得
+	const TArray<UNaEntity*>&	GetEntities() const	{return m_SpawnEntities;}
+
+	// ワールドステージにエンティティ登録
+	bool		RegisterEntity( UNaEntity* entity );
+	// ワールドステージからエンティティ除去
+	void		UnregisterEntity( UNaEntity* entity );
+	//! エンティティID発行
+	uint32		IssueEntityID();
+
+	// エンティティスポーン（実体の生成）
+	bool		SpawnEntity( UNaEntity* entity, FIntVector pos );
+	// エンティティデスポーン（実体の削除）
+	void		DespawnEntity( UNaEntity* entity );
+
+	// ワールドに配置
+	bool		EnterEntity( UNaEntity* entity );
+	// ワールドから除去
+	void		LeaveEntity( UNaEntity* entity );
+
+	// アクションチェインに追加
+	void		AttachActionChain( UNaEntity* entity );
+	// アクションチェインから除去
+	void		DetachActionChain( UNaEntity* entity );
+
+
+	//! UEワールド設定
+	void		SetWorldContext( UWorld* context )	{ m_WorldContext = context; }
+	//! UEワールド取得
+	UWorld*		GetWorldContext() const				{ return m_WorldContext; }
+
+	//
+	void		SetChunkLimit( FIntVector min, FIntVector max )	{m_ChunkMin = min; m_ChunkMax = max;}
+	//! 
+	FIntVector	GetChunkMin() const	{ return m_ChunkMin; }
+	//! 
+	FIntVector	GetChunkMax() const	{ return m_ChunkMax; }
+
+	//! マップ生成
+	void		CreateMap( FIntVector location, const UNaMapAsset* mapAsset );
+	void		CreateMap( FIntVector location, const FStringAssetReference& mapAsset );
+	//! 
+	void		FindMap( FIntVector location, TArray<UNaMap*>& outArray );
+	//! マップ取得
+//	UNaMap*		GetMap( int32 idx ) const	{return m_MapData.IsValidIndex(idx) ? m_MapData[idx] : nullptr;}
+
+	//! 指定チャンクのエンティティ収集
+	void		GatherWorldEntities( const FIntVector& chunkPos, TArray<UNaEntity*>& outVal );
+
+	UNaEntityPlayer*	GetPlayer() const	{return m_pPlayer;}
+
+	void		SetCeilZ(int32 cz)	{m_CeilZ = cz;}
+	int32		GetCeilZ() const	{return m_CeilZ;}
+
+	void			SetWorldDirection(ENaDirection dir)	{m_WorldDirection = dir;}
+	ENaDirection	GetWorldDirection() const			{return m_WorldDirection;}
+
+	//! イベントマネージャ取得
+	virtual UNaEventManager*	GetEventManager()	{ return nullptr; }
+
+protected:
+	//
+	FString		MakeWorldDirPath( int32 worldID ) const;
+	//
+	FString		GetWorldFilePath() const;
+	//
+	FString		GetRegionDirPath() const;
+	//
+	FString		GetMapDirPath() const;
+
+public:
+	UPROPERTY(EditDefaultsOnly, Category = General)
+	int32		WorldID;
+	UPROPERTY(EditDefaultsOnly, Category = General)
+	FText		WorldName;
+	
+protected:
+	//!
+	FString		m_WorldPath;
+	//! ワールドチャンク範囲下限
+	FIntVector	m_ChunkMin;
+	//! ワールドチャンク範囲上限
+	FIntVector	m_ChunkMax;
+
+	//! 
+	UPROPERTY(Transient)
+	UNaWorldGenerator*	m_Generator;
+
+	//! UEワールドコンテキスト
+	UPROPERTY(Transient)
+	UWorld*				m_WorldContext;
+	// ホームポジション //
+	TArray<FIntVector>	m_HomePositions;
+
+	// 環境情報 //
+	int32	m_Temperature;		// 気温
+	int32	m_Humidity;			// 湿度
+	int32	m_AtmosPressure;	// 気圧
+
+	// カレント
+	FIntVector			m_CurrentWorldPos;	// 
+	FIntVector			m_CurrentChunkPos;	// 
+	int32				m_CeilZ;			// 
+	ENaDirection		m_WorldDirection;	// ワールド表示方角
+	//! アクティブチャンク範囲
+	FIntVector			m_ChunkRange;
+
+	// メイン地形情報
+	UPROPERTY(Transient)
+	TArray<UNaRegion*>				m_Regions;		// リージョン実体
+	TMap<FIntVector, UNaRegion*>	m_RegionMap;	// リージョンアクセス用マップ
+	TMap<FIntVector, UNaChunk*>		m_ChunkMap;		// チャンクアクセス用マップ（実体はリージョン内管理）
+
+	// 中間データマップ
+	UPROPERTY()
+	TArray<FNaMapEntry>				m_MapEntries;	// マップエントリ
+	UPROPERTY(Transient)
+	TMap<int32, UNaMap*>			m_MapData;		// 展開中のマップ実体
+
+	// エンティティ //
+	UPROPERTY()
+	TArray<UNaEntity*>				m_Entities;				// ワールドステージのエンティティ実体 //
+	UPROPERTY()
+	int32							m_NextEntityID;			// 次回ワールドエンティティID //
+	UPROPERTY(Transient)
+	TArray<UNaEntity*>				m_SpawnEntities;		// スポーン中のエンティティ（ステージ共通） //
+	
+
+	// ターン処理 //
+	UPROPERTY(Transient)
+	TArray<UNaTurnActionComponent*>	m_ActionChain;		// アクションリスト //
+	UPROPERTY(Transient)
+	UNaTurnActionComponent*			m_CurrentAction;	//  //
+
+	// プレイヤー //
+	UPROPERTY(Transient)
+	UNaEntityPlayer*	m_pPlayer;
+};
