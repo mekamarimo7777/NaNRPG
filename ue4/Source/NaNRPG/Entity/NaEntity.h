@@ -12,9 +12,9 @@
 #include "Assets/Event/NaEventAsset.h"
 
 #include "Entity/Controller/NaEntityManipulator.h"
-
-#include "Entity/Components/NaStateMachine.h"
 #include "Entity/Components/NaTurnActionComponent.h"
+
+#include "Utility/Components/NaStateMachine.h"
 
 #include "NaEntity.generated.h"
 

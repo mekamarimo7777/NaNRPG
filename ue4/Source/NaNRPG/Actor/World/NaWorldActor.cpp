@@ -15,10 +15,20 @@
 
 #include "Database/NaGameDatabase.h"
 
-ANaWorldActor::ANaWorldActor()
+ANaWorldActor::ANaWorldActor( const FObjectInitializer& ObjectInitializer )
+: Super( ObjectInitializer )
 {
  	// 
 	PrimaryActorTick.bCanEverTick = true;
+
+	//! 
+	m_SM	= NewObject<UNaStateMachine>();
+	if ( m_SM ){
+		FNaStateDelegate	func;
+
+		func.BindUObject( this, &ANaWorldActor::ProcMain );
+		m_SM->RegisterState( EState::Main, func );
+	}
 
 	// ルートコンポーネント //
 	UStaticMeshComponent*	comp = CreateDefaultSubobject<UStaticMeshComponent>( TEXT("RootComponent") );
@@ -59,6 +69,8 @@ void ANaWorldActor::BeginPlay()
 	}
 
 	SetRenderSize( FIntVector( 3, 3, 0 ), FIntVector( 1, 1, 0 ) );
+
+	m_SM->ChangeState( EState::Main );
 }
 	
 // 
@@ -66,9 +78,11 @@ void ANaWorldActor::Tick( float DeltaSeconds )
 {
 	Super::Tick( DeltaSeconds );
 
+	m_SM->Execute( DeltaSeconds );
+
 	switch ( m_State ){
 	case EState::Main:
-		ProcMain( DeltaSeconds );
+		ProcMainOld( DeltaSeconds );
 		break;
 	}
 
@@ -433,7 +447,13 @@ UMaterialInstanceDynamic* ANaWorldActor::FindBlockMaterial( int32 id )
 // public methods
 //////////////////////////////////////////////////
 //
-void ANaWorldActor::ProcMain(float DeltaTime)
+bool ANaWorldActor::ProcMain( UNaStateMachine* sm, float DeltaTime )
+{
+	return true;
+}
+
+//
+void ANaWorldActor::ProcMainOld(float DeltaTime)
 {
 	enum StateStep
 	{

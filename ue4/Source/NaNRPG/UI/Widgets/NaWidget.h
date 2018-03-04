@@ -4,7 +4,7 @@
 
 #include "UMG.h"
 
-#include "Entity/Components/NaStateMachine.h"
+#include "Utility/Components/NaStateMachine.h"
 
 #include "NaWidget.generated.h"
 

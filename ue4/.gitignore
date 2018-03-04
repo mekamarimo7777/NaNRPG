@@ -16,3 +16,4 @@
 *.uproject
 *.suo
 *.VC.db
+*.VC.opendb

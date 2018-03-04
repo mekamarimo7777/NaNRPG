@@ -94,8 +94,8 @@ class NANRPG_API ANaMapChunkActor : public AActor
 	};
 
 public:
-	// 
-	ANaMapChunkActor();
+	//! コンストラクタ
+	ANaMapChunkActor( const FObjectInitializer& ObjectInitializer );
 
 	// 
 	virtual void BeginPlay() override;

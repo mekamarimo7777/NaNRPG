@@ -12,6 +12,8 @@
 
 #include "World/NaWorld.h"
 
+#include "Utility/Components/NaStateMachine.h"
+
 #include "NaWorldActor.generated.h"
 
 class ANaActorBase;
@@ -30,16 +32,20 @@ public:
 	};
 	
 public:
-	// 
-	ANaWorldActor();
+	//! コンストラクタ
+	ANaWorldActor( const FObjectInitializer& ObjectInitializer );
 
-	// 
+	//! 開始処理
 	virtual void BeginPlay() override;
-	
-	// 
+	//! 更新
 	virtual void Tick( float DeltaSeconds ) override;
 
 public:
+	//! 
+
+
+
+
 	// @obsolete マップ読み込み //
 	void	LoadMap( int32 mapID );
 
@@ -70,7 +76,10 @@ public:
 
 protected:
 	//
-	void	ProcMain(float DeltaTime);
+	bool	ProcMain( UNaStateMachine* sm, float DeltaTime );
+
+	//
+	void	ProcMainOld(float DeltaTime);
 	
 public:
 	//! ポストプロセスマテリアル
@@ -78,6 +87,10 @@ public:
 	UMaterialInstance*	PostProcessMaterial;
 
 protected:
+	//! 状態管理
+	UPROPERTY()
+	UNaStateMachine*	m_SM;
+
 	//! ゲームワールド
 	UPROPERTY()
 	UNaWorld*		m_World;

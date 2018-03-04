@@ -13,6 +13,42 @@ UNaStateMachine::UNaStateMachine( const FObjectInitializer& ObjectInitializer )
 , m_NextState( -1 )
 , m_NextStateParam( -1 )
 {
+	m_StateFunc.Reserve( 16 );
+}
+
+//! ステート登録
+void UNaStateMachine::RegisterState( int32 state, FNaStateDelegate func )
+{
+	if ( m_StateFunc.Num() <= state ){
+		m_StateFunc.SetNum( state + 1 );
+	}
+	m_StateFunc[state]	= func;
+}
+
+//! 実行
+void UNaStateMachine::Execute( float DeltaTime )
+{
+	FNaStateDelegate	func;
+
+	while ( true ){
+		if ( m_State != m_NextState ){
+			ChangeState( m_NextState, m_NextStateParam, true );
+		}
+
+		if ( m_StateFunc.IsValidIndex( m_State ) ){
+			func	= m_StateFunc[m_State];
+			if ( func.IsBound() ){
+				bool	finished;
+
+				finished	= func.Execute( this, DeltaTime );
+				if ( !finished ){
+					continue;
+				}
+			}
+		}
+
+		break;
+	}
 }
 
 //! 

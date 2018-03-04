@@ -6,7 +6,7 @@
 
 #include "Singleton/NaGameInstance.h"
 
-#include "Entity/Components/NaStateMachine.h"
+#include "Utility/Components/NaStateMachine.h"
 
 #include "UI/Actor/Event/NaSkitAgent.h"
 

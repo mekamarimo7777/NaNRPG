@@ -4,7 +4,7 @@
 
 #include "UI/Widgets/NaWidget.h"
 
-#include "Entity/Components/NaStateMachine.h"
+#include "Utility/Components/NaStateMachine.h"
 
 #include "NaUIAgent.generated.h"
 

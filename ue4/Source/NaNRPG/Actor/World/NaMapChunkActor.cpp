@@ -8,7 +8,8 @@
 
 #include "Assets/NaAssetLibrary.h"
 
-ANaMapChunkActor::ANaMapChunkActor()
+ANaMapChunkActor::ANaMapChunkActor( const FObjectInitializer& ObjectInitializer )
+: Super( ObjectInitializer )
 {
  	// 
 	PrimaryActorTick.bCanEverTick = true;

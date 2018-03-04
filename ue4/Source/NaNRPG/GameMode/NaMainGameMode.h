@@ -20,12 +20,11 @@ class NANRPG_API ANaMainGameMode : public AGameMode
 	GENERATED_BODY()
 
 public:
-	// コンストラクタ //
-	ANaMainGameMode(const FObjectInitializer& ObjectInitializer);
+	//! コンストラクタ
+	ANaMainGameMode( const FObjectInitializer& ObjectInitializer );
 
 	// 
 	virtual void	BeginPlay() override;
-
 	// 
 	virtual void	EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 

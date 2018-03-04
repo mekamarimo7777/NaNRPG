@@ -5,7 +5,8 @@
 #include "NaEntityManipulator.h"
 
 #include "Entity/Character/NaEntityPlayer.h"
-#include "Entity/Components/NaStateMachine.h"
+
+#include "Utility/Components/NaStateMachine.h"
 
 // 操作ターゲット設定
 void UNaEntityManipulator::BindTarget( UNaEntityCharacter* target )

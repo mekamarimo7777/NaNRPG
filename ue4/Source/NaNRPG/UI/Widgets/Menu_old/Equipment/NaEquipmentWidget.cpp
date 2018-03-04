@@ -4,7 +4,8 @@
 #include "NaEquipmentWidget.h"
 
 #include "Entity/Character/NaEntityCharacter.h"
-#include "Entity/Components/NaStateMachine.h"
+
+#include "Utility/Components/NaStateMachine.h"
 
 #include "UI/Widgets/Menu_old/Inventory/NaUIItemList.h"
 

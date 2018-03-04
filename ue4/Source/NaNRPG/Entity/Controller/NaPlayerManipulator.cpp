@@ -9,8 +9,9 @@
 #include "UI/Widgets/Common/NaPopupDamage.h"
 
 #include "Entity/Character/NaEntityPlayer.h"
-#include "Entity/Components/NaStateMachine.h"
 #include "Entity/INaEntityFactory.h"
+
+#include "Utility/Components/NaStateMachine.h"
 
 #include "World/Event/NaEventManager.h"
 
