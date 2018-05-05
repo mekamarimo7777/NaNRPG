@@ -15,9 +15,9 @@ UNaGameWorld::UNaGameWorld()
 }
 
 //! ‰Šú‰»
-void UNaGameWorld::Setup( UWorld* world )
+void UNaGameWorld::Setup( ANaWorldActor* actor )
 {
-	Super::Setup( world );
+	Super::Setup( actor );
 
 	m_EventManager	= NewObject<UNaEventManager>();
 	m_EventManager->Initialize( this );

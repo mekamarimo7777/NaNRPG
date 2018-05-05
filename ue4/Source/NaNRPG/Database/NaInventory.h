@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -9,7 +9,7 @@
 class UNaEntityItem;
 
 /**
- * ƒCƒ“ƒxƒ“ƒgƒŠiNaEntity‚ÌW‡‚ğŠÇ—j
+ * ã‚¤ãƒ³ãƒ™ãƒ³ãƒˆãƒªï¼ˆNaEntityã®é›†åˆã‚’ç®¡ç†ï¼‰
  */
 UCLASS()
 class NANRPG_API UNaInventory : public UObject
@@ -22,12 +22,12 @@ public:
 	//!
 	void	RemoveItem( UNaItem* item );
 
-	//! Š‹àXV
+	//! æ‰€æŒé‡‘æ›´æ–°
 	void	UpdateMoney();
 	//! 
 	int32	GetMoney() const	{ return m_Money; }
 
-	//! d—ÊXV
+	//! é‡é‡æ›´æ–°
 	void	UpdateWeight();
 	
 public:
@@ -37,13 +37,13 @@ public:
 	UPROPERTY()
 	int32	m_Capacity;
 
-	//! ƒAƒCƒeƒ€
+	//! ã‚¢ã‚¤ãƒ†ãƒ 
 	UPROPERTY()
 	TArray<UNaItem*>	m_pItems;
-	//! Š‹à
+	//! æ‰€æŒé‡‘
 	UPROPERTY()
 	int32				m_Money;
-	//! ‘d—Ê
+	//! ç·é‡é‡
 	UPROPERTY()
 	int32				m_Weight;
 };

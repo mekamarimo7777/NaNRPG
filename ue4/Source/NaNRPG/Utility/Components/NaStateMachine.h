@@ -39,7 +39,7 @@ public:
 	void	Execute( float DeltaTime );
 
 	//! ステート変更
-	void	ChangeState(int32 state, int32 param = 0, bool immediate = false);
+	void	ChangeState( int32 state, int32 param = 0, bool immediate = false );
 	//! ステート取得
 	int32	GetState() const		{ return m_State; }
 	//! ステートパラメータ取得
@@ -48,11 +48,11 @@ public:
 	void	Again()					{ m_Again = true; }
 
 	//! フェーズ設定
-	void	SetPhase(int32 phase)	{ m_StatePhase = phase; }
-	//! フェーズ取得
-	int32	GetPhase() const		{ return m_StatePhase; }
+	void	SetPhase( int32 phase, bool again = true );
 	//! フェーズ進行
-	void	Advance()			{ m_StatePhase++; }
+	void	Advance( bool again = true );
+	//! フェーズ取得
+	int32	GetPhase() const				{ return m_StatePhase; }
 
 protected:
 

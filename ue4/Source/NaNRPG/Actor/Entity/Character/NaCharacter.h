@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -26,7 +26,7 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-	//! ƒAƒCƒeƒ€î•ñæ“¾
+	//! ã‚¢ã‚¤ãƒ†ãƒ æƒ…å ±å–å¾—
 	UFUNCTION( BlueprintCallable, Category = "EntityActor" )
 	UNaItem*	GetItemProperty() const;
 	
@@ -53,12 +53,12 @@ protected:
 	void	CreateActor( FName assetID );
 
 public:
-	//! ƒAƒjƒ[ƒVƒ‡ƒ“
+	//! ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³
 	UPROPERTY(EditDefaultsOnly, Category = Animation)
 	UAnimMontage*			Animations[ENaActorAnimation::ENUM_MAX];
 
 protected:
-	//! ƒRƒ“ƒ|[ƒlƒ“ƒg
+	//! ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆ
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Model)
 	UCapsuleComponent*		m_Capsule;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Model)

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "NaNRPG.h"
 #include "NaGameDatabase.h"
@@ -59,7 +59,7 @@ bool UNaGameDatabase::LoadDB(FString name)
 		}
 	}
 	else {
-		// V‹Kì¬ //
+		// æ–°è¦ä½œæˆ //
 		SaveDB();
 	}
 
@@ -95,21 +95,21 @@ void UNaGameDatabase::Serialize( FArchive& ar )
 	}
 }
 
-//! ƒvƒŒƒCƒ„[ƒGƒ“ƒeƒBƒeƒB“o˜^
+//! ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ç™»éŒ²
 void UNaGameDatabase::RegisterPlayer( UNaEntityPlayer* player )
 {
 	m_Player	= player;
 	m_Player->SetStage( ENaEntityStage::Global );
 }
 
-//! ƒOƒ[ƒoƒ‹ƒGƒ“ƒeƒBƒeƒB“o˜^
+//! ã‚°ãƒ­ãƒ¼ãƒãƒ«ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ç™»éŒ²
 void UNaGameDatabase::RegisterGlobalEntity( UNaEntity* entity )
 {
 	entity->SetStage( ENaEntityStage::Global );
 	m_GlobalEntities.Add( entity );
 }
 
-//! w’èƒ[ƒ‹ƒh“àƒGƒ“ƒeƒBƒeƒBûW
+//! æŒ‡å®šãƒ¯ãƒ¼ãƒ«ãƒ‰å†…ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£åé›†
 void UNaGameDatabase::GatherEntities( FName id, TArray<UNaEntity*>& outVal )
 {
 	outVal	= m_GlobalEntities.FilterByPredicate( [id]( UNaEntity* p )
@@ -122,7 +122,7 @@ void UNaGameDatabase::GatherEntities( FName id, TArray<UNaEntity*>& outVal )
 	}
 }
 
-//! ƒ[ƒ‹ƒhƒGƒ“ƒgƒŠ“o˜^
+//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚¨ãƒ³ãƒˆãƒªç™»éŒ²
 void UNaGameDatabase::RegisterWorldEntry( FName id, uint32 dataID )
 {
 	FNaWorldRecord	rec;
@@ -133,7 +133,7 @@ void UNaGameDatabase::RegisterWorldEntry( FName id, uint32 dataID )
 	m_WorldRecords.Add( rec );
 }
 
-//! ƒ[ƒ‹ƒhƒGƒ“ƒgƒŠæ“¾
+//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚¨ãƒ³ãƒˆãƒªå–å¾—
 FNaWorldRecord* UNaGameDatabase::FindWorldEntry( FName id )
 {
 	FNaWorldRecord*	rec;
@@ -146,7 +146,7 @@ FNaWorldRecord* UNaGameDatabase::FindWorldEntry( FName id )
 	return rec;
 }
 
-//! ƒ[ƒ‹ƒhƒGƒ“ƒgƒŠŠm”F
+//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚¨ãƒ³ãƒˆãƒªç¢ºèª
 bool UNaGameDatabase::ExistWorldEntry( FName id )
 {
 	return m_WorldRecords.FindByPredicate( [id]( FNaWorldRecord& p )
@@ -155,13 +155,13 @@ bool UNaGameDatabase::ExistWorldEntry( FName id )
 	}) != nullptr;
 }
 
-//! ƒ[ƒ‹ƒhƒf[ƒ^ID¶¬
+//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ãƒ‡ãƒ¼ã‚¿IDç”Ÿæˆ
 uint32 UNaGameDatabase::GenerateWorldDataID()
 {
 	uint32	dataID;
 
 #if 0
-	//! ƒ‰ƒ“ƒ_ƒ€‚ÅID¶¬
+	//! ãƒ©ãƒ³ãƒ€ãƒ ã§IDç”Ÿæˆ
 	do {
 		dataID	= FMath::Rand();
 	} while ( m_WorldRecords.ContainsByPredicate( [dataID]( FNaWorldRecord& p ){ return p.DataID == dataID; }) );

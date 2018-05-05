@@ -1,9 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "NaNRPG.h"
 #include "NaEntityConst.h"
 
-//! ƒVƒŠƒAƒ‰ƒCƒYFFName
+//! ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºï¼šFName
 void SerializeFName( FArchive &ar, FName& obj )
 {
 	FString	str;
@@ -18,7 +18,7 @@ void SerializeFName( FArchive &ar, FName& obj )
 	}
 }
 
-//! ƒVƒŠƒAƒ‰ƒCƒYFFNaEntityProfile
+//! ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºï¼šFNaEntityProfile
 FArchive& operator << ( FArchive &ar, FNaEntityProfile& obj )
 {
 	SerializeFName( ar, obj.AssetID );

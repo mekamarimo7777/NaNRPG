@@ -59,8 +59,8 @@ void UNaStateMachine::Execute( float DeltaTime )
 	}
 }
 
-//! 
-void UNaStateMachine::ChangeState(int32 state, int32 param, bool immediate)
+//! ステート変更
+void UNaStateMachine::ChangeState( int32 state, int32 param, bool immediate )
 {
 	if ( immediate ){
 		m_State			= state;
@@ -71,4 +71,18 @@ void UNaStateMachine::ChangeState(int32 state, int32 param, bool immediate)
 		m_NextState			= state;
 		m_NextStateParam	= param;
 	}
+}
+
+//! フェーズ設定
+void UNaStateMachine::SetPhase( int32 phase, bool again )
+{
+	m_StatePhase	= phase;
+	m_Again			= again;
+}
+
+//! フェーズ進行
+void UNaStateMachine::Advance( bool again )
+{
+	m_StatePhase++;
+	m_Again	= again;
 }

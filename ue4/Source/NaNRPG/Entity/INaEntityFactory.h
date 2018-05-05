@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -9,7 +9,7 @@
 class UNaEntity;
 
 /**
- * ƒGƒ“ƒeƒBƒeƒBƒtƒ@ƒNƒgƒŠ
+ * ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ãƒ•ã‚¡ã‚¯ãƒˆãƒª
  */
 class NANRPG_API INaEntityFactory
 {
@@ -17,14 +17,14 @@ public:
 	// 
 	static INaEntityFactory* GetFactory();
 
-	// ƒGƒ“ƒeƒBƒeƒBƒCƒ“ƒXƒ^ƒ“ƒX¶¬
+	// ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ç”Ÿæˆ
 	template<typename T = UNaEntity>
 	static T*	NewEntity( ENaEntity::Type type )
 	{
 		return static_cast<T*>( GetFactory()->NewEntity_Inner( type ) );
 	}
 
-	//! ƒGƒ“ƒeƒBƒeƒBƒVƒŠƒAƒ‰ƒCƒY
+	//! ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚º
 	static void	SerializeEntities( FArchive& ar, TArray<UNaEntity*>& refArray );
 
 public:

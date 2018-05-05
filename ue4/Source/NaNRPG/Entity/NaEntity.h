@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -28,7 +28,7 @@ struct FNaEntityDataAsset;
 class ANaGameHUD;
 
 /**
- * ƒGƒ“ƒeƒBƒeƒBŠî’ê
+ * ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£åŸºåº•
  */
 UCLASS(abstract)
 class NANRPG_API UNaEntity : public UObject
@@ -36,68 +36,68 @@ class NANRPG_API UNaEntity : public UObject
 	GENERATED_BODY()
 
 public:
-	// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	UNaEntity();
 
-	// ‰Šú‰»
+	// åˆæœŸåŒ–
 	void	Initialize( ENaEntity::Type type );
 
-	// IDİ’è
+	// IDè¨­å®š
 	void	SetID( int32 id );
-	// IDœ‹
+	// IDé™¤å»
 	void	ResetID();
 
-	// ƒXƒ|[ƒ“ˆ—iƒ`ƒƒƒ“ƒNƒf[ƒ^‚Ö‚Ì’Ç‰Áj
+	// ã‚¹ãƒãƒ¼ãƒ³å‡¦ç†ï¼ˆãƒãƒ£ãƒ³ã‚¯ãƒ‡ãƒ¼ã‚¿ã¸ã®è¿½åŠ ï¼‰
 	void	Spawn();
-	// ƒfƒXƒ|[ƒ“ˆ—iƒ`ƒƒƒ“ƒNƒf[ƒ^‚©‚çíœj
+	// ãƒ‡ã‚¹ãƒãƒ¼ãƒ³å‡¦ç†ï¼ˆãƒãƒ£ãƒ³ã‚¯ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰å‰Šé™¤ï¼‰
 	void	Despawn();
-	// “üêˆ—iƒ`ƒƒƒ“ƒN‹N“®‚Ìˆ—j
+	// å…¥å ´å‡¦ç†ï¼ˆãƒãƒ£ãƒ³ã‚¯èµ·å‹•æ™‚ã®å‡¦ç†ï¼‰
 	void	Enter();
-	// ‘Şêˆ—iƒ`ƒƒƒ“ƒNÁ‹‚Ì‘Ş”ğˆ—j
+	// é€€å ´å‡¦ç†ï¼ˆãƒãƒ£ãƒ³ã‚¯æ¶ˆå»æ™‚ã®é€€é¿å‡¦ç†ï¼‰
 	void	Leave();
 
-	// Naƒ[ƒ‹ƒhİ’è
+	// Naãƒ¯ãƒ¼ãƒ«ãƒ‰è¨­å®š
 	void		SetNaWorld( UNaWorld* world )	{ m_pWorld = world; }
-	// Naƒ[ƒ‹ƒhæ“¾
+	// Naãƒ¯ãƒ¼ãƒ«ãƒ‰å–å¾—
 	UNaWorld*	GetNaWorld() const				{ return m_pWorld; }
 
-	//! Š‘®ƒ[ƒ‹ƒhIDİ’è
+	//! æ‰€å±ãƒ¯ãƒ¼ãƒ«ãƒ‰IDè¨­å®š
 	void		SetWorldID( FName id )			{ m_WorldID = id; }
-	//! Š‘®ƒ[ƒ‹ƒhIDæ“¾
+	//! æ‰€å±ãƒ¯ãƒ¼ãƒ«ãƒ‰IDå–å¾—
 	FName		GetWorldID() const				{ return m_WorldID; }
-	//! Š‘®ƒ}ƒbƒvIDİ’è
+	//! æ‰€å±ãƒãƒƒãƒ—IDè¨­å®š
 	void		SetMapID( int32 id )			{ m_MapID = id; }
-	//! Š‘®ƒ}ƒbƒvIDæ“¾
+	//! æ‰€å±ãƒãƒƒãƒ—IDå–å¾—
 	int32		GetMapID() const				{ return m_MapID; }
 
-	// UEƒ[ƒ‹ƒhæ“¾
+	// UEãƒ¯ãƒ¼ãƒ«ãƒ‰å–å¾—
 	UWorld*		GetWorldContext() const			{ return m_pWorld ? m_pWorld->GetWorldContext() : nullptr; }
-	// UEHUDæ“¾
+	// UEHUDå–å¾—
 	ANaGameHUD*	GetHUD() const					{ return Cast<ANaGameHUD>( GWorld->GetFirstPlayerController()->GetHUD() ); }
 
-	//! ƒGƒ“ƒeƒBƒeƒBî•ñ¶¬
+	//! ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£æƒ…å ±ç”Ÿæˆ
 	virtual void	CreateFromAsset( const FNaEntityDataAsset& asset );
-	//! ƒGƒ“ƒeƒBƒeƒBƒpƒ‰ƒ[ƒ^İ’è
+	//! ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿è¨­å®š
 	virtual void	SetEntityParameter( const TMap<FName, FString>& values );
 
-	//!
+	//! ãƒ—ãƒ­ãƒ•ã‚£ãƒ¼ãƒ«å–å¾—
 	FNaEntityProfile*	GetProfile()		{return &m_Profile;}
-	//!
+	//! è¡¨ç¤ºåå–å¾—
 	FString				GetDisplayName()	{return m_Profile.DisplayName;}
 
-	//! ƒAƒCƒeƒ€î•ñƒZƒbƒg
+	//! ã‚¢ã‚¤ãƒ†ãƒ æƒ…å ±ã‚»ãƒƒãƒˆ
 	virtual void		SetItemProperty( UNaItem* item )	{}
-	//! ƒAƒCƒeƒ€î•ñæ“¾
+	//! ã‚¢ã‚¤ãƒ†ãƒ æƒ…å ±å–å¾—
 	virtual UNaItem*	GetItemProperty()					{ return nullptr; }
 
-	//! ƒXƒ|[ƒ“”»’è
+	//! ã‚¹ãƒãƒ¼ãƒ³åˆ¤å®š
 	bool	IsSpawned() const	{ return m_Spawned; }
-	//! ¶‘¶”»’è
+	//! ç”Ÿå­˜åˆ¤å®š
 	bool	IsAlive() const		{ return !m_IsKill; }
 
-	//! ƒCƒxƒ“ƒgƒZƒbƒg
+	//! ã‚¤ãƒ™ãƒ³ãƒˆã‚»ãƒƒãƒˆ
 	void	SetEvent( FName eventID );
-	//! ƒCƒxƒ“ƒgæ“¾
+	//! ã‚¤ãƒ™ãƒ³ãƒˆå–å¾—
 	bool	FindEvent( ENaEventTrigger trigger, const UNaEventAsset*& outEvent, int32& outSheet );
 
 
@@ -105,16 +105,16 @@ public:
 
 
 
-	// À•Wİ’è
+	// åº§æ¨™è¨­å®š
 	virtual void	SetWorldPosition(const FIntVector& pos);
 	virtual void	MoveToWorldPosition(const FIntVector& pos);
 	void			UpdateCurrentChunk();
-	//! ƒ[ƒ‹ƒhÀ•Wæ“¾
+	//! ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™å–å¾—
 	FIntVector		GetWorldPosition() const				{ return m_WorldPos; }
-	//! Š‘®ƒ`ƒƒƒ“ƒNÀ•Wæ“¾
+	//! æ‰€å±ãƒãƒ£ãƒ³ã‚¯åº§æ¨™å–å¾—
 	FIntVector		GetChunkPosition() const;
 
-	// Œü‚«İ’è
+	// å‘ãè¨­å®š
 	void			SetDirection( ENaDirection value )		{m_Direction = value;}
 	ENaDirection	GetDirection() const					{return m_Direction;}
 	// 
@@ -133,22 +133,22 @@ public:
 	bool	FindMovePosition( ENaDirection dir, FIntVector& outPos );
 
 	//==================================================
-	// ƒXƒe[ƒg
+	// ã‚¹ãƒ†ãƒ¼ãƒˆ
 	//==================================================
 	//!
 	virtual UNaStateMachine*	GetStateMachine() const			{ return m_SM; }
 
 	//==================================================
-	// ƒ^[ƒ“ƒAƒNƒVƒ‡ƒ“
+	// ã‚¿ãƒ¼ãƒ³ã‚¢ã‚¯ã‚·ãƒ§ãƒ³
 	//==================================================
 	//!
 	virtual UNaTurnActionComponent*	GetTurnAction() const	{ return nullptr; }
 	//!
 	FORCEINLINE bool	HasTurnAction() const	{ return GetTurnAction() != nullptr; }
 
-	// íœ
-	void	Kill()	{ m_IsKill = true; }
-	// íœ‘Ò‚¿
+	// å‰Šé™¤
+	void			Kill()					{ m_IsKill = true; }
+	// å‰Šé™¤å¾…ã¡
 	virtual bool	IsPendingKill() const	{ return m_IsKill; }
 
 	//!
@@ -159,107 +159,100 @@ public:
 	//
 	ENaEntityStage::Type	GetStage() const	{return m_Stage;}
 
-	//! –³Œ`ƒGƒ“ƒeƒBƒeƒBiƒ`ƒƒƒ“ƒN‚ÉŠ‘®‚µ‚È‚¢j
+	//! ç„¡å½¢ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ï¼ˆãƒãƒ£ãƒ³ã‚¯ã«æ‰€å±ã—ãªã„ï¼‰
 	virtual bool	IsIntangible() const	{ return m_IsAbstract; }
-	// ƒRƒŠƒWƒ‡ƒ“‚Ì—L–³
+	// ã‚³ãƒªã‚¸ãƒ§ãƒ³ã®æœ‰ç„¡
 	virtual bool	IsCollidable() const	{ return !m_IsAbstract && m_Collidable; }
 
-	// 
-	//virtual bool	IsAbstract() const		{return m_IsAbstract;}
-	// 
-	//virtual bool	IsStationaly() const	{return m_IsStationary;}
-	// 
-	//virtual bool	IsNoSave() const		{return m_bNoSave;}
-
-	// ƒVƒŠƒAƒ‰ƒCƒY
+	// ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚º
 	virtual	void	Serialize( FArchive& ar ) override;
 
 protected:
-	// ¶¬Œã‚Ì‰Šú‰»
+	// ç”Ÿæˆå¾Œã®åˆæœŸåŒ–
 	virtual void	OnAwake(){}
-	// íœ‘O
+	// å‰Šé™¤å‰
 	virtual void	OnDestroy(){}
-	// ƒXƒ|[ƒ“Œãˆ—
+	// ã‚¹ãƒãƒ¼ãƒ³å¾Œå‡¦ç†
 	virtual void	OnSpawn(){}
-	// ƒfƒXƒ|[ƒ“‘Oˆ—
+	// ãƒ‡ã‚¹ãƒãƒ¼ãƒ³å‰å‡¦ç†
 	virtual void	OnDespawn(){}
 	// 
 	virtual void	OnEnter(){}
 	// 
 	virtual void	OnLeave(){}
 
-	//! ƒVƒŠƒAƒ‰ƒCƒYˆ—
+	//! ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºå‡¦ç†
 	virtual void	OnSerialize( FArchive& ar );
 
-	//! ˆêî•ñ‚ÌXV
+	//! ä¸€æ™‚æƒ…å ±ã®æ›´æ–°
 	void	UpdateTransientData( const FNaEntityDataAsset* asset );
 
 public:
-	//! ƒAƒNƒVƒ‡ƒ“‚µ‚È‚¢iƒAƒNƒVƒ‡ƒ“ƒ`ƒFƒCƒ“‚ÉŒq‚ª‚È‚¢j
+	//! ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ã—ãªã„ï¼ˆã‚¢ã‚¯ã‚·ãƒ§ãƒ³ãƒã‚§ã‚¤ãƒ³ã«ç¹‹ãŒãªã„ï¼‰
 	bool	m_IsStationary;
-	//! À•WŠÇ—‚µ‚È‚¢ƒGƒ“ƒeƒBƒeƒBiƒ`ƒƒƒ“ƒN‚É‘®‚³‚È‚¢j
+	//! åº§æ¨™ç®¡ç†ã—ãªã„ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ï¼ˆãƒãƒ£ãƒ³ã‚¯ã«å±ã•ãªã„ï¼‰
 	bool	m_IsAbstract;
-	//! ƒLƒ‹ƒtƒ‰ƒO
+	//! ã‚­ãƒ«ãƒ•ãƒ©ã‚°
 	bool	m_IsKill;
 	
 protected:
 	//*** Serialize ***//
-	//! ƒGƒ“ƒeƒBƒeƒBí•Ê
+	//! ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ç¨®åˆ¥
 	TEnumAsByte<ENaEntity::Type>	m_Type;
-	//! ƒAƒZƒbƒgID
+	//! ã‚¢ã‚»ãƒƒãƒˆID
 	FName							m_AssetID;
-	//! ŒÅ—LID
+	//! å›ºæœ‰ID
 	uint32							m_ID;
-	//! ƒGƒ“ƒeƒBƒeƒBî•ñ
+	//! ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£æƒ…å ±
 	FNaEntityProfile				m_Profile;
 
-	//! Š‘®ƒŒƒxƒ‹
+	//! æ‰€å±ãƒ¬ãƒ™ãƒ«
 	TEnumAsByte<ENaEntityStage::Type>	m_Stage;
-	//! Š‘®ƒ[ƒ‹ƒhIDiWorldƒXƒe[ƒWˆÈã‚Éİ’èj
+	//! æ‰€å±ãƒ¯ãƒ¼ãƒ«ãƒ‰IDï¼ˆWorldã‚¹ãƒ†ãƒ¼ã‚¸ä»¥ä¸Šã«è¨­å®šï¼‰
 	FName								m_WorldID;
-	//! Š‘®ƒ}ƒbƒvIDi-1‚Å–¢Š‘®j
+	//! æ‰€å±ãƒãƒƒãƒ—IDï¼ˆ-1ã§æœªæ‰€å±ï¼‰
 	int32								m_MapID;
 	//! 
 	bool								m_Spawned;
 
-	FIntVector		m_WorldPos;		// ƒ[ƒ‹ƒhÀ•W //
-	ENaDirection	m_Direction;	// Œü‚« //
+	FIntVector		m_WorldPos;		// ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ //
+	ENaDirection	m_Direction;	// å‘ã //
 
 	//
-	int32	m_Speed;			// s“®‘¬“x //
-	int32	m_WaitTime;			// ‘Ò‚¿ŠÔ //
-	uint32	m_TotalTurn;		// —İŒvƒ^[ƒ“ //
+	int32	m_Speed;			// è¡Œå‹•é€Ÿåº¦ //
+	int32	m_WaitTime;			// å¾…ã¡æ™‚é–“ //
+	uint32	m_TotalTurn;		// ç´¯è¨ˆã‚¿ãƒ¼ãƒ³ //
 
-	int32	m_Group;		// Š‘®¨—Íi‰¼j //
+	int32	m_Group;		// æ‰€å±å‹¢åŠ›ï¼ˆä»®ï¼‰ //
 
 	//
-	int32	m_LastUpdateTime;	// ‘O‰ñ‚Ìs“®ŠÔ //
-	int32	m_RevivalTime;		// •œŠˆ‘Ò‚¿ŠÔi•œŠˆ‚·‚éƒLƒƒƒ‰‚Ì‚İj //
+	int32	m_LastUpdateTime;	// å‰å›ã®è¡Œå‹•æ™‚é–“ //
+	int32	m_RevivalTime;		// å¾©æ´»å¾…ã¡æ™‚é–“ï¼ˆå¾©æ´»ã™ã‚‹ã‚­ãƒ£ãƒ©ã®ã¿ï¼‰ //
 
-	//! ƒCƒxƒ“ƒg
+	//! ã‚¤ãƒ™ãƒ³ãƒˆ
 	FName					m_EventID;
-	//! ƒGƒ“ƒeƒBƒeƒBƒpƒ‰ƒ[ƒ^
+	//! ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
 	TMap<FName, FString>	m_Params;
 
 	//*** Serialize End ***//
 
 protected:
-	// ˆêƒpƒ‰ƒ[ƒ^ //
-	//! Š‘®ƒ[ƒ‹ƒhQÆ
+	// ä¸€æ™‚ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ //
+	//! æ‰€å±ãƒ¯ãƒ¼ãƒ«ãƒ‰å‚ç…§
 	UPROPERTY(Transient)
 	UNaWorld*	m_pWorld;
-	//! Š‘®ƒ`ƒƒƒ“ƒNQÆ
+	//! æ‰€å±ãƒãƒ£ãƒ³ã‚¯å‚ç…§
 	UPROPERTY(Transient)
 	UNaChunk*	m_pCurrentChunk;
 
-	//! ƒXƒe[ƒgŠÇ—
+	//! ã‚¹ãƒ†ãƒ¼ãƒˆç®¡ç†
 	UPROPERTY(Transient)
 	UNaStateMachine*	m_SM;
 
-	//! ƒ\[ƒXƒAƒZƒbƒg
+	//! ã‚½ãƒ¼ã‚¹ã‚¢ã‚»ãƒƒãƒˆ
 	const FNaEntityDataAsset*	m_Asset;
-	//! ƒTƒCƒY
+	//! ã‚µã‚¤ã‚º
 	FIntVector					m_Size;
-	//! ƒRƒŠƒWƒ‡ƒ“—L–³
+	//! ã‚³ãƒªã‚¸ãƒ§ãƒ³æœ‰ç„¡
 	bool						m_Collidable;
 };

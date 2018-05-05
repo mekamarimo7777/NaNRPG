@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "NaNRPG.h"
 
@@ -46,7 +46,7 @@ void UNaEntity::ResetID()
 	m_ID	= -1;
 }
 
-// ƒXƒ|[ƒ“ˆ—
+// ã‚¹ãƒãƒ¼ãƒ³æ™‚å‡¦ç†
 void UNaEntity::Spawn()
 {
 	OnSpawn();
@@ -56,7 +56,7 @@ void UNaEntity::Spawn()
 //	UpdateCurrentChunk();
 }
 
-// ƒfƒXƒ|[ƒ“ˆ—
+// ãƒ‡ã‚¹ãƒãƒ¼ãƒ³æ™‚å‡¦ç†
 void UNaEntity::Despawn()
 {
 	OnDespawn();
@@ -84,7 +84,7 @@ void UNaEntity::Leave()
 	m_pWorld	= nullptr;
 }
 
-//! ƒGƒ“ƒeƒBƒeƒBî•ñ¶¬
+//! ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£æƒ…å ±ç”Ÿæˆ
 void UNaEntity::CreateFromAsset( const FNaEntityDataAsset& asset )
 {
 	m_AssetID	= asset.Name;
@@ -96,13 +96,13 @@ void UNaEntity::CreateFromAsset( const FNaEntityDataAsset& asset )
 	UpdateTransientData( &asset );
 }
 
-//! ƒGƒ“ƒeƒBƒeƒBƒpƒ‰ƒ[ƒ^İ’è
+//! ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿è¨­å®š
 void UNaEntity::SetEntityParameter( const TMap<FName, FString>& values )
 {
 	m_Params.Append( values );
 }
 
-//! ƒCƒxƒ“ƒgƒZƒbƒg
+//! ã‚¤ãƒ™ãƒ³ãƒˆã‚»ãƒƒãƒˆ
 void UNaEntity::SetEvent( FName eventID )
 {
 	if ( !eventID.IsNone() ){
@@ -110,7 +110,7 @@ void UNaEntity::SetEvent( FName eventID )
 	}
 }
 
-//! ƒCƒxƒ“ƒgæ“¾
+//! ã‚¤ãƒ™ãƒ³ãƒˆå–å¾—
 bool UNaEntity::FindEvent( ENaEventTrigger trigger, const UNaEventAsset*& outEvent, int32& outSheet )
 {
 	UNaEventAsset*	asset = UNaAssetLibrary::Get()->FindEventAsset( m_EventID );
@@ -142,7 +142,7 @@ void UNaEntity::MoveToWorldPosition(const FIntVector& pos)
 	UpdateCurrentChunk();
 }
 
-// ƒJƒŒƒ“ƒgƒ`ƒƒƒ“ƒNXV //
+// ã‚«ãƒ¬ãƒ³ãƒˆãƒãƒ£ãƒ³ã‚¯æ›´æ–° //
 void UNaEntity::UpdateCurrentChunk()
 {
 	if ( m_pWorld && !IsIntangible() ){
@@ -160,7 +160,7 @@ void UNaEntity::UpdateCurrentChunk()
 	}
 }
 
-// ˆÚ“®æÀ•Wæ“¾ //
+// ç§»å‹•å…ˆåº§æ¨™å–å¾— //
 bool UNaEntity::FindMovePosition( ENaDirection dir, FIntVector& outPos )
 {
 	const FIntVector	c_dir[8] = 
@@ -175,7 +175,7 @@ bool UNaEntity::FindMovePosition( ENaDirection dir, FIntVector& outPos )
 	FIntVector	pos;
 	int32		height,iz;
 
-	//! Œ»İ‚Ì‚‚³Zo
+	//! ç¾åœ¨ã®é«˜ã•ç®—å‡º
 	height	= wpos.Z << 8;
 	if ( m_pWorld->GetBlock( wpos, cell ) ){
 		//! 
@@ -185,7 +185,7 @@ bool UNaEntity::FindMovePosition( ENaDirection dir, FIntVector& outPos )
 		}
 	}
 
-	//! ŒŸõŠJnˆÊ’u
+	//! æ¤œç´¢é–‹å§‹ä½ç½®
 	pos		= wpos + c_dir[int32(dir)];
 	outPos	= pos;
 	iz		= height + 192;
@@ -217,7 +217,7 @@ bool UNaEntity::FindMovePosition( ENaDirection dir, FIntVector& outPos )
 		iz	-= 256;
 	}
 
-	// ƒLƒƒƒ‰Šm”F //
+	// ã‚­ãƒ£ãƒ©ç¢ºèª //
 	TArray<UNaEntity*>	buff;
 
 	if ( m_pWorld->FindEntity( outPos, buff ) ){
@@ -231,7 +231,7 @@ bool UNaEntity::FindMovePosition( ENaDirection dir, FIntVector& outPos )
 	return true;
 }
 
-//! Š‘®ƒ`ƒƒƒ“ƒNÀ•Wæ“¾
+//! æ‰€å±ãƒãƒ£ãƒ³ã‚¯åº§æ¨™å–å¾—
 FIntVector UNaEntity::GetChunkPosition() const
 {
 	FIntVector	cpos = m_WorldPos;
@@ -247,7 +247,7 @@ void UNaEntity::Serialize( FArchive& ar )
 {
 	OnSerialize( ar );
 
-	//! ƒVƒŠƒAƒ‰ƒCƒYŒãˆ—
+	//! ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºå¾Œå‡¦ç†
 	if ( ar.IsLoading() ){
 		UNaAssetLibrary*			alib = UNaAssetLibrary::Get();
 		const FNaEntityDataAsset*	asset = nullptr;
@@ -259,7 +259,7 @@ void UNaEntity::Serialize( FArchive& ar )
 	}
 }
 
-//! ƒVƒŠƒAƒ‰ƒCƒYˆ—
+//! ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºå‡¦ç†
 void UNaEntity::OnSerialize( FArchive& ar )
 {
 	ar << m_Type;
@@ -280,7 +280,7 @@ void UNaEntity::OnSerialize( FArchive& ar )
 	ar << m_Group;
 }
 
-//! ˆêƒf[ƒ^‚ÌXV
+//! ä¸€æ™‚ãƒ‡ãƒ¼ã‚¿ã®æ›´æ–°
 void UNaEntity::UpdateTransientData( const FNaEntityDataAsset* asset )
 {
 	m_Asset			= asset;

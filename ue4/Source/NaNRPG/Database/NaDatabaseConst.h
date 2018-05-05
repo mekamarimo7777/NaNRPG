@@ -1,21 +1,21 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "NaDatabaseConst.generated.h"
 
 /**
- * ƒ[ƒ‹ƒh“o˜^î•ñ
+ * ãƒ¯ãƒ¼ãƒ«ãƒ‰ç™»éŒ²æƒ…å ±
  */
 USTRUCT()
 struct NANRPG_API FNaWorldRecord
 {
 	GENERATED_BODY()
 
-	//! ŒÅ—LID
+	//! å›ºæœ‰ID
 	UPROPERTY()
 	FName	UID;
-	//! ƒf[ƒ^IDi•Û‘¶ƒtƒHƒ‹ƒ_‚Ì¯•Ê—pBƒ‰ƒ“ƒ_ƒ€‚É¶¬j
+	//! ãƒ‡ãƒ¼ã‚¿IDï¼ˆä¿å­˜ãƒ•ã‚©ãƒ«ãƒ€ã®è­˜åˆ¥ç”¨ã€‚ãƒ©ãƒ³ãƒ€ãƒ ã«ç”Ÿæˆï¼‰
 	UPROPERTY()
 	uint32	DataID;
 };

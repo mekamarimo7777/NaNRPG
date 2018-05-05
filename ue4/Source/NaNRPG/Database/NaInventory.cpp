@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "NaNRPG.h"
 #include "NaInventory.h"
@@ -9,7 +9,7 @@
 //!
 bool UNaInventory::AddItem( UNaItem* item )
 {
-	//! ƒXƒ^ƒbƒN’Ç‰Á
+	//! ã‚¹ã‚¿ãƒƒã‚¯è¿½åŠ 
 	for ( auto& it : m_pItems ){
 		if ( it->IsStackable( item ) ){
 			int32	tmp;
@@ -46,7 +46,7 @@ void UNaInventory::RemoveItem( UNaItem* item )
 	}
 }
 
-//! Š‹àXV
+//! æ‰€æŒé‡‘æ›´æ–°
 void UNaInventory::UpdateMoney()
 {
 	TArray<FNaItemProperty*>	props;
@@ -64,7 +64,7 @@ void UNaInventory::UpdateMoney()
 	}
 }
 
-//! d—ÊXV
+//! é‡é‡æ›´æ–°
 void UNaInventory::UpdateWeight()
 {
 }

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -9,7 +9,7 @@
 #include "NaGameDatabase.generated.h"
 
 /**
- * ƒOƒ[ƒoƒ‹ƒQ[ƒ€ƒf[ƒ^ƒx[ƒXiÅãˆÊ‚ÌƒZ[ƒuƒf[ƒ^j
+ * ã‚°ãƒ­ãƒ¼ãƒãƒ«ã‚²ãƒ¼ãƒ ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹ï¼ˆæœ€ä¸Šä½ã®ã‚»ãƒ¼ãƒ–ãƒ‡ãƒ¼ã‚¿ï¼‰
  */
 UCLASS()
 class NANRPG_API UNaGameDatabase : public UObject
@@ -30,22 +30,22 @@ public:
 	//
 	virtual	void	Serialize( FArchive& ar ) override;
 
-	//! ƒvƒŒƒCƒ„[ƒGƒ“ƒeƒBƒeƒB“o˜^
+	//! ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ç™»éŒ²
 	void				RegisterPlayer( UNaEntityPlayer* player );
-	//! ƒOƒ[ƒoƒ‹ƒGƒ“ƒeƒBƒeƒB“o˜^
+	//! ã‚°ãƒ­ãƒ¼ãƒãƒ«ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ç™»éŒ²
 	void				RegisterGlobalEntity( UNaEntity* entity );
-	//! w’èƒ[ƒ‹ƒh“àƒGƒ“ƒeƒBƒeƒBûW
+	//! æŒ‡å®šãƒ¯ãƒ¼ãƒ«ãƒ‰å†…ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£åé›†
 	void				GatherEntities( FName id, TArray<UNaEntity*>& outVal );
-	//! ƒvƒŒƒCƒ„[ƒGƒ“ƒeƒBƒeƒBæ“¾
+	//! ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£å–å¾—
 	UNaEntityPlayer*	GetPlayer() const	{ return m_Player; }
 
-	//! ƒ[ƒ‹ƒhƒGƒ“ƒgƒŠ“o˜^
+	//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚¨ãƒ³ãƒˆãƒªç™»éŒ²
 	void				RegisterWorldEntry( FName id, uint32 dataID );
-	//! ƒ[ƒ‹ƒhƒGƒ“ƒgƒŠæ“¾
+	//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚¨ãƒ³ãƒˆãƒªå–å¾—
 	FNaWorldRecord*		FindWorldEntry( FName id );
-	//! ƒ[ƒ‹ƒhƒGƒ“ƒgƒŠŠm”F
+	//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚¨ãƒ³ãƒˆãƒªç¢ºèª
 	bool				ExistWorldEntry( FName id );
-	//! ƒ[ƒ‹ƒhƒf[ƒ^ID¶¬
+	//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ãƒ‡ãƒ¼ã‚¿IDç”Ÿæˆ
 	uint32				GenerateWorldDataID();
 
 protected:
@@ -57,27 +57,27 @@ protected:
 public:
 	FString	m_DataName;
 
-	//! ƒvƒŒƒCƒ„[À‘Ì
+	//! ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼å®Ÿä½“
 	UPROPERTY()
 	UNaEntityPlayer*			m_Player;
-	//! ƒp[ƒeƒBƒƒ“ƒo[
+	//! ãƒ‘ãƒ¼ãƒ†ã‚£ãƒ¡ãƒ³ãƒãƒ¼
 	UPROPERTY()
 	TArray<UNaEntityCharacter*>	m_PartyMember;
-	//! ƒOƒ[ƒoƒ‹ƒGƒ“ƒeƒBƒeƒB
+	//! ã‚°ãƒ­ãƒ¼ãƒãƒ«ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£
 	UPROPERTY()
 	TArray<UNaEntity*>			m_GlobalEntities;
 
-	//! ¶¬ƒ[ƒ‹ƒhˆê——
+	//! ç”Ÿæˆãƒ¯ãƒ¼ãƒ«ãƒ‰ä¸€è¦§
 	UPROPERTY()
 	TArray<FNaWorldRecord>	m_WorldRecords;
-	//! ƒJƒŒƒ“ƒg‚Ìƒ[ƒJƒ‹ƒ}ƒbƒvi–¢İ’è‚ÍƒOƒ[ƒoƒ‹ƒ}ƒbƒvj
+	//! ã‚«ãƒ¬ãƒ³ãƒˆã®ãƒ­ãƒ¼ã‚«ãƒ«ãƒãƒƒãƒ—ï¼ˆæœªè¨­å®šæ™‚ã¯ã‚°ãƒ­ãƒ¼ãƒãƒ«ãƒãƒƒãƒ—ï¼‰
 	UPROPERTY()
 	FName					m_WorldID;
 
-	//! ƒCƒxƒ“ƒgƒtƒ‰ƒO
+	//! ã‚¤ãƒ™ãƒ³ãƒˆãƒ•ãƒ©ã‚°
 //	UPROPERTY()
 //	TBitArray<FDefaultBitArrayAllocator>	m_EventFlags;
-	//! ƒCƒxƒ“ƒg•Ï”
+	//! ã‚¤ãƒ™ãƒ³ãƒˆå¤‰æ•°
 	UPROPERTY()
 	TMap<FName, FString>					m_EventVariables;
 

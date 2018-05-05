@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -13,24 +13,24 @@
 
 class ANaWorldActor;
 
-//! •`‰æ—pƒ[ƒN
+//! æç”»ç”¨ãƒ¯ãƒ¼ã‚¯
 struct FNaRenderCellWork
 {
-	//! ƒZƒ‹À•W
+	//! ã‚»ãƒ«åº§æ¨™
 	uint8	X;
 	uint8	Y;
 	uint8	Z;
 
-	//! •`‰æ–Ê
+	//! æç”»é¢
 	uint8	Faces;
 	//! 
 	//int8	MaterialIdx;
 
-	//! ƒZƒ‹î•ñ
+	//! ã‚»ãƒ«æƒ…å ±
 	FNaMapPartsCell*	Cell;
 };
 
-//! •`‰æƒŒƒCƒ„[
+//! æç”»ãƒ¬ã‚¤ãƒ¤ãƒ¼
 USTRUCT()
 struct FNaChunkRenderLayer
 {
@@ -42,7 +42,7 @@ struct FNaChunkRenderLayer
 	UPROPERTY()
 	UNaChunk*	Chunk;
 
-	//! ƒƒbƒVƒ…
+	//! ãƒ¡ãƒƒã‚·ãƒ¥
 	UPROPERTY()
 	UProceduralMeshComponent*	ProcMesh;
 	//! 
@@ -60,8 +60,8 @@ struct FNaChunkRenderLayer
 	}
 };
 
-// ƒ}ƒbƒvƒ`ƒƒƒ“ƒNƒAƒNƒ^[
-// –ğŠ„Fƒ`ƒƒƒ“ƒNƒf[ƒ^‚Ì¶¬E•`‰æAXV‚Ìˆ—
+// ãƒãƒƒãƒ—ãƒãƒ£ãƒ³ã‚¯ã‚¢ã‚¯ã‚¿ãƒ¼
+// å½¹å‰²ï¼šãƒãƒ£ãƒ³ã‚¯ãƒ‡ãƒ¼ã‚¿ã®ç”Ÿæˆãƒ»æç”»ã€æ›´æ–°æ™‚ã®å‡¦ç†
 UCLASS()
 class NANRPG_API ANaMapChunkActor : public AActor
 {
@@ -70,15 +70,15 @@ class NANRPG_API ANaMapChunkActor : public AActor
 	//! 
 	struct FNaRenderMaterial
 	{
-		//! ƒZƒ‹ƒCƒ“ƒfƒbƒNƒX
+		//! ã‚»ãƒ«ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
 		TArray<int16>				CellIndices;
-		//! ƒ}ƒeƒŠƒAƒ‹
+		//! ãƒãƒ†ãƒªã‚¢ãƒ«
 		FNaBlockMaterialAsset*		MaterialAsset;
 
 		//! 
 		UMaterialInterface*			Material;
 
-		// ƒƒbƒVƒ…ƒf[ƒ^ //
+		// ãƒ¡ãƒƒã‚·ãƒ¥ãƒ‡ãƒ¼ã‚¿ //
 		TArray<FVector>				Vertices;
 		TArray<int32>				Indices;
 		TArray<FVector>				Normals;
@@ -94,7 +94,7 @@ class NANRPG_API ANaMapChunkActor : public AActor
 	};
 
 public:
-	//! ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	//! ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	ANaMapChunkActor( const FObjectInitializer& ObjectInitializer );
 
 	// 
@@ -103,12 +103,12 @@ public:
 	// 
 	virtual void Tick( float DeltaSeconds ) override;
 
-	//! ƒ[ƒ‹ƒhƒAƒNƒ^
+	//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚¢ã‚¯ã‚¿
 	void	SetWorldActor( ANaWorldActor* actor )	{ m_WorldActor = actor; }
 
-	//! ƒ`ƒƒƒ“ƒNİ’è
+	//! ãƒãƒ£ãƒ³ã‚¯è¨­å®š
 	void	SetChunk( UNaChunk* chunk );
-	//! ƒ`ƒƒƒ“ƒNƒƒbƒVƒ…XV
+	//! ãƒãƒ£ãƒ³ã‚¯ãƒ¡ãƒƒã‚·ãƒ¥æ›´æ–°
 	void	UpdateChunkMesh( int32 layer );
 
 	//! 
@@ -119,11 +119,11 @@ protected:
 	void	GatherRenderCells( int32 layer );
 	
 protected:
-	//! ƒ[ƒ‹ƒhƒAƒNƒ^
+	//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚¢ã‚¯ã‚¿
 	UPROPERTY()
 	ANaWorldActor*	m_WorldActor;
 
-	//! ƒƒbƒVƒ…
+	//! ãƒ¡ãƒƒã‚·ãƒ¥
 	UPROPERTY()
 	UProceduralMeshComponent*	m_ProcMesh;
 	UPROPERTY()
@@ -133,11 +133,11 @@ protected:
 	//! 
 	bool						m_Invalidate;
 
-	//! •\¦ƒ`ƒƒƒ“ƒN
+	//! è¡¨ç¤ºãƒãƒ£ãƒ³ã‚¯
 	UPROPERTY()
 	UNaChunk*	m_Chunk;
 
-	//! ˆêî•ñ
+	//! ä¸€æ™‚æƒ…å ±
 	TArray<FNaRenderCellWork>	m_RenderCells;
 	//! 
 	TArray<FNaRenderMaterial>	m_RenderMaterial;

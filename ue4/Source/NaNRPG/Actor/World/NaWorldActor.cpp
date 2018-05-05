@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "NaNRPG.h"
 #include "NaWorldActor.h"
@@ -8,6 +8,7 @@
 #include "Actor/Entity/NaActorBase.h"
 #include "Actor/Entity/Character/NaCharacter.h"
 
+#include "World/NaGameWorld.h"
 #include "World/Map/NaMap.h"
 
 #include "Entity/INaEntityFactory.h"
@@ -25,16 +26,16 @@ ANaWorldActor::ANaWorldActor( const FObjectInitializer& ObjectInitializer )
  	//! 
 	PrimaryActorTick.bCanEverTick = true;
 
-	//! ƒ‹[ƒgƒRƒ“ƒ|[ƒlƒ“ƒg
+	//! ãƒ«ãƒ¼ãƒˆã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆ
 	UStaticMeshComponent*	comp = CreateDefaultSubobject<UStaticMeshComponent>( TEXT("RootComponent") );
 	RootComponent	= comp;
 
-	//! ƒ‰ƒCƒg
+	//! ãƒ©ã‚¤ãƒˆ
 	m_pDirLight	= CreateDefaultSubobject<UDirectionalLightComponent>( TEXT("DiretionalLight") );
 	m_pDirLight->SetRelativeRotation( FRotator( -31.0f, 36.0f, -51.0f ) );
 	m_pDirLight->AttachToComponent( RootComponent, FAttachmentTransformRules::KeepRelativeTransform );
 
-	//! Õ•ÁƒLƒƒƒvƒ`ƒƒ
+	//! é®è”½ã‚­ãƒ£ãƒ—ãƒãƒ£
 	m_CaptureCube	= CreateDefaultSubobject<USceneCaptureComponentCube>( TEXT("OccludeCapture") );
 	if ( m_CaptureCube ){
 		m_CaptureCube->AttachToComponent( RootComponent, FAttachmentTransformRules::KeepRelativeTransform );
@@ -42,7 +43,7 @@ ANaWorldActor::ANaWorldActor( const FObjectInitializer& ObjectInitializer )
 		m_CaptureCube->bCaptureEveryFrame	= false;
 		m_CaptureCube->bCaptureOnMovement	= false;
 	}
-	//! ƒ|ƒXƒgƒvƒƒZƒX
+	//! ãƒã‚¹ãƒˆãƒ—ãƒ­ã‚»ã‚¹
 	m_PostProcess	= CreateDefaultSubobject<UPostProcessComponent>( TEXT("PostProcessCmp") );
 	if ( m_PostProcess ){
 		m_PostProcess->AttachToComponent( RootComponent, FAttachmentTransformRules::KeepRelativeTransform );
@@ -66,7 +67,7 @@ void ANaWorldActor::BeginPlay()
 
 	SetRenderSize( FIntVector( 3, 3, 0 ), FIntVector( 1, 1, 0 ) );
 
-	//! ƒXƒe[ƒgŠÇ—
+	//! ã‚¹ãƒ†ãƒ¼ãƒˆç®¡ç†
 	m_SM	= NewObject<UNaStateMachine>();
 	if ( m_SM ){
 		m_SM->RegisterState( EState::Main, this, &ANaWorldActor::ProcMain );
@@ -82,26 +83,26 @@ void ANaWorldActor::Tick( float DeltaSeconds )
 	m_SM->Execute( DeltaSeconds );
 }
 
-//! ƒ[ƒ‹ƒhƒI[ƒvƒ“
+//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚ªãƒ¼ãƒ—ãƒ³
 UNaWorld* ANaWorldActor::OpenWorld( FName id, FName assetID )
 {
 	UNaGameDatabase*	db = UNaGameDatabase::GetDB();
 	UWorld*	const		world = GetWorld();
-	UNaWorld*			naw = nullptr;
+	UNaWorld*			naw;
 
-	//! ƒGƒ“ƒgƒŠ–â‚¢‡‚í‚¹
+	naw	= NewObject<UNaGameWorld>();
+
+	//! ã‚¨ãƒ³ãƒˆãƒªå•ã„åˆã‚ã›
 	if ( FNaWorldRecord* rec = db->FindWorldEntry( id ) ){
-		naw	= UNaWorld::Open( rec->DataID );
+		naw->OpenWorld( rec->DataID );
 	}
 	else {
-		//! V‹K¶¬
-		naw	= UNaWorld::Create( id, assetID );
-		check( naw );
-
+		//! æ–°è¦ç”Ÿæˆ
+		naw->CreateWorld( id, assetID );
 		db->RegisterWorldEntry( id, naw->GetDataID() );
 	}
 
-	naw->Setup( world );
+	naw->Setup( this );
 
 	m_Worlds.Add( naw );
 
@@ -112,7 +113,7 @@ UNaWorld* ANaWorldActor::OpenWorld( FName id, FName assetID )
 	return naw;
 }
 
-//! ƒ[ƒ‹ƒhƒNƒ[ƒY
+//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚¯ãƒ­ãƒ¼ã‚º
 void ANaWorldActor::CloseWorld( FName id )
 {
 	int32	idx;
@@ -138,7 +139,7 @@ void ANaWorldActor::CloseWorld( FName id )
 	}
 }
 
-//! ƒAƒNƒeƒBƒuƒ[ƒ‹ƒh•ÏXƒŠƒNƒGƒXƒg
+//! ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ãƒ¯ãƒ¼ãƒ«ãƒ‰å¤‰æ›´ãƒªã‚¯ã‚¨ã‚¹ãƒˆ
 void ANaWorldActor::SwitchWorld( FName id )
 {
 	int32	idx;
@@ -153,7 +154,7 @@ void ANaWorldActor::SwitchWorld( FName id )
 	}
 }
 
-//! •\¦ƒ`ƒƒƒ“ƒN”ÍˆÍİ’è
+//! è¡¨ç¤ºãƒãƒ£ãƒ³ã‚¯ç¯„å›²è¨­å®š
 void ANaWorldActor::SetRenderSize( FIntVector size, FIntVector margin )
 {
 	m_RenderSize		= size;
@@ -187,7 +188,7 @@ void ANaWorldActor::SetRenderSize( FIntVector size, FIntVector margin )
 	}
 }
 
-//! ƒ`ƒƒƒ“ƒNƒAƒNƒ^[æ“¾
+//! ãƒãƒ£ãƒ³ã‚¯ã‚¢ã‚¯ã‚¿ãƒ¼å–å¾—
 ANaMapChunkActor* ANaWorldActor::GetChunkActor( const FIntVector& chunkPos )
 {
 	FIntVector	apos,vec;
@@ -210,7 +211,7 @@ ANaMapChunkActor* ANaWorldActor::GetChunkActor( const FIntVector& chunkPos )
 	return m_ChunkActors[tmp];
 }
 
-//! ƒuƒƒbƒNƒ}ƒeƒŠƒAƒ‹æ“¾
+//! ãƒ–ãƒ­ãƒƒã‚¯ãƒãƒ†ãƒªã‚¢ãƒ«å–å¾—
 UMaterialInstanceDynamic* ANaWorldActor::FindBlockMaterial( int32 id )
 {
 	UMaterialInstanceDynamic*	retVal = m_MIDMap.FindRef( id );
@@ -226,6 +227,27 @@ UMaterialInstanceDynamic* ANaWorldActor::FindBlockMaterial( int32 id )
 	}
 
 	return retVal;
+}
+
+//! ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ã‚¢ã‚¯ã‚¿ãƒ¼ç”Ÿæˆ
+ANaActorBase* ANaWorldActor::SpawnEntityActor( UNaEntity* entity )
+{
+	UNaAssetLibrary*			alib = UNaAssetLibrary::Get();
+	const FNaActorDataAsset*	asset = alib->FindActorAsset( entity->GetProfile()->ActorName );
+	ANaActorBase*				actor = nullptr;
+
+	if ( asset ){
+		actor	= GetWorld()->SpawnActor<ANaActorBase>( asset->ActorClass );
+		check( actor );
+
+		actor->Initialize( entity->GetNaWorld(), entity );
+
+		if ( entity == UNaGameDatabase::GetDB()->GetPlayer() ){
+			m_Camera->AttachTarget( actor );
+		}
+	}
+
+	return actor;
 }
 
 //////////////////////////////////////////////////
@@ -250,7 +272,7 @@ void ANaWorldActor::ProcMain( UNaStateMachine* sm, float DeltaTime )
 		break;
 
 	case Main:
-		//! ƒ[ƒ‹ƒhXV
+		//! ãƒ¯ãƒ¼ãƒ«ãƒ‰æ›´æ–°
 		for ( auto& it : m_Worlds ){
 			it->Update( DeltaTime );
 		}
@@ -263,7 +285,7 @@ void ANaWorldActor::ProcMain( UNaStateMachine* sm, float DeltaTime )
 			if ( player ){
 				actor	= player->GetActor();
 
-				//! ƒ}ƒeƒŠƒAƒ‹ƒpƒ‰ƒ[ƒ^İ’è
+				//! ãƒãƒ†ãƒªã‚¢ãƒ«ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿è¨­å®š
 				for ( auto& it : m_MIDMap ){
 					if ( actor ){
 						it.Value->SetVectorParameterValue( "PlayerLocation", actor->GetActorLocation() );
@@ -271,11 +293,11 @@ void ANaWorldActor::ProcMain( UNaStateMachine* sm, float DeltaTime )
 					it.Value->SetScalarParameterValue( "CeilZ", m_ActiveWorld->GetCeilZ() );
 				}
 
-				//! ƒJƒƒ‰ƒAƒ“ƒOƒ‹İ’è
+				//! ã‚«ãƒ¡ãƒ©ã‚¢ãƒ³ã‚°ãƒ«è¨­å®š
 				int32	dir = int32( m_ActiveWorld->GetWorldDirection() );
 				m_Camera->SetAngle( dir * 45.0f );
 
-				//! ‹ŠE•\¦XV
+				//! è¦–ç•Œè¡¨ç¤ºæ›´æ–°
 				{
 					FIntVector	cpos;
 					FVector		v;
@@ -313,7 +335,7 @@ void ANaWorldActor::ProcMain( UNaStateMachine* sm, float DeltaTime )
 			}
 		}
 
-		//! •\¦ƒ[ƒ‹ƒh•ÏX
+		//! è¡¨ç¤ºãƒ¯ãƒ¼ãƒ«ãƒ‰å¤‰æ›´
 		if ( m_NextWorld ){
 			m_ActiveWorld	= m_NextWorld;
 			m_NextWorld		= nullptr;
@@ -325,7 +347,7 @@ void ANaWorldActor::ProcMain( UNaStateMachine* sm, float DeltaTime )
 	}
 }
 
-//! ƒ`ƒƒƒ“ƒNƒAƒNƒ^[XV
+//! ãƒãƒ£ãƒ³ã‚¯ã‚¢ã‚¯ã‚¿ãƒ¼æ›´æ–°
 void ANaWorldActor::UpdateChunkActor()
 {
 	FIntVector	chunkPos;

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -15,42 +15,42 @@ class NANRPG_API ANaCameraActor : public ACameraActor
 	GENERATED_BODY()
 	
 public:
-	//! ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	//! ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	ANaCameraActor( const FObjectInitializer& ObjectInitializer );
 
-	//! ŠJn
+	//! é–‹å§‹
 	virtual void BeginPlay() override;
 
-	//! XVˆ—
+	//! æ›´æ–°å‡¦ç†
 	virtual void Update( float DeltaSeconds );
 
 public:
-	//! ƒoƒCƒ“ƒhæİ’è
+	//! ãƒã‚¤ãƒ³ãƒ‰å…ˆè¨­å®š
 	void	AttachTarget( AActor* target );
-	//! ƒAƒ“ƒOƒ‹İ’è
+	//! ã‚¢ãƒ³ã‚°ãƒ«è¨­å®š
 	void	SetAngle( float angle );
 
 protected:
-	//! ƒJƒƒ‰Šp“xİ’è
+	//! ã‚«ãƒ¡ãƒ©è§’åº¦è¨­å®š
 	void	ApplyCameraAngle();
 
 public:
-	//! ƒJƒƒ‰ƒsƒbƒ`
+	//! ã‚«ãƒ¡ãƒ©ãƒ”ãƒƒãƒ
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = CameraActor)
 	float	OrbitalPitch;
-	//! ƒJƒƒ‰‹——£
+	//! ã‚«ãƒ¡ãƒ©è·é›¢
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = CameraActor)
 	float	OrbitalRange;
 
 protected:
-	//! ’‹ƒ^[ƒQƒbƒg
+	//! æ³¨è¦–ã‚¿ãƒ¼ã‚²ãƒƒãƒˆ
 	UPROPERTY()
 	AActor*	m_pTarget;
 
 	//! 
 	FVector	m_CurrentPos;
-	//! ƒJƒŒƒ“ƒgŠp“x
+	//! ã‚«ãƒ¬ãƒ³ãƒˆè§’åº¦
 	float	m_CurrentAngle;
-	//! ƒŠƒNƒGƒXƒgŠp“x
+	//! ãƒªã‚¯ã‚¨ã‚¹ãƒˆè§’åº¦
 	float	m_RequestAngle;
 };

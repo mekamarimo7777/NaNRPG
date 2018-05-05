@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -12,7 +12,7 @@
 class UNaEntity;
 
 /**
- * ƒAƒCƒeƒ€ƒCƒ“ƒXƒ^ƒ“ƒX
+ * ã‚¢ã‚¤ãƒ†ãƒ ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
  */
 UCLASS()
 class NANRPG_API UNaItem : public UObject
@@ -20,13 +20,13 @@ class NANRPG_API UNaItem : public UObject
 	GENERATED_BODY()
 	
 public:
-	//! ƒAƒZƒbƒg‚©‚çŠî–{ƒf[ƒ^\’z
+	//! ã‚¢ã‚»ãƒƒãƒˆã‹ã‚‰åŸºæœ¬ãƒ‡ãƒ¼ã‚¿æ§‹ç¯‰
 	void	CreateFromAsset( const FNaItemDataAsset& asset );
 
-	//! ‘fŞ“K—p
+	//! ç´ æé©ç”¨
 	void	ApplyMatter( FName matterName );
 
-	//! ƒGƒ“ƒeƒBƒeƒB‚ğ¶¬
+	//! ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ã‚’ç”Ÿæˆ
 	UNaEntityCharacter*	GenerateEntity();
 
 	//! 
@@ -51,20 +51,20 @@ public:
 	//! 
 	const TArray<FNaItemProperty>&	GetProperties() const	{ return m_Properties; }
 
-	//! ‰Â”\ƒAƒNƒVƒ‡ƒ“”»’è
+	//! å¯èƒ½ã‚¢ã‚¯ã‚·ãƒ§ãƒ³åˆ¤å®š
 	bool	HasAction( ENaActionTrigger::Type action );
-	//! ‰Â”\ƒAƒNƒVƒ‡ƒ“”»’èiƒtƒ‰ƒOj
+	//! å¯èƒ½ã‚¢ã‚¯ã‚·ãƒ§ãƒ³åˆ¤å®šï¼ˆãƒ•ãƒ©ã‚°ï¼‰
 	bool	HasActionFlag( int32 actionFlag );
 
-	//! Œø‰Ê”»’è
+	//! åŠ¹æœåˆ¤å®š
 	bool	HasEffect( ENaActionEffect::Type effect );
 
-	//! Œø‰Ê—ñ‹“
+	//! åŠ¹æœåˆ—æŒ™
 	bool	EnumProperties( ENaActionEffect::Type effect, TArray<FNaItemProperty*>& outVal );
 
-	//! ƒXƒ^ƒbƒN”’Ç‰Ái–ß‚è’l‚ÍÀÛ‚É‘Œ¸‚µ‚½’lj
+	//! ã‚¹ã‚¿ãƒƒã‚¯æ•°è¿½åŠ ï¼ˆæˆ»ã‚Šå€¤ã¯å®Ÿéš›ã«å¢—æ¸›ã—ãŸå€¤ï¼‰
 	int32	AddStack( int32 value );
-	//! ƒXƒ^ƒbƒN‰Â”\”»’è
+	//! ã‚¹ã‚¿ãƒƒã‚¯å¯èƒ½åˆ¤å®š
 	bool	IsStackable( UNaItem* item );
 	//! 
 	UFUNCTION( BlueprintCallable, Category = "Item" )
@@ -77,30 +77,30 @@ public:
 	UFUNCTION( BlueprintCallable, Category = "Item" )
 	int32	GetWeight() const			{ return 0; }
 
-	//! ‘•”õ‰Â”\•”ˆÊ”»’è
+	//! è£…å‚™å¯èƒ½éƒ¨ä½åˆ¤å®š
 	bool	CanEquipment( ENaItemEquipPart::Type part ) const	{ return (m_EquipFlag & (1 << int32(part))) != 0; }
 	//! 
 	void	SetEquip( bool isEquip )	{ m_IsEquip = isEquip; }
 	//! 
 	bool	IsEquip() const				{ return m_IsEquip; }
 
-	//! ƒVƒŠƒAƒ‰ƒCƒY
+	//! ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚º
 	virtual	void	Serialize( FArchive& ar ) override;
 
 public:
 
 protected:
-	//! ƒI[ƒi[ƒGƒ“ƒeƒBƒeƒB
+	//! ã‚ªãƒ¼ãƒŠãƒ¼ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£
 	UPROPERTY(Transient)
 	UNaEntity*	m_Entity;
 
-	//! Œ³ƒAƒZƒbƒgID
+	//! å…ƒã‚¢ã‚»ãƒƒãƒˆID
 	int32		m_AssetID;
 
-	//! •\¦–¼
+	//! è¡¨ç¤ºå
 	FString		m_DisplayName;
 
-	//! ƒGƒ“ƒeƒBƒeƒB—p
+	//! ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ç”¨
 	FName		m_EntityName;
 	int32		m_EntityParam;
 	int16		m_IconID;
@@ -111,26 +111,26 @@ protected:
 	int16		m_MaxStackCount;
 	int16		m_StackCount;
 
-	//! ‘•”õ‰Â”\•”ˆÊ
+	//! è£…å‚™å¯èƒ½éƒ¨ä½
 	int32		m_EquipFlag;
 	bool		m_IsEquip;
 
-	//! ‘fŞ–¼
+	//! ç´ æå
 	FName		m_MatterName;
 
-	//! Œø‰ÊƒŠƒXƒg
+	//! åŠ¹æœãƒªã‚¹ãƒˆ
 	TArray<FNaItemProperty>	m_Properties;
 
 
 
-/*	FString		m_Name;				// –¼‘O
-	FString		m_UnknownName;		// •sŠm’è–¼
+/*	FString		m_Name;				// åå‰
+	FString		m_UnknownName;		// ä¸ç¢ºå®šå
 
-	int32		m_Price;			// Šî–{‰¿Ši
-	int32		m_Rarity;			// ƒŒƒAƒŠƒeƒB
-	int32		m_Weight;			// d‚³
-	int32		m_Identification;	// ŠÓ’è“x
-	int32		m_Reinforce;		// ‹­‰»’l
+	int32		m_Price;			// åŸºæœ¬ä¾¡æ ¼
+	int32		m_Rarity;			// ãƒ¬ã‚¢ãƒªãƒ†ã‚£
+	int32		m_Weight;			// é‡ã•
+	int32		m_Identification;	// é‘‘å®šåº¦
+	int32		m_Reinforce;		// å¼·åŒ–å€¤
 
 	TArray<FNaItemProperty>	m_Properties;*/
 };

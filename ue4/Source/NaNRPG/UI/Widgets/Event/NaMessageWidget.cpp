@@ -10,6 +10,7 @@
 bool UNaMessageWidget::Initialize()
 {
 	if ( Super::Initialize() ){
+		m_SM->RegisterState( EState::Hide, this, &UNaMessageWidget::ProcHide );
 		m_SM->RegisterState( EState::Main, this, &UNaMessageWidget::ProcMain );
 		return true;
 	}
@@ -55,7 +56,40 @@ void UNaMessageWidget::SetText( FText text )
 //////////////////////////////////////////////////
 // protected methods
 //////////////////////////////////////////////////
-//! 
+//! 非表示
+void UNaMessageWidget::ProcHide( UNaStateMachine* sm, float DeltaTime )
+{
+	//! 
+	enum EPhase
+	{
+		//! 
+		Init,
+		//! 
+		Wait,
+		//! 
+		Main,
+		//! 
+		End,
+	};
+
+	//! メイン
+	switch ( sm->GetPhase() ){
+	case Init:
+		sm->Advance();
+		break;
+
+	case Wait:
+		break;
+
+	case Main:
+		break;
+
+	case End:
+		break;
+	}
+}
+
+//! メイン
 void UNaMessageWidget::ProcMain( UNaStateMachine* sm, float DeltaTime )
 {
 	//! 

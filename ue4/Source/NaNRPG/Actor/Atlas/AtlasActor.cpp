@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "NaNRPG.h"
 #include "AtlasActor.h"
@@ -10,7 +10,7 @@ AAtlasActor::AAtlasActor()
  	// 
 	PrimaryActorTick.bCanEverTick = true;
 
-	// ƒ‹[ƒgƒRƒ“ƒ|[ƒlƒ“ƒg //
+	// ãƒ«ãƒ¼ãƒˆã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆ //
 //	m_pProcMesh		= CreateDefaultSubobject<UProceduralMeshComponent>( TEXT("RootComponent") );
 //	RootComponent	= m_pProcMesh;
 }

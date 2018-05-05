@@ -4,6 +4,7 @@
 
 #include "NaEntityCharacter.h"
 
+#include "Actor/World/NaWorldActor.h"
 #include "Actor/Entity/NaActorBase.h"
 
 #include "Assets/NaAssetLibrary.h"
@@ -49,21 +50,11 @@ void UNaEntityCharacter::OnSpawn()
 //
 void UNaEntityCharacter::OnEnter()
 {
-	UNaAssetLibrary*	alib = UNaAssetLibrary::Get();
-	UWorld*	const		world = m_pWorld->GetWorldContext();
+	ANaWorldActor*	wact = m_pWorld->GetWorldActor();
 
 	// アクター生成
-	if ( alib ){
-		const FNaActorDataAsset*	asset = alib->FindActorAsset( m_Profile.ActorName );
-
-		if ( asset ){
-			m_Actor	= world->SpawnActor<ANaCharacter>( asset->ActorClass );
-			m_Actor->Initialize( m_pWorld, this );
-
-			if ( m_ItemProperty ){
-				
-			}
-		}
+	if ( wact ){
+		m_Actor	= wact->SpawnEntityActor( this );
 	}
 
 	m_TurnAction->SetSpeed( m_Speed );

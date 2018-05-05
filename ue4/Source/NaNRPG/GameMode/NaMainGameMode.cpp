@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "NaNRPG.h"
 #include "NaMainGameMode.h"
@@ -18,7 +18,7 @@
 
 #include "Controller/MyPlayerController.h"
 
-//! ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+//! ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 ANaMainGameMode::ANaMainGameMode(const FObjectInitializer& ObjectInitializer)
 : Super( ObjectInitializer )
 {
@@ -26,7 +26,7 @@ ANaMainGameMode::ANaMainGameMode(const FObjectInitializer& ObjectInitializer)
 	PlayerControllerClass	= AMyPlayerController::StaticClass();
 }
 
-//! ŠJnˆ—
+//! é–‹å§‹å‡¦ç†
 void ANaMainGameMode::BeginPlay()
 {
 	Super::BeginPlay();
@@ -34,18 +34,18 @@ void ANaMainGameMode::BeginPlay()
 	UWorld*	const	world = GetWorld();
 
 #if WITH_EDITOR
-	{// ’¼ÚƒGƒfƒBƒ^‚©‚ç—ˆ‚½ê‡‚ÌGameDatabase“Ç‚İ‚İ
+	{// ç›´æ¥ã‚¨ãƒ‡ã‚£ã‚¿ã‹ã‚‰æ¥ãŸå ´åˆã®GameDatabaseèª­ã¿è¾¼ã¿
 		UNaGameDatabase*	db = UNaGameDatabase::GetDB();
 
 		db->LoadDB( "test" );
 
-		//! ‰Šúƒf[ƒ^\’zi‚»‚Ì‚¤‚¿ƒAƒZƒbƒg‚©‚ç‚Ì¶¬‚É•ÏXj
+		//! åˆæœŸãƒ‡ãƒ¼ã‚¿æ§‹ç¯‰ï¼ˆãã®ã†ã¡ã‚¢ã‚»ãƒƒãƒˆã‹ã‚‰ã®ç”Ÿæˆã«å¤‰æ›´ï¼‰
 		if ( !db->GetPlayer() ){
 			UNaAssetLibrary*			alib = UNaAssetLibrary::Get();
 			UNaEntityPlayer*			player;
 			const FNaEntityDataAsset*	asset;
 
-			//! ƒvƒŒƒCƒ„[ƒf[ƒ^¶¬
+			//! ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãƒ‡ãƒ¼ã‚¿ç”Ÿæˆ
 			player	= INaEntityFactory::NewEntity<UNaEntityPlayer>( ENaEntity::Player );
 
 			asset	= alib->FindEntityAsset( "Player" );
@@ -57,7 +57,7 @@ void ANaMainGameMode::BeginPlay()
 	}
 #endif
 
-	//! ƒJƒƒ‰¶¬
+	//! ã‚«ãƒ¡ãƒ©ç”Ÿæˆ
 	if ( world ){
 		APlayerController*	pc = world->GetFirstPlayerController();
 
@@ -67,29 +67,15 @@ void ANaMainGameMode::BeginPlay()
 		pc->SetViewTargetWithBlend( m_Camera );
 	}
 
-	//! ƒXƒe[ƒgŠÇ—
+	//! ã‚¹ãƒ†ãƒ¼ãƒˆç®¡ç†
 	m_SM	= NewObject<UNaStateMachine>();
 	if ( m_SM ){
 		m_SM->RegisterState( EState::Main, this, &ANaMainGameMode::ProcMain );
 	}
 	m_SM->ChangeState( EState::Main );
-
-/*	{// ƒ[ƒ‹ƒh¶¬
-		m_NaWorld	= LoadWorld( 0, "TestWorld" );
-
-		if ( world ){
-			m_Camera	= world->SpawnActor<ANaCameraActor>( CameraActorClass );
-			pc->SetViewTargetWithBlend( m_Camera );
-
-			m_pMapActor	= world->SpawnActor<ANaWorldActor>( WorldActorClass );
-	//		m_pMapActor->LoadMap( 0 );
-			m_pMapActor->SetCamera( m_Camera );
-			m_pMapActor->AssignWorld( m_NaWorld );
-		}
-	}*/
 }
 
-//! I—¹ˆ—
+//! çµ‚äº†å‡¦ç†
 void ANaMainGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	switch ( EndPlayReason ){
@@ -103,7 +89,7 @@ void ANaMainGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay( EndPlayReason );
 }
 
-//! XV
+//! æ›´æ–°
 void ANaMainGameMode::Tick(float DeltaTime)
 {
 	Super::Tick( DeltaTime );
@@ -116,78 +102,12 @@ void ANaMainGameMode::Tick(float DeltaTime)
 //////////////////////////////////////////////////
 // public methods
 //////////////////////////////////////////////////
-//
-void ANaMainGameMode::TravelToWorld(int32 worldID)
-{
-//	m_pMapActor->LoadMap( worldID );
-}
 
-//! ƒ[ƒ‹ƒh“Ç‚İ‚İi¡Œã‚Ç‚±‚©‚Ìstatic‚ÉˆÚ“®j
-UNaWorld* ANaMainGameMode::LoadWorld( int32 uid, FName worldID )
-{
-	UWorld*	const		world = GetWorld();
-	APlayerController*	pc = world->GetFirstPlayerController();
-	FIntVector			ppos( 0, 0, 64 );
-	UNaWorld*			naw = nullptr;
-
-//@	naw	= UNaWorld::Open( uid );
-
-	if ( !naw ){
-/*		UNaAssetLibrary*	alib = UNaAssetLibrary::Get();
-		UNaGameDatabase*	db = UNaGameDatabase::GetDB();
-		UNaWorldAsset*		worldAsset;
-		UNaEntity*			entity;
-
-		naw	= NewObject<UNaGameWorld>();
-		naw->Setup( GetWorld() );
-
-		worldAsset	= alib->FindWorldAsset( worldID );
-		naw->CreateWorld( uid, worldAsset );
-
-		// ƒvƒŒƒCƒ„[”z’u
-		entity	= db->GetPlayer();
-		naw->SetCurrentPosition( ppos );
-		naw->SpawnEntity( entity, ppos );*/
-	}
-/*
-	if ( m_pWorld ){
-		UNaGameDatabase*	db = UNaGameDatabase::GetDB();
-		UNaEntity*			entity;
-
-		m_pWorld->DataAsset	= m_pDataAsset;
-		if ( mapID == 2 ){
-			m_pWorld->SetChunkLimit( FIntVector(0, 0, -1), FIntVector(4, 4, 1) );
-		}
-		if ( mapID == 3 ){
-			UNaMapAsset*	asset = NewObject<UNaMapAsset>();
-			UNaMap*			map = NewObject<UNaMap>();
-
-			asset->CreateSimpleRandomMap( FIntVector( 4, 4, 1 ) );
-			map->Instantiate( asset );
-
-			m_pWorld->EntryMap( FIntVector( -2, -2, 0 ), map );
-		}
-		m_pWorld->SetCurrentPosition( ppos );
-	
-		// ƒvƒŒƒCƒ„[”z’u
-		entity	= db->m_pPlayer;
-		entity->SetWorldPosition( ppos );
-		m_pWorld->SpawnEntity( entity );
-
-		// 
-//		entity	= INaEntityFactory::NewEntity( ENaEntity::GLOBAL_SPAWNER );
-//		entity->SetStage( ENaEntityStage::Transient );
-//		m_pWorld->SpawnEntity( entity );
-	}
-
-	*/
-	return naw;
-}
 
 //////////////////////////////////////////////////
 // protected methods
 //////////////////////////////////////////////////
-//! ƒƒCƒ“
+//! ãƒ¡ã‚¤ãƒ³
 void ANaMainGameMode::ProcMain( UNaStateMachine* sm, float DeltaTime )
 {
 	enum EPhase
@@ -199,10 +119,10 @@ void ANaMainGameMode::ProcMain( UNaStateMachine* sm, float DeltaTime )
 
 	switch ( sm->GetPhase() ){
 	case Start:
-		//! ƒ[ƒ‹ƒhƒAƒNƒ^¶¬
+		//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚¢ã‚¯ã‚¿ç”Ÿæˆ
 		CreateWorldActor();
 
-		//! ƒ[ƒ‹ƒh“Ç‚İ‚İ
+		//! ãƒ¯ãƒ¼ãƒ«ãƒ‰èª­ã¿è¾¼ã¿
 		{
 			UNaGameDatabase*	db = UNaGameDatabase::GetDB();
 			UNaEntityPlayer*	player = db->GetPlayer();
@@ -222,7 +142,7 @@ void ANaMainGameMode::ProcMain( UNaStateMachine* sm, float DeltaTime )
 	}
 }
 
-//! ƒ[ƒ‹ƒhŠÇ—ƒAƒNƒ^[¶¬
+//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ç®¡ç†ã‚¢ã‚¯ã‚¿ãƒ¼ç”Ÿæˆ
 void ANaMainGameMode::CreateWorldActor()
 {
 	UWorld*	world = GetWorld();

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "NaNRPG.h"
 #include "INaEntityFactory.h"
@@ -7,7 +7,7 @@
 
 #include "Entity/Env/NaEntitySpawnManager.h"
 
-// ƒfƒtƒHƒ‹ƒg‚Ì‚â‚Â
+// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ã‚„ã¤
 class UNaEntityFactoryImpl : public INaEntityFactory
 {
 protected:
@@ -49,7 +49,7 @@ INaEntityFactory* INaEntityFactory::GetFactory()
 	return s_EntityFactory.Get();
 }
 
-//! ƒGƒ“ƒeƒBƒeƒBƒVƒŠƒAƒ‰ƒCƒY
+//! ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚º
 void INaEntityFactory::SerializeEntities( FArchive& ar, TArray<UNaEntity*>& refArray )
 {
 	TEnumAsByte<ENaEntity::Type>	etype;

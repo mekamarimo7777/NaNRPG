@@ -58,6 +58,9 @@ public:
 	//! ブロックマテリアル取得
 	UMaterialInstanceDynamic*	FindBlockMaterial(int32 id);
 
+	//! エンティティアクター生成
+	ANaActorBase*	SpawnEntityActor( UNaEntity* entity );
+
 protected:
 	//! メイン
 	void	ProcMain( UNaStateMachine* sm, float DeltaTime );

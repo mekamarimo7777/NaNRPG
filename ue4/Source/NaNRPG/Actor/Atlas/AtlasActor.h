@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -8,7 +8,7 @@
 
 #include "AtlasActor.generated.h"
 
-// ƒOƒ[ƒoƒ‹ƒ}ƒbƒvƒAƒNƒ^[
+// ã‚°ãƒ­ãƒ¼ãƒãƒ«ãƒãƒƒãƒ—ã‚¢ã‚¯ã‚¿ãƒ¼
 UCLASS()
 class NANRPG_API AAtlasActor : public AActor
 {

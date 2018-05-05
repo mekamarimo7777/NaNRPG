@@ -21,7 +21,7 @@ public:
 	UNaGameWorld();
 
 	//! ‰Šú‰»
-	virtual void	Setup( UWorld* world ) override;
+	virtual void	Setup( ANaWorldActor* actor ) override;
 	//! 
 	virtual void	Update( float DeltaTime ) override;
 

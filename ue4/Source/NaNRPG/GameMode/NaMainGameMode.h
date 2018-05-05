@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -14,7 +14,7 @@
 #include "NaMainGameMode.generated.h"
 
 /**
- * 
+ * ãƒ¡ã‚¤ãƒ³ã‚²ãƒ¼ãƒ ãƒ¢ãƒ¼ãƒ‰
  */
 UCLASS()
 class NANRPG_API ANaMainGameMode : public AGameMode
@@ -22,56 +22,47 @@ class NANRPG_API ANaMainGameMode : public AGameMode
 	GENERATED_BODY()
 
 public:
-	//! ƒXƒe[ƒg
+	//! ã‚¹ãƒ†ãƒ¼ãƒˆ
 	enum EState
 	{
 		Main,
 	};
 
 public:
-	//! ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	//! ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	ANaMainGameMode( const FObjectInitializer& ObjectInitializer );
 
-	//! ŠJnˆ—
+	//! é–‹å§‹å‡¦ç†
 	virtual void	BeginPlay() override;
-	//! I—¹ˆ—
+	//! çµ‚äº†å‡¦ç†
 	virtual void	EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-	//! XV
+	//! æ›´æ–°
 	virtual void	Tick(float DeltaTime) override;
 
-public:
-	//
-	void		TravelToWorld(int32 worldID);
-	//
-	UNaWorld*	LoadWorld( int32 uid, FName worldID );
-
-	//
-	ANaCameraActor*	GetCamera() const	{ return m_Camera; }
-
 protected:
-	//! ƒƒCƒ“
+	//! ãƒ¡ã‚¤ãƒ³
 	void	ProcMain( UNaStateMachine* sm, float DeltaTime );
 
-	//! ƒ[ƒ‹ƒhŠÇ—ƒAƒNƒ^[¶¬
+	//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ç®¡ç†ã‚¢ã‚¯ã‚¿ãƒ¼ç”Ÿæˆ
 	void	CreateWorldActor();
 
 public:
-	//! ƒJƒƒ‰ƒAƒNƒ^[ƒNƒ‰ƒX
+	//! ã‚«ãƒ¡ãƒ©ã‚¢ã‚¯ã‚¿ãƒ¼ã‚¯ãƒ©ã‚¹
 	UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "Camera" )
 	TSubclassOf<ANaCameraActor>		CameraActorClass;
-	//! ƒ[ƒ‹ƒhŠÇ—ƒAƒNƒ^[ƒNƒ‰ƒX
+	//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ç®¡ç†ã‚¢ã‚¯ã‚¿ãƒ¼ã‚¯ãƒ©ã‚¹
 	UPROPERTY( EditDefaultsOnly, BlueprintReadOnly, Category = "World Actor" )
 	TSubclassOf<ANaWorldActor>		WorldActorClass;
 
 protected:
-	//! ó‘ÔŠÇ—
+	//! çŠ¶æ…‹ç®¡ç†
 	UPROPERTY()
 	UNaStateMachine*	m_SM;
 
-	//! ƒ[ƒ‹ƒhƒAƒNƒ^[
+	//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚¢ã‚¯ã‚¿ãƒ¼
 	UPROPERTY()
 	ANaWorldActor*		m_WorldActor;
-	//! ƒJƒƒ‰
+	//! ã‚«ãƒ¡ãƒ©
 	UPROPERTY()
 	ANaCameraActor*		m_Camera;
 };

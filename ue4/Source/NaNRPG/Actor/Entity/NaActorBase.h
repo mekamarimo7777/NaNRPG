@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -38,13 +38,13 @@ public:
 	virtual void Tick( float DeltaSeconds ) override;
 	
 public:
-	// ‰Šú‰»
+	// åˆæœŸåŒ–
 	void	Initialize( UNaWorld* world, UNaEntity* entity );
 
 	//
 	void	ChangeState(EState state, int32 param = 0, bool immediate = false);
 
-	// ˆÚ“®ˆ—ŠÖ˜A //
+	// ç§»å‹•å‡¦ç†é–¢é€£ //
 	// 
 	bool		SetWorldPosition( const FIntVector& pos, bool teleport = false );
 	// 
@@ -79,18 +79,18 @@ protected:
 	virtual void	OnInitialize()	{}
 
 protected:
-	// Šî–{î•ñ //
+	// åŸºæœ¬æƒ…å ± //
 	UPROPERTY()
-	UNaWorld*	m_pWorld;		// Naƒ[ƒ‹ƒh
+	UNaWorld*	m_pWorld;		// Naãƒ¯ãƒ¼ãƒ«ãƒ‰
 	UPROPERTY()
-	UNaEntity*	m_pEntity;		// ƒGƒ“ƒeƒBƒeƒB
+	UNaEntity*	m_pEntity;		// ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£
 
 	//
 	EState	m_State;
 	int32	m_StateParam;
 	int32	m_StateStep;
 
-	// ˆÚ“®
+	// ç§»å‹•
 	FVector			m_DestLocation;
 	FRotator		m_DestRotate;
 	TArray<FVector>	m_DestList;

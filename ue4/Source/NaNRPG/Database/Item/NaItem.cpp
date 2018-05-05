@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "NaNRPG.h"
 #include "NaItem.h"
@@ -8,7 +8,7 @@
 
 #include "Assets/NaAssetLibrary.h"
 
-//! ƒAƒZƒbƒg‚©‚çŠî–{ƒf[ƒ^\’z
+//! ã‚¢ã‚»ãƒƒãƒˆã‹ã‚‰åŸºæœ¬ãƒ‡ãƒ¼ã‚¿æ§‹ç¯‰
 void UNaItem::CreateFromAsset( const FNaItemDataAsset& asset )
 {
 	m_AssetID		= asset.UID;
@@ -32,12 +32,12 @@ void UNaItem::CreateFromAsset( const FNaItemDataAsset& asset )
 	m_Properties	= asset.Properties;
 }
 
-//! ‘fŞ“K—p
+//! ç´ æé©ç”¨
 void UNaItem::ApplyMatter( FName matterName )
 {
 }
 
-//! ƒGƒ“ƒeƒBƒeƒB‚ğ¶¬
+//! ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ã‚’ç”Ÿæˆ
 UNaEntityCharacter* UNaItem::GenerateEntity()
 {
 	UNaAssetLibrary*	alib = UNaAssetLibrary::Get();
@@ -56,7 +56,7 @@ UNaEntityCharacter* UNaItem::GenerateEntity()
 	return entity;
 }
 
-//! ‰Â”\ƒAƒNƒVƒ‡ƒ“”»’è
+//! å¯èƒ½ã‚¢ã‚¯ã‚·ãƒ§ãƒ³åˆ¤å®š
 bool UNaItem::HasAction( ENaActionTrigger::Type action )
 {
 	for ( auto& it : m_Properties ){
@@ -67,7 +67,7 @@ bool UNaItem::HasAction( ENaActionTrigger::Type action )
 	return false;
 }
 
-//! ‰Â”\ƒAƒNƒVƒ‡ƒ“”»’èiƒtƒ‰ƒOj
+//! å¯èƒ½ã‚¢ã‚¯ã‚·ãƒ§ãƒ³åˆ¤å®šï¼ˆãƒ•ãƒ©ã‚°ï¼‰
 bool UNaItem::HasActionFlag( int32 actionFlag )
 {
 	for ( auto& it : m_Properties ){
@@ -78,7 +78,7 @@ bool UNaItem::HasActionFlag( int32 actionFlag )
 	return false;
 }
 
-//! Œø‰Ê”»’è
+//! åŠ¹æœåˆ¤å®š
 bool UNaItem::HasEffect( ENaActionEffect::Type effect )
 {
 	for ( auto& it : m_Properties ){
@@ -89,7 +89,7 @@ bool UNaItem::HasEffect( ENaActionEffect::Type effect )
 	return false;
 }
 
-//! Œø‰Êæ“¾
+//! åŠ¹æœå–å¾—
 bool UNaItem::EnumProperties( ENaActionEffect::Type effect, TArray<FNaItemProperty*>& outVal )
 {
 	for ( auto& it : m_Properties ){
@@ -100,7 +100,7 @@ bool UNaItem::EnumProperties( ENaActionEffect::Type effect, TArray<FNaItemProper
 	return outVal.Num() > 0;
 }
 
-//! ƒXƒ^ƒbƒN”’Ç‰Ái–ß‚è’l‚ÍÀÛ‚É‘Œ¸‚µ‚½’lj
+//! ã‚¹ã‚¿ãƒƒã‚¯æ•°è¿½åŠ ï¼ˆæˆ»ã‚Šå€¤ã¯å®Ÿéš›ã«å¢—æ¸›ã—ãŸå€¤ï¼‰
 int32 UNaItem::AddStack( int32 value )
 {
 	int32	prevValue = m_StackCount;
@@ -110,14 +110,14 @@ int32 UNaItem::AddStack( int32 value )
 	return m_StackCount - prevValue;
 }
 
-//! ƒXƒ^ƒbƒN‰Â”\”»’è
+//! ã‚¹ã‚¿ãƒƒã‚¯å¯èƒ½åˆ¤å®š
 bool UNaItem::IsStackable( UNaItem* item )
 {
 	if ( m_MaxStackCount <= 1 ){
 		return false;
 	}
 
-	//@ ‰¼”»’è
+	//@ ä»®åˆ¤å®š
 	if ( m_AssetID != item->m_AssetID ){
 		return false;
 	}
@@ -125,7 +125,7 @@ bool UNaItem::IsStackable( UNaItem* item )
 	return true;
 }
 
-//! ƒVƒŠƒAƒ‰ƒCƒY
+//! ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚º
 void UNaItem::Serialize( FArchive& ar )
 {
 	ar << m_AssetID;

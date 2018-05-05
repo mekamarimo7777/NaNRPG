@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "NaNRPG.h"
 #include "NaCharacter.h"
@@ -38,14 +38,6 @@ void ANaCharacter::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
-	if ( m_pEntity == UNaGameDatabase::GetDB()->GetPlayer() ){
-		ANaMainGameMode*	gm = Cast<ANaMainGameMode>( UGameplayStatics::GetGameMode( this ) );
-		ANaCameraActor*		camera;
-
-		camera	= gm->GetCamera();
-		camera->AttachTarget( this );
-	}
-
 	switch ( m_State ){
 	case EState::Waiting:
 		ProcWaiting( DeltaTime );
@@ -62,7 +54,7 @@ void ANaCharacter::Tick( float DeltaTime )
 	}
 }
 
-//! ƒAƒCƒeƒ€î•ñŽæ“¾
+//! ã‚¢ã‚¤ãƒ†ãƒ æƒ…å ±å–å¾—
 UNaItem* ANaCharacter::GetItemProperty() const
 {
 	return m_pEntity->GetItemProperty();
@@ -118,7 +110,7 @@ void ANaCharacter::OnInitialize()
 		// skeletal mesh
 		if ( !asset->SkeletalMesh.IsNull() ){
 			if ( !asset->SkeletalMesh.IsValid() ){
-				// ‚Ð‚Æ‚Ü‚¸“¯Šúƒ[ƒh
+				// ã²ã¨ã¾ãšåŒæœŸãƒ­ãƒ¼ãƒ‰
 				asset->SkeletalMesh.LoadSynchronous();
 			}
 			m_SkeletalMesh->SetSkeletalMesh( asset->SkeletalMesh.Get() );
@@ -127,7 +119,7 @@ void ANaCharacter::OnInitialize()
 		// skeletal mesh
 		if ( !asset->StaticMesh.IsNull() ){
 			if ( !asset->StaticMesh.IsValid() ){
-				// ‚Ð‚Æ‚Ü‚¸“¯Šúƒ[ƒh
+				// ã²ã¨ã¾ãšåŒæœŸãƒ­ãƒ¼ãƒ‰
 				asset->StaticMesh.LoadSynchronous();
 			}
 			m_StaticMesh->SetStaticMesh( asset->StaticMesh.Get() );

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -9,23 +9,23 @@
 
 #include "NaEntityConst.generated.h"
 
-// ƒGƒ“ƒeƒBƒeƒB“à•”ƒf[ƒ^
+// ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£å†…éƒ¨ãƒ‡ãƒ¼ã‚¿
 USTRUCT()
 struct FNaEntityProfile
 {
 	GENERATED_BODY()
 
-	// ƒ\[ƒXƒAƒZƒbƒgID //
+	// ã‚½ãƒ¼ã‚¹ã‚¢ã‚»ãƒƒãƒˆID //
 	UPROPERTY()
 	FName	AssetID;
 
-	// •\¦–¼i‚±‚ÌƒGƒ“ƒeƒBƒeƒBƒf[ƒ^‚Ì–¼‘OBuƒ^ƒ“ƒXv‚Æ‚©uŠX‚Ì‹M‘°v‚Æ‚©j //
+	// è¡¨ç¤ºåï¼ˆã“ã®ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ãƒ‡ãƒ¼ã‚¿ã®åå‰ã€‚ã€Œã‚¿ãƒ³ã‚¹ã€ã¨ã‹ã€Œè¡—ã®è²´æ—ã€ã¨ã‹ï¼‰ //
 	UPROPERTY()
 	FString	DisplayName;
-	// g—pƒAƒNƒ^[ //
+	// ä½¿ç”¨ã‚¢ã‚¯ã‚¿ãƒ¼ //
 	UPROPERTY()
 	FName	ActorName;
-	// ƒ†ƒj[ƒN•\¦–¼i¶¬‚³‚ê‚éƒLƒƒƒ‰ƒNƒ^[EƒIƒuƒWƒFƒNƒg‚ÌŒÅ—L–¼B‹ó”’‚Íƒ‹[ƒ‹‚É]‚Á‚Äƒ‰ƒ“ƒ_ƒ€¶¬j //
+	// ãƒ¦ãƒ‹ãƒ¼ã‚¯è¡¨ç¤ºåï¼ˆç”Ÿæˆã•ã‚Œã‚‹ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ãƒ»ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®å›ºæœ‰åã€‚ç©ºç™½ã¯ãƒ«ãƒ¼ãƒ«ã«å¾“ã£ã¦ãƒ©ãƒ³ãƒ€ãƒ ç”Ÿæˆï¼‰ //
 	UPROPERTY()
 	FString	UniqueName;
 
@@ -33,7 +33,7 @@ struct FNaEntityProfile
 	UPROPERTY()
 	int32	AIType;
 
-	//! ƒAƒZƒbƒg‚©‚çŠî–{î•ñ‚ğ\’z
+	//! ã‚¢ã‚»ãƒƒãƒˆã‹ã‚‰åŸºæœ¬æƒ…å ±ã‚’æ§‹ç¯‰
 	void	CopyFromAsset( const FNaEntityDataAsset& asset )
 	{
 		AssetID	= asset.Name;
@@ -46,12 +46,12 @@ struct FNaEntityProfile
 	}
 };
 
-//! ƒVƒŠƒAƒ‰ƒCƒYFFName
+//! ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºï¼šFName
 void SerializeFName( FArchive &ar, FName& obj );
-//! ƒVƒŠƒAƒ‰ƒCƒYFFNaEntityProfile
+//! ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚ºï¼šFNaEntityProfile
 FArchive& operator << ( FArchive &ar, FNaEntityProfile& obj );
 
-// ƒAƒoƒ^[ƒf[ƒ^
+// ã‚¢ãƒã‚¿ãƒ¼ãƒ‡ãƒ¼ã‚¿
 USTRUCT()
 struct FNaEntityAvatar
 {
@@ -65,14 +65,14 @@ struct FNaBaseParameter
 {
 	GENERATED_BODY()
 
-	// g‘ÌŒnƒpƒ‰ƒ[ƒ^
+	// èº«ä½“ç³»ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
 	float	Str;
 	float	Vit;
 	float	Agi;
 	float	Dec;
 	float	End;
 
-	// ¸_Œnƒpƒ‰ƒ[ƒ^
+	// ç²¾ç¥ç³»ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
 	float	Mag;
 	float	Int;
 	float	Men;
@@ -80,15 +80,15 @@ struct FNaBaseParameter
 	float	Cha;
 };
 
-//! ƒLƒƒƒ‰ƒNƒ^[ƒXƒe[ƒ^ƒX
+//! ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã‚¹ãƒ†ãƒ¼ã‚¿ã‚¹
 USTRUCT()
 struct FNaCharacterStatus
 {
 	GENERATED_BODY()
 
 	// 
-	int16	Level;		//! ƒŒƒxƒ‹
-	int16	LevelMax;	//! Å‘å“’BƒŒƒxƒ‹
+	int16	Level;		//! ãƒ¬ãƒ™ãƒ«
+	int16	LevelMax;	//! æœ€å¤§åˆ°é”ãƒ¬ãƒ™ãƒ«
 
 	int32	HP;			// Health
 	int32	HPMax;		// 
@@ -98,76 +98,76 @@ struct FNaCharacterStatus
 	int32	MPMax;		// 
 
 	//
-	int32	Speed;		//! s“®‘¬“x
+	int32	Speed;		//! è¡Œå‹•é€Ÿåº¦
 
-	// ƒƒCƒ“ƒpƒ‰ƒ[ƒ^
-	FNaBaseParameter	BaseParam;		//! Šî‘b’l
+	// ãƒ¡ã‚¤ãƒ³ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
+	FNaBaseParameter	BaseParam;		//! åŸºç¤å€¤
 
-	// ƒ|ƒeƒ“ƒVƒƒƒ‹
-	FNaBaseParameter	Potencial;		//! ƒ|ƒeƒ“ƒVƒƒƒ‹Œ»İ’l
-	FNaBaseParameter	PotencialMax;	//! ƒ|ƒeƒ“ƒVƒƒƒ‹Å‘å’l
-	FNaBaseParameter	PotencialExp;	//! ƒ|ƒeƒ“ƒVƒƒƒ‹ŒoŒ±’l
+	// ãƒãƒ†ãƒ³ã‚·ãƒ£ãƒ«
+	FNaBaseParameter	Potencial;		//! ãƒãƒ†ãƒ³ã‚·ãƒ£ãƒ«ç¾åœ¨å€¤
+	FNaBaseParameter	PotencialMax;	//! ãƒãƒ†ãƒ³ã‚·ãƒ£ãƒ«æœ€å¤§å€¤
+	FNaBaseParameter	PotencialExp;	//! ãƒãƒ†ãƒ³ã‚·ãƒ£ãƒ«çµŒé¨“å€¤
 
 };
 
-//! ƒXƒLƒ‹ƒf[ƒ^
+//! ã‚¹ã‚­ãƒ«ãƒ‡ãƒ¼ã‚¿
 USTRUCT()
 struct FNaCharacterSkill
 {
 	GENERATED_BODY()
 
 	//
-	FName	SkillID;		//! ƒXƒLƒ‹ID
-	int32	SkillLv;		//! ƒXƒLƒ‹ƒŒƒxƒ‹
-	float	Exp;			//! ƒXƒLƒ‹ŒoŒ±’l
+	FName	SkillID;		//! ã‚¹ã‚­ãƒ«ID
+	int32	SkillLv;		//! ã‚¹ã‚­ãƒ«ãƒ¬ãƒ™ãƒ«
+	float	Exp;			//! ã‚¹ã‚­ãƒ«çµŒé¨“å€¤
 };
 
-//! Ë”\ƒf[ƒ^
+//! æ‰èƒ½ãƒ‡ãƒ¼ã‚¿
 USTRUCT()
 struct FNaCharacterTalent
 {
 	GENERATED_BODY()
 
 	//
-	FName	TalentID;		//! Ë”\ID
-	int16	TalentLv;		//! Ë”\ƒŒƒxƒ‹
+	FName	TalentID;		//! æ‰èƒ½ID
+	int16	TalentLv;		//! æ‰èƒ½ãƒ¬ãƒ™ãƒ«
 };
 
-//! ‹Zƒf[ƒ^
+//! æŠ€ãƒ‡ãƒ¼ã‚¿
 USTRUCT()
 struct FNaCharacterArts
 {
 	GENERATED_BODY()
 
 	//
-	FName	ID;			//! ƒA[ƒcID
-	int16	Lv;			//! ƒA[ƒcƒŒƒxƒ‹
+	FName	ID;			//! ã‚¢ãƒ¼ãƒ„ID
+	int16	Lv;			//! ã‚¢ãƒ¼ãƒ„ãƒ¬ãƒ™ãƒ«
 };
 
-//! ƒXƒyƒ‹ƒf[ƒ^
+//! ã‚¹ãƒšãƒ«ãƒ‡ãƒ¼ã‚¿
 USTRUCT()
 struct FNaCharacterSpell
 {
 	GENERATED_BODY()
 
 	//
-	int16	Lv;			//! ƒXƒyƒ‹ƒŒƒxƒ‹
-	int16	Rank;		//! ƒXƒyƒ‹ƒ‰ƒ“ƒN
+	int16	Lv;			//! ã‚¹ãƒšãƒ«ãƒ¬ãƒ™ãƒ«
+	int16	Rank;		//! ã‚¹ãƒšãƒ«ãƒ©ãƒ³ã‚¯
 
 	//
 //	TArray<FSpellEffect>	Effects;
 };
 
-//! ‘•”õî•ñ
+//! è£…å‚™æƒ…å ±
 USTRUCT()
 struct FNaCharacterEquipPart
 {
 	GENERATED_BODY()
 
-	//! •”ˆÊƒ^ƒCƒv
+	//! éƒ¨ä½ã‚¿ã‚¤ãƒ—
 	ENaItemEquipPart::Type	Part;
-	//! ‘•”õ•i
+	//! è£…å‚™å“
 	class UNaItem*			Item;
-	//! ‘•”õ•iiƒTƒuj
+	//! è£…å‚™å“ï¼ˆã‚µãƒ–ï¼‰
 	class UNaItem*			SubItem;
 };

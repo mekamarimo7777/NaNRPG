@@ -14,6 +14,7 @@
 
 #include "NaWorld.generated.h"
 
+class ANaWorldActor;
 class UNaWorldAsset;
 class UNaEntity;
 class UNaEntityPlayer;
@@ -53,17 +54,11 @@ class NANRPG_API UNaWorld : public UObject, public INaWorldDataAccessor
 	GENERATED_BODY()
 
 public:
-	// 新規ワールド生成
-	static UNaWorld*	Create( FName uid, FName assetID );
-	// ワールドデータオープン
-	static UNaWorld*	Open( uint32 dataID );
-	
-public:
 	// コンストラクタ
 	UNaWorld();
 
 	//! 使用開始準備
-	virtual void	Setup( UWorld* world );
+	virtual void	Setup( ANaWorldActor* actor );
 	//! 更新
 	virtual void	Update( float DeltaTime );
 
@@ -154,11 +149,10 @@ public:
 	// アクションチェインから除去
 	void		DetachActionChain( UNaEntity* entity );
 
-
-	//! UEワールド設定
-	void		SetWorldContext( UWorld* context )	{ m_WorldContext = context; }
 	//! UEワールド取得
-	UWorld*		GetWorldContext() const				{ return m_WorldContext; }
+	UWorld*			GetWorldContext() const	{ return m_WorldContext; }
+	//! ワールドアクター取得
+	ANaWorldActor*	GetWorldActor() const	{ return m_WorldActor; }
 
 	//
 	void		SetChunkLimit( FIntVector min, FIntVector max )	{m_ChunkMin = min; m_ChunkMax = max;}
@@ -223,9 +217,12 @@ protected:
 	UPROPERTY(Transient)
 	UNaWorldGenerator*	m_Generator;
 
-	//! UEワールドコンテキスト
+	//! UEワールド
 	UPROPERTY(Transient)
 	UWorld*				m_WorldContext;
+	//! ワールド表示管理アクター
+	UPROPERTY(Transient)
+	ANaWorldActor*		m_WorldActor;
 	// ホームポジション //
 	TArray<FIntVector>	m_HomePositions;
 

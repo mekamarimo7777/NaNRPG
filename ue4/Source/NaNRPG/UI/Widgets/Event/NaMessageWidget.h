@@ -16,7 +16,9 @@ class NANRPG_API UNaMessageWidget : public UNaWidget
 	{
 		//! なし
 		None	= -1,
-		//! メイン
+		//! 非表示
+		Hide,
+		//! 表示メイン
 		Main,
 	};
 	
@@ -42,7 +44,9 @@ public:
 	FSimpleEvent&	MessageReached()	{ return m_MessageReachedEvent; }
 
 protected:
-	//! 
+	//! 非表示ステート
+	void	ProcHide( UNaStateMachine* sm, float DeltaTime );
+	//! メイン
 	void	ProcMain( UNaStateMachine* sm, float DeltaTime );
 	FReply	ProcMainKeyDown( UNaStateMachine* sm, const FKeyEvent* KeyEvent );
 

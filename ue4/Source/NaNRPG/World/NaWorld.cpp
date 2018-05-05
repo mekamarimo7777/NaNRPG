@@ -3,6 +3,7 @@
 #include "NaNRPG.h"
 #include "NaWorld.h"
 
+#include "Actor/World/NaWorldActor.h"
 #include "Actor/Entity/NaActorBase.h"
 
 #include "Assets/NaAssetLibrary.h"
@@ -23,32 +24,11 @@ UNaWorld::UNaWorld()
 	m_Generator	= NewObject<UNaWorldGenerator>();
 }
 
-//! 新規ワールド生成
-UNaWorld* UNaWorld::Create( FName uid, FName assetID )
-{
-	UNaWorld*	world	= NewObject<UNaWorld>();
-
-	world->CreateWorld( uid, assetID );
-
-	return world;
-}
-
-//! ワールドデータオープン
-UNaWorld* UNaWorld::Open( uint32 dataID )
-{
-	UNaWorld*	world	= NewObject<UNaWorld>();
-
-	if ( !world->OpenWorld( dataID ) ){
-		world	= nullptr;
-	}
-
-	return world;
-}
-
 //! 使用開始準備
-void UNaWorld::Setup( UWorld* world )
+void UNaWorld::Setup( ANaWorldActor* actor )
 {
-	m_WorldContext	= world;
+	m_WorldActor	= actor;
+	m_WorldContext	= m_WorldActor->GetWorld();
 }
 
 //! 

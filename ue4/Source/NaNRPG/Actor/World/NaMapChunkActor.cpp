@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "NaNRPG.h"
 
@@ -14,7 +14,7 @@ ANaMapChunkActor::ANaMapChunkActor( const FObjectInitializer& ObjectInitializer 
  	// 
 	PrimaryActorTick.bCanEverTick = true;
 
-	// ƒ‹[ƒgƒRƒ“ƒ|[ƒlƒ“ƒg //
+	// ãƒ«ãƒ¼ãƒˆã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆ //
 	//m_ProcMesh		= CreateDefaultSubobject<UProceduralMeshComponent>( TEXT("ProcMesh") );
 	//RootComponent	= m_ProcMesh;
 
@@ -125,7 +125,7 @@ void ANaMapChunkActor::UpdateChunkMesh( int32 layer )
 			vertNum		= 0;
 			indexNum	= 0;
 
-			//! •`‰æ–Ê”
+			//! æç”»é¢æ•°
 			for ( int32 j = 0; j < rm->CellIndices.Num(); ++j ){
 				pLayer->Chunk->GetBlock( rm->CellIndices[j], work );
 

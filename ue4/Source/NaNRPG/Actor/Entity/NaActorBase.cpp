@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+Ôªø// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "NaNRPG.h"
 #include "NaActorBase.h"
@@ -115,7 +115,7 @@ void ANaActorBase::ChangeState(EState state, int32 param, bool immediate)
 	m_StateStep		= 0;
 }
 
-// ç¿ïWê›íË //
+// Â∫ßÊ®ôË®≠ÂÆö //
 bool ANaActorBase::SetWorldPosition( const FIntVector& pos, bool teleport )
 {
 	if ( teleport ){

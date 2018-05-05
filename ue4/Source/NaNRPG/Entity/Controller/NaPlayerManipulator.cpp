@@ -184,7 +184,7 @@ void UNaPlayerManipulator::ProcAction( UNaStateMachine* sm, float DeltaTime )
 				naw->SetWorldDirection( (ENaDirection)tmp );
 			}
 
-			if ( pc->WasInputKeyJustPressed( EKeys::NumPadZero ) ){
+/*			if ( pc->WasInputKeyJustPressed( EKeys::NumPadZero ) ){
 				ANaMainGameMode*	gm = Cast<ANaMainGameMode>( UGameplayStatics::GetGameMode( naw->GetWorldContext() ) );
 				gm->TravelToWorld(0);
 			}
@@ -199,7 +199,7 @@ void UNaPlayerManipulator::ProcAction( UNaStateMachine* sm, float DeltaTime )
 			if ( pc->WasInputKeyJustPressed( EKeys::NumPadThree ) ){
 				ANaMainGameMode*	gm = Cast<ANaMainGameMode>( UGameplayStatics::GetGameMode( naw->GetWorldContext() ) );
 				gm->TravelToWorld(3);
-			}
+			}*/
 
 			// ˆÚ“® //
 			if ( pc->IsInputKeyDown( EKeys::W ) ){

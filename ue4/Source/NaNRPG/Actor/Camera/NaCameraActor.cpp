@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "NaNRPG.h"
 
@@ -6,7 +6,7 @@
 
 //====================================================================================================
 
-//! ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+//! ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 ANaCameraActor::ANaCameraActor( const FObjectInitializer& ObjectInitializer )
 : Super( ObjectInitializer )
 , OrbitalPitch( 35.0f )
@@ -16,16 +16,16 @@ ANaCameraActor::ANaCameraActor( const FObjectInitializer& ObjectInitializer )
 {
 }
 
-//! ŠJnˆ—
+//! é–‹å§‹å‡¦ç†
 void ANaCameraActor::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-//! XV
+//! æ›´æ–°
 void ANaCameraActor::Update( float DeltaSeconds )
 {
-	//! Šp“xˆÚ“®
+	//! è§’åº¦ç§»å‹•
 	if ( FMath::Abs( m_RequestAngle - m_CurrentAngle ) >= FLT_EPSILON ){
 		float	diff;
 
@@ -37,12 +37,12 @@ void ANaCameraActor::Update( float DeltaSeconds )
 			diff	= diff + 360.0f;
 		}
 
-		diff			= FMath::Clamp( diff, -10.0f, 10.0f );
+		diff			= FMath::Clamp( diff, -5.0f, 5.0f );
 		m_CurrentAngle	= FMath::Fmod( m_CurrentAngle + diff, 360.0f );
 		ApplyCameraAngle();
 	}
 
-	//! ˆÊ’uˆÚ“®
+	//! ä½ç½®ç§»å‹•
 	if ( m_pTarget ){
 		FVector	pos,dir;
 
@@ -56,7 +56,7 @@ void ANaCameraActor::Update( float DeltaSeconds )
 	}
 }
 
-//! ƒoƒCƒ“ƒhæİ’è
+//! ãƒã‚¤ãƒ³ãƒ‰å…ˆè¨­å®š
 void ANaCameraActor::AttachTarget( AActor* target )
 {
 	if ( m_pTarget != target ){
@@ -67,7 +67,7 @@ void ANaCameraActor::AttachTarget( AActor* target )
 	}
 }
 
-//! ƒAƒ“ƒOƒ‹İ’è
+//! ã‚¢ãƒ³ã‚°ãƒ«è¨­å®š
 void ANaCameraActor::SetAngle( float angle )
 {
 	m_RequestAngle	= FMath::Fmod( angle, 360.0f );
@@ -75,7 +75,7 @@ void ANaCameraActor::SetAngle( float angle )
 
 //====================================================================================================
 
-//! ƒJƒƒ‰Šp“xİ’è
+//! ã‚«ãƒ¡ãƒ©è§’åº¦è¨­å®š
 void ANaCameraActor::ApplyCameraAngle()
 {
 	FVector	dir;
