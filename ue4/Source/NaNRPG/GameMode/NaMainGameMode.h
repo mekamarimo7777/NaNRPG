@@ -9,6 +9,8 @@
 
 #include "World/NaWorld.h"
 
+#include "Utility/Components/NaStateMachine.h"
+
 #include "NaMainGameMode.generated.h"
 
 /**
@@ -20,32 +22,38 @@ class NANRPG_API ANaMainGameMode : public AGameMode
 	GENERATED_BODY()
 
 public:
+	//! ステート
+	enum EState
+	{
+		Main,
+	};
+
+public:
 	//! コンストラクタ
 	ANaMainGameMode( const FObjectInitializer& ObjectInitializer );
 
-	// 
+	//! 開始処理
 	virtual void	BeginPlay() override;
-	// 
+	//! 終了処理
 	virtual void	EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
-	// 
+	//! 更新
 	virtual void	Tick(float DeltaTime) override;
 
 public:
-	//
-	void	ChangeState(int32 state, int32 param = 0, bool immediate = false);
-
 	//
 	void		TravelToWorld(int32 worldID);
 	//
 	UNaWorld*	LoadWorld( int32 uid, FName worldID );
 
 	//
-	ANaCameraActor*	GetCamera() const	{return m_pCamera;}
+	ANaCameraActor*	GetCamera() const	{ return m_Camera; }
 
 protected:
-	//
-	void	ProcMain(float DeltaTime);
+	//! メイン
+	void	ProcMain( UNaStateMachine* sm, float DeltaTime );
+
+	//! ワールド管理アクター生成
+	void	CreateWorldActor();
 
 public:
 	//! カメラアクタークラス
@@ -56,19 +64,14 @@ public:
 	TSubclassOf<ANaWorldActor>		WorldActorClass;
 
 protected:
-	//
-	int32	m_State;
-	int32	m_StateParam;
-	int32	m_StateStep;
+	//! 状態管理
+	UPROPERTY()
+	UNaStateMachine*	m_SM;
 
-	//!
+	//! ワールドアクター
 	UPROPERTY()
-	UNaWorld*		m_NaWorld;
-
-	// マップ //
+	ANaWorldActor*		m_WorldActor;
+	//! カメラ
 	UPROPERTY()
-	ANaWorldActor*		m_pMapActor;
-	// カメラ //
-	UPROPERTY()
-	ANaCameraActor*		m_pCamera;
+	ANaCameraActor*		m_Camera;
 };

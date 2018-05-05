@@ -83,7 +83,8 @@ public:
 
 protected:
 	//! メイン
-	void	ProcMain( UNaStateMachine* sm, float DeltaTime, const FKeyEvent* KeyEvent = nullptr );
+	void	ProcMain( UNaStateMachine* sm, float DeltaTime );
+	FReply	ProcMainKeyDown( UNaStateMachine* sm, const FKeyEvent* KeyEvent );
 
 	//! メニューカテゴリ生成
 	void	UpdateMenuItems();

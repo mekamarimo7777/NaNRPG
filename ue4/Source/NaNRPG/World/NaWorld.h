@@ -45,7 +45,7 @@ class INaWorldDataAccessor
 };
 
 /**
- * 
+ * ワールドインスタンス
  */
 UCLASS()
 class NANRPG_API UNaWorld : public UObject, public INaWorldDataAccessor
@@ -53,26 +53,36 @@ class NANRPG_API UNaWorld : public UObject, public INaWorldDataAccessor
 	GENERATED_BODY()
 
 public:
-	// ワールドオープン
-	static UNaWorld*	Open( int32 worldID );
-	// ワールド生成
-	static UNaWorld*	Create( int32 worldID );
+	// 新規ワールド生成
+	static UNaWorld*	Create( FName uid, FName assetID );
+	// ワールドデータオープン
+	static UNaWorld*	Open( uint32 dataID );
 	
 public:
 	// コンストラクタ
 	UNaWorld();
 
-	//! 初期化
-	virtual void	Initialize( UWorld* world );
+	//! 使用開始準備
+	virtual void	Setup( UWorld* world );
 	//! 更新
-	virtual void	Tick( float DeltaTime );
+	virtual void	Update( float DeltaTime );
 
-	// 開く
-	bool	OpenWorld( int32 worldID );
-	// 新規作成
-	bool	CreateWorld( int32 worldID, UNaWorldAsset* asset );
-	// 閉じる
-	void	CloseWorld();
+	//! 新規作成
+	virtual bool	CreateWorld( FName uid, FName assetID );
+	//! 開く
+	bool			OpenWorld( int32 dataID );
+	//! 閉じる
+	void			CloseWorld( bool isSave = true );
+
+	//! 固有ID取得
+	FName	GetUID() const		{ return m_UID; }
+	//! アセットID取得
+	FName	GetAssetID() const	{ return m_AssetID; }
+	//! データID取得
+	uint32	GetDataID() const	{ return m_DataID; }
+
+
+
 
 	//! ワールドジェネレータ取得
 	UNaWorldGenerator*	GetGenerator() const	{ return m_Generator; }
@@ -90,9 +100,9 @@ public:
 	// 更新
 	virtual void	UpdateWorld();
 
-	//
+	//! ターン進行
 	void	AdvanceTurn();
-	//
+	//! アクションチェインに追加
 	void	InsertActionChain( UNaTurnActionComponent* tac );
 
 	// リージョン取得
@@ -190,18 +200,24 @@ protected:
 	FString		GetMapDirPath() const;
 
 public:
-	UPROPERTY(EditDefaultsOnly, Category = General)
-	int32		WorldID;
-	UPROPERTY(EditDefaultsOnly, Category = General)
-	FText		WorldName;
 	
 protected:
+	//! 固有ID
+	FName		m_UID;
+	//! アセットID
+	FName		m_AssetID;
+	//! データID
+	uint32		m_DataID;
+
 	//!
 	FString		m_WorldPath;
 	//! ワールドチャンク範囲下限
 	FIntVector	m_ChunkMin;
 	//! ワールドチャンク範囲上限
 	FIntVector	m_ChunkMax;
+
+	//! ワールド表示名
+	FText		m_DisplayName;
 
 	//! 
 	UPROPERTY(Transient)

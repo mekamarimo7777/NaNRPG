@@ -67,9 +67,6 @@ public:
 	void	GetSkillResult();
 
 protected:
-	//! 更新
-	virtual void	OnTick( UNaStateMachine* sm, float DeltaTime ) override;
-
 	//! メイン
 	void	ProcMain( UNaStateMachine* sm, float DeltaTime );
 	//! インベントリ

@@ -7,6 +7,7 @@
 #include "NaEntityManipulator.generated.h"
 
 class UNaEntityCharacter;
+class UNaStateMachine;
 
 /**
  * エンティティ操作基底
@@ -19,16 +20,21 @@ class NANRPG_API UNaEntityManipulator : public UObject
 public:
 	// 操作ターゲット設定
 	void	BindTarget( UNaEntityCharacter* target );
+	// 操作ターゲット解除
+	void	UnbindTarget();
 
 	// 更新
-	void	UpdateControl( float DeltaTime );
+	void	UpdateControl( UNaStateMachine* sm, float DeltaTime );
 
 	// 行動終了
 	bool	IsEndAction() const	{return true;}
 
 protected:
 	// 更新処理
-	virtual void	OnControl( float DeltaTime );
+	virtual void	OnControl( UNaStateMachine* sm, float DeltaTime );
+
+	//! ターンエンド処理
+	void	ProcEndTurn( UNaStateMachine* sm, float DeltaTime );
 
 	//! 
 	UWorld*	GetWorldContext() const;

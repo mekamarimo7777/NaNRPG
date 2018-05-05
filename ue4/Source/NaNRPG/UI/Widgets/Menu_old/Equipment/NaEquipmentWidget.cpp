@@ -47,7 +47,7 @@ FReply UNaEquipmentWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FK
 	if ( !InKeyEvent.IsRepeat() && !m_InvalidateView ){
 		const FKey	key = InKeyEvent.GetKey();
 
-		switch ( m_StateMachine->GetState() ){
+		switch ( m_SM->GetState() ){
 		case EState::Equipment:
 			if ( key == EKeys::Enter ){
 				UpdateSelectionItems();
@@ -55,7 +55,7 @@ FReply UNaEquipmentWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FK
 				m_ItemView->SetVisibility( ESlateVisibility::Visible );
 				m_ItemView->SetKeyboardFocus();
 
-				m_StateMachine->ChangeState( EState::SelectItem );
+				m_SM->ChangeState( EState::SelectItem );
 
 				return FReply::Handled();
 			}
@@ -76,14 +76,14 @@ FReply UNaEquipmentWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FK
 
 				m_ItemView->SetVisibility( ESlateVisibility::Hidden );
 
-				m_StateMachine->ChangeState( EState::Equipment );
+				m_SM->ChangeState( EState::Equipment );
 			}
 			else if ( key == EKeys::BackSpace ){
 				m_LvMain->SetKeyboardFocus();
 
 				m_ItemView->SetVisibility( ESlateVisibility::Hidden );
 
-				m_StateMachine->ChangeState( EState::Equipment );
+				m_SM->ChangeState( EState::Equipment );
 			}
 			break;
 		}
@@ -105,7 +105,7 @@ void UNaEquipmentWidget::Open( int32 ZOrder )
 	SetInputModeUI();
 //	m_LvMain->SetKeyboardFocus();
 
-	m_StateMachine->ChangeState( EState::Equipment );
+	m_SM->ChangeState( EState::Equipment );
 
 /*	if ( m_UIAction ){
 		m_UIAction->DeleteAllItems();

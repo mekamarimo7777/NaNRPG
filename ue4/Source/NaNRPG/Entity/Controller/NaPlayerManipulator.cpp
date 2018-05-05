@@ -33,34 +33,30 @@
 // protected methods
 //////////////////////////////////////////////////
 // 更新処理
-void UNaPlayerManipulator::OnControl( float DeltaTime )
+void UNaPlayerManipulator::OnControl( UNaStateMachine* sm, float DeltaTime )
 {
-	if ( m_Target ){
-		UNaStateMachine*	sm = m_Target->GetStateMachine();
-
-		switch ( sm->GetState() ){
-		case UNaEntityCharacter::EState::Waiting:
-			ProcWaiting( sm, DeltaTime );
-			break;
-		case UNaEntityCharacter::EState::Action:
-			ProcAction( sm, DeltaTime );
-			break;
-		case UNaEntityCharacter::EState::Menu:
-			ProcMenu( sm, DeltaTime );
-			break;
-		case UNaEntityCharacter::EState::Inventory:
-			ProcInventory( sm, DeltaTime );
-			break;
-		case UNaEntityCharacter::EState::Equipment:
-			ProcEquipment( sm, DeltaTime );
-			break;
-		case UNaEntityCharacter::EState::Event:
-			ProcEvent( sm, DeltaTime );
-			break;
-		}
+	switch ( sm->GetState() ){
+	case UNaEntityCharacter::EState::Waiting:
+		ProcWaiting( sm, DeltaTime );
+		break;
+	case UNaEntityCharacter::EState::Action:
+		ProcAction( sm, DeltaTime );
+		break;
+	case UNaEntityCharacter::EState::Menu:
+		ProcMenu( sm, DeltaTime );
+		break;
+	case UNaEntityCharacter::EState::Inventory:
+		ProcInventory( sm, DeltaTime );
+		break;
+	case UNaEntityCharacter::EState::Equipment:
+		ProcEquipment( sm, DeltaTime );
+		break;
+	case UNaEntityCharacter::EState::Event:
+		ProcEvent( sm, DeltaTime );
+		break;
 	}
 
-	Super::OnControl( DeltaTime );
+	Super::OnControl( sm, DeltaTime );
 }
 
 //
@@ -87,7 +83,7 @@ void UNaPlayerManipulator::ProcAction( UNaStateMachine* sm, float DeltaTime )
 
 	switch ( sm->GetPhase() ){
 	case Start:
-		sm->AdvancePhase();
+		sm->Advance();
 		// fall through
 	case Main:
 		if ( !actor->IsMoving() ){
@@ -272,7 +268,7 @@ void UNaPlayerManipulator::ProcAction( UNaStateMachine* sm, float DeltaTime )
 		break;
 	case Attack:
 		actor->ChangeState( ANaActorBase::EState::Attack );
-		sm->AdvancePhase();
+		sm->Advance();
 		break;
 	case WaitAttack:
 		if ( actor->IsWaiting() ){
@@ -283,7 +279,7 @@ void UNaPlayerManipulator::ProcAction( UNaStateMachine* sm, float DeltaTime )
 
 	case End:
 		// @test プレイヤー移動位置を更新（暫定）
-		naw->SetCurrentPosition( m_Target->GetWorldPosition() );
+//		naw->SetCurrentPosition( m_Target->GetWorldPosition() );
 
 		sm->ChangeState( UNaEntityCharacter::EState::EndTurn );
 		break;
@@ -308,11 +304,11 @@ void UNaPlayerManipulator::ProcMenu( UNaStateMachine* sm, float DeltaTime )
 	//! 初期化
 	case Init:
 		CreateMenuAgent();
-		sm->AdvancePhase();
+		sm->Advance();
 		break;
 	case Start:
 		m_UIAMenu->Start( sm->GetParam() );
-		sm->AdvancePhase();
+		sm->Advance();
 		break;
 
 	//! メイン
@@ -352,7 +348,7 @@ void UNaPlayerManipulator::ProcMenu( UNaStateMachine* sm, float DeltaTime )
 	switch ( sm->GetPhase() ){
 	case Start:
 		view->Open();
-		sm->AdvancePhase();
+		sm->Advance();
 		break;
 	case Main:
 		{
@@ -380,12 +376,12 @@ void UNaPlayerManipulator::ProcMenu( UNaStateMachine* sm, float DeltaTime )
 					
 					}
 					else {
-						sm->AdvancePhase();
+						sm->Advance();
 					}
 				}
 				break;
 			case EUIResult::Canceled:
-				sm->AdvancePhase();
+				sm->Advance();
 				break;
 			}
 		}
@@ -432,7 +428,7 @@ void UNaPlayerManipulator::ProcInventory( UNaStateMachine* sm, float DeltaTime )
 		view->SetAction( ENaActionTrigger::None );
 		view->SetMode( ENaInventoryMode::Inventory );
 
-		sm->AdvancePhase();
+		sm->Advance();
 		break;
 	case Main:
 		{
@@ -502,7 +498,7 @@ void UNaPlayerManipulator::ProcInventory( UNaStateMachine* sm, float DeltaTime )
 				}
 				break;
 			case EUIResult::Canceled:
-				sm->AdvancePhase();
+				sm->Advance();
 				break;
 			}
 		}
@@ -536,7 +532,7 @@ void UNaPlayerManipulator::ProcEquipment( UNaStateMachine* sm, float DeltaTime )
 	case Start:
 		view->SetCharacter( m_Target );
 		view->Open();
-		sm->AdvancePhase();
+		sm->Advance();
 		break;
 	case Main:
 		{
@@ -552,7 +548,7 @@ void UNaPlayerManipulator::ProcEquipment( UNaStateMachine* sm, float DeltaTime )
 				}
 				break;
 			case EUIResult::Canceled:
-				sm->AdvancePhase();
+				sm->Advance();
 				break;
 			}
 		}
@@ -595,7 +591,7 @@ void UNaPlayerManipulator::ProcEvent( UNaStateMachine* sm, float DeltaTime )
 					UNaEventManager*	em = naw->GetEventManager();
 
 					em->PlayEvent( evt, sheet );
-					sm->AdvancePhase();
+					sm->Advance();
 					break;
 				}
 			}
@@ -610,7 +606,7 @@ void UNaPlayerManipulator::ProcEvent( UNaStateMachine* sm, float DeltaTime )
 			UNaEventManager*	em = naw->GetEventManager();
 			
 			if ( !em->IsPlaying() ){
-				sm->AdvancePhase();
+				sm->Advance();
 			}
 		}
 		break;

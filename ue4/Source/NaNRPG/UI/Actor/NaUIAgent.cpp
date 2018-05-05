@@ -8,7 +8,7 @@ ANaUIAgent::ANaUIAgent( const FObjectInitializer& ObjectInitializer )
 : Super( ObjectInitializer )
 , m_IsBusy( false )
 {
-	m_StateMachine	= CreateDefaultSubobject<UNaStateMachine>( "StateMachine", true );
+	m_SM	= CreateDefaultSubobject<UNaStateMachine>( "StateMachine", true );
 
 	PrimaryActorTick.bCanEverTick = true;
 }
@@ -24,13 +24,11 @@ void ANaUIAgent::Tick( float DeltaSeconds )
 {
 	Super::Tick( DeltaSeconds );
 
-	m_StateMachine->Update( DeltaSeconds );
-
-	OnTick( m_StateMachine, DeltaSeconds );
+	m_SM->Execute( DeltaSeconds );
 }
 
 //! ŽÀs‘Ò‚¿
 bool ANaUIAgent::WaitForAction()
 {
-	return m_StateMachine->GetState() == -1;
+	return m_SM->GetState() == -1;
 }

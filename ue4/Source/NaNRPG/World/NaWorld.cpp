@@ -14,7 +14,7 @@
 
 //
 UNaWorld::UNaWorld()
-: m_CurrentChunkPos( 0, 0, INT_MAX )
+: m_CurrentChunkPos( 0, 0, SHORT_MAX )
 , m_ChunkRange( 9, 9, 9 )
 , m_ChunkMin( -INT_MAX, -INT_MAX, 0 )
 , m_ChunkMax( INT_MAX, INT_MAX, 15 )
@@ -23,46 +23,145 @@ UNaWorld::UNaWorld()
 	m_Generator	= NewObject<UNaWorldGenerator>();
 }
 
-//
-UNaWorld* UNaWorld::Open( int32 worldID )
+//! 新規ワールド生成
+UNaWorld* UNaWorld::Create( FName uid, FName assetID )
 {
 	UNaWorld*	world	= NewObject<UNaWorld>();
 
-	if ( !world->OpenWorld( worldID ) ){
+	world->CreateWorld( uid, assetID );
+
+	return world;
+}
+
+//! ワールドデータオープン
+UNaWorld* UNaWorld::Open( uint32 dataID )
+{
+	UNaWorld*	world	= NewObject<UNaWorld>();
+
+	if ( !world->OpenWorld( dataID ) ){
 		world	= nullptr;
 	}
 
 	return world;
 }
 
-//
-UNaWorld* UNaWorld::Create( int32 worldID )
-{
-	UNaWorld*	world	= NewObject<UNaWorld>();
-
-//	world->CreateWorld( worldID );
-
-	return world;
-}
-
-//! 
-void UNaWorld::Initialize( UWorld* world )
+//! 使用開始準備
+void UNaWorld::Setup( UWorld* world )
 {
 	m_WorldContext	= world;
 }
 
 //! 
-void UNaWorld::Tick( float DeltaTime )
+void UNaWorld::Update( float DeltaTime )
 {
-	//!
+	UNaGameDatabase*	db = UNaGameDatabase::GetDB();
+
+	if ( UNaEntity* player = db->GetPlayer() ){
+		if ( player->GetWorldID() == GetUID() ){
+			SetCurrentPosition( player->GetWorldPosition() );
+		}
+	}
+
+	//! ターン進行
+	AdvanceTurn();
+}
+
+//! ワールドデータ構築
+bool UNaWorld::CreateWorld( FName uid, FName assetID )
+{
+	UNaGameDatabase*	db = UNaGameDatabase::GetDB();
+	UNaAssetLibrary*	alib = UNaAssetLibrary::Get();
+	UNaWorldAsset*		asset;
+
+	m_UID		= uid;
+	m_DataID	= db->GenerateWorldDataID();
+
+	//! アセットID未指定はUIDで検索
+	if ( assetID.IsNone() ){
+		assetID	= uid;
+	}
+
+	//! アセットから構築
+	asset	= alib->FindWorldAsset( assetID );
+
+	if ( asset ){
+		m_DisplayName	= asset->DisplayName;
+
+		//! マップ作成
+		for ( auto& it : asset->MapEntries ){
+			CreateMap( it.Location, it.Map );
+		}
+
+		// ワールド定義エンティティ生成
+		for ( auto& it : asset->Entities ){
+			const FNaEntityDataAsset*	entAsset;
+
+			entAsset	= alib->FindEntityAsset( it.EntityID );
+			if ( entAsset ){
+				UNaEntity*	entity = INaEntityFactory::NewEntity<UNaEntity>( entAsset->Type );
+
+				entity->CreateFromAsset( *entAsset );
+				entity->SetWorldPosition( it.Position );
+				entity->SetEvent( it.EventID );
+				entity->SetEntityParameter( it.Params );
+
+				switch ( it.Stage ){
+				case ENaEntityStage::World:
+					RegisterEntity( entity );
+					break;
+				case ENaEntityStage::Global:
+					db->RegisterGlobalEntity( entity );
+					break;
+				case ENaEntityStage::Chunk:
+					//! ワールド定義ではチャンク管理エンティティは作れない
+					//! もしくは一時スポーン待ちリストに入れておく？
+					check( false );
+					break;
+				}
+			}
+		}
+	}
+
+	//! 保存処理
+	{
+		IPlatformFile&	pf = FPlatformFileManager::Get().GetPlatformFile();
+		FString			dir,region_dir,map_dir,fname;
+		FBufferArchive	ar;
+
+		dir	= MakeWorldDirPath( m_DataID );
+		if ( FPaths::DirectoryExists( dir ) ){
+			pf.DeleteDirectoryRecursively( *dir );
+		}
+		pf.CreateDirectoryTree( *dir );
+		m_WorldPath	= dir;
+
+		// リージョンフォルダ生成
+		region_dir	= GetRegionDirPath();
+		if ( !FPaths::DirectoryExists( region_dir ) ){
+			pf.CreateDirectoryTree( *region_dir );
+		}
+
+		// マップフォルダ生成
+		map_dir	= GetMapDirPath();
+		if ( !FPaths::DirectoryExists( region_dir ) ){
+			pf.CreateDirectoryTree( *region_dir );
+		}
+
+		fname	= GetWorldFilePath();
+
+		Serialize( ar );
+		FFileHelper::SaveArrayToFile( ar, *fname );
+	}
+
+	return true;
 }
 
 //
-bool UNaWorld::OpenWorld( int32 worldID )
+bool UNaWorld::OpenWorld( int32 dataID )
 {
 	FString	dir,fname;
 
-	dir	= MakeWorldDirPath( worldID );
+	dir	= MakeWorldDirPath( dataID );
 	if ( !FPaths::DirectoryExists( dir ) ){
 		return false;
 	}
@@ -83,88 +182,19 @@ bool UNaWorld::OpenWorld( int32 worldID )
 
 		Serialize( reader );
 
-		// エンティティ登録
-		for( auto& it : m_Entities ){
+		// 無形エンティティを登録
+/*		for( auto& it : m_Entities ){
 			if ( it->IsIntangible() ){
 				EnterEntity( it );
 			}
-		}
+		}*/
 	}
 
 	return true;
 }
 
 //
-bool UNaWorld::CreateWorld( int32 worldID, UNaWorldAsset* asset )
-{
-	IPlatformFile&	pf = FPlatformFileManager::Get().GetPlatformFile();
-	FString			dir,region_dir,map_dir,fname;
-
-	dir	= MakeWorldDirPath( worldID );
-	if ( FPaths::DirectoryExists( dir ) ){
-		pf.DeleteDirectoryRecursively( *dir );
-	}
-	pf.CreateDirectoryTree( *dir );
-	m_WorldPath	= dir;
-
-	// リージョンフォルダ生成
-	region_dir	= GetRegionDirPath();
-	if ( !FPaths::DirectoryExists( region_dir ) ){
-		pf.CreateDirectoryTree( *region_dir );
-	}
-
-	// マップフォルダ生成
-	map_dir	= GetMapDirPath();
-	if ( !FPaths::DirectoryExists( region_dir ) ){
-		pf.CreateDirectoryTree( *region_dir );
-	}
-
-	fname	= GetWorldFilePath();
-
-	// @test
-	WorldID	= worldID;
-
-	//! アセットから生成
-	if ( asset ){
-		UNaAssetLibrary*	alib = UNaAssetLibrary::Get();
-
-		WorldName	= asset->DisplayName;
-
-		//! マップ作成
-		for ( auto& it : asset->MapEntries ){
-			CreateMap( it.Location, it.Map );
-		}
-
-		// ワールド定義エンティティ配置
-		for ( auto& it : asset->Entities ){
-			const FNaEntityDataAsset*	entAsset;
-
-			entAsset	= alib->FindEntityAsset( it.EntityID );
-			if ( entAsset ){
-				UNaEntity*	entity = INaEntityFactory::NewEntity<UNaEntity>( entAsset->Type );
-
-				entity->CreateFromAsset( *entAsset );
-				entity->SetWorldPosition( it.Position );
-				entity->SetEvent( it.EventID );
-				entity->SetEntityParameter( it.Params );
-				RegisterEntity( entity );
-				//SpawnEntity( entity, it.Position );
-			}
-		}
-	}
-
-	{// save
-		FBufferArchive	ar;
-
-		Serialize( ar );
-		FFileHelper::SaveArrayToFile( ar, *fname );
-	}
-
-	return true;
-}
-
-//
-void UNaWorld::CloseWorld()
+void UNaWorld::CloseWorld( bool isSave )
 {
 	//! プレイヤー・パーティメンバーをワールドから外す
 	{
@@ -184,9 +214,13 @@ void UNaWorld::CloseWorld()
 //
 void UNaWorld::Serialize( FArchive& ar )
 {
+	//! ID関連
+	ar << m_UID;
+	ar << m_AssetID;
+	ar << m_DataID;
+
 	//! 
-	ar << WorldID;
-	ar << WorldName;
+	ar << m_DisplayName;
 	
 	//! 
 	ar << m_NextEntityID;
@@ -226,7 +260,7 @@ void UNaWorld::SetCurrentPosition( const FIntVector& pos )
 			cz	= pos.Z + 3;
 		}
 		else {
-			cz	= INT_MAX;
+			cz	= SHORT_MAX;
 		}
 
 		if ( cz != m_CeilZ ){
@@ -320,7 +354,7 @@ void UNaWorld::UpdateWorld()
 			m_ChunkMap.Add( it->GetPositionInWorld(), it );
 			it->Open();
 
-			//! ワールド付きエンティティの生成
+			//! 上位管理エンティティの生成
 			GatherWorldEntities( it->GetPositionInWorld(), entities );
 			for ( auto& it2 : entities ){
 				SpawnEntity( it2, it2->GetWorldPosition() );
@@ -357,7 +391,7 @@ void UNaWorld::AdvanceTurn()
 		}
 
 		// ターンアクション開始
-		if ( !m_CurrentAction ){
+		if ( !m_CurrentAction && m_ActionChain.Num() > 0 ){
 			m_CurrentAction	= m_ActionChain[0];
 			m_ActionChain.RemoveAt( 0 );
 
@@ -368,15 +402,20 @@ void UNaWorld::AdvanceTurn()
 		}
 
 		// ターン処理
-		m_CurrentAction->ExecuteTurn( 0.0f );
+		if ( m_CurrentAction ){
+			m_CurrentAction->ExecuteTurn( 0.0f );
 
-		// 終了しなかった場合は次フレームへ
-		if ( !m_CurrentAction->IsEndTurn() ){
+			// 終了しなかった場合は次フレームへ
+			if ( !m_CurrentAction->IsEndTurn() ){
+				break;
+			}
+
+			InsertActionChain( m_CurrentAction );
+			m_CurrentAction	= nullptr;
+		}
+		else {
 			break;
 		}
-
-		InsertActionChain( m_CurrentAction );
-		m_CurrentAction	= nullptr;
 	}
 }
 
@@ -589,6 +628,7 @@ bool UNaWorld::SpawnEntity( UNaEntity* entity, FIntVector pos )
 	entity->SetWorldPosition( pos );
 	entity->Spawn();
 
+	//! 表示
 	EnterEntity( entity );
 
 	return true;
@@ -601,6 +641,7 @@ void UNaWorld::DespawnEntity( UNaEntity* entity )
 		return;
 	}
 
+	//! 消去
 	LeaveEntity( entity );
 
 	//! デスポーン処理
@@ -614,10 +655,10 @@ bool UNaWorld::EnterEntity( UNaEntity* entity )
 		return false;
 	}
 
-	// スポーンリストへ追加
+	//! スポーンリストへ追加
 	m_SpawnEntities.Add( entity );
 
-	// 実行チェインに追加 //
+	//! 実行チェインに追加
 	AttachActionChain( entity );
 
 	// 
@@ -715,7 +756,24 @@ void UNaWorld::GatherWorldEntities( const FIntVector& chunkPos, TArray<UNaEntity
 {
 	outVal.Reset();
 
-	//! Globalエンティティ検索
+	//! グローバルエンティティ検索
+	if ( UNaGameDatabase* db = UNaGameDatabase::GetDB() ){
+		TArray<UNaEntity*>	entities;
+
+		db->GatherEntities( m_UID, entities );
+
+		for ( auto& it : entities ){
+			//! 生存判定
+			if ( !it->IsAlive() ){
+				continue;
+			}
+
+			//! チャンク内・または無形エンティティ
+			if ( it->GetChunkPosition() == chunkPos || it->IsIntangible() ){
+				outVal.Add( it );
+			}
+		}
+	}
 
 	//! ワールドエンティティ検索
 	for ( auto& it : m_Entities ){
@@ -724,7 +782,8 @@ void UNaWorld::GatherWorldEntities( const FIntVector& chunkPos, TArray<UNaEntity
 			continue;
 		}
 
-		if ( it->GetChunkPosition() == chunkPos ){
+		//! チャンク内・または無形エンティティ
+		if ( it->GetChunkPosition() == chunkPos || it->IsIntangible() ){
 			outVal.Add( it );
 		}
 	}

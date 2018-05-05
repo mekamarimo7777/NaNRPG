@@ -31,13 +31,11 @@ public:
 	virtual bool	WaitForAction();
 
 protected:
-	//! 更新
-	virtual void	OnTick( UNaStateMachine* sm, float DeltaTime ){}
 
 protected:
-	//! 
+	//! ステート管理
 	UPROPERTY()
-	UNaStateMachine*	m_StateMachine;
+	UNaStateMachine*	m_SM;
 	//! 
 	bool				m_IsBusy;
 };

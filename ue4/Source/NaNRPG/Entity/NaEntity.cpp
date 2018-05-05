@@ -14,9 +14,8 @@
 
 // 
 UNaEntity::UNaEntity()
-: m_bAbstract( false )
-, m_bNoSave( false )
-, m_bKill( false )
+: m_IsAbstract( false )
+, m_IsKill( false )
 , m_Direction( ENaDirection::South )
 , m_Speed( 500 )
 , m_ID( -1 )
@@ -30,7 +29,7 @@ void UNaEntity::Initialize( ENaEntity::Type type )
 {
 	m_Type	= type;
 
-	m_StateMachine	= NewObject<UNaStateMachine>();
+	m_SM	= NewObject<UNaStateMachine>();
 
 	OnAwake();
 }

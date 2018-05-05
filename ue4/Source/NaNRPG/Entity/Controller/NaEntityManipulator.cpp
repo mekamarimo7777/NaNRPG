@@ -11,29 +11,32 @@
 // 操作ターゲット設定
 void UNaEntityManipulator::BindTarget( UNaEntityCharacter* target )
 {
+	UnbindTarget();
+
 	m_Target	= target;
 }
 
-// 更新
-void UNaEntityManipulator::UpdateControl( float DeltaTime )
+// 操作ターゲット解除
+void UNaEntityManipulator::UnbindTarget()
 {
-	OnControl( DeltaTime );
+	if ( m_Target ){
+		m_Target	= nullptr;
+	}
+}
+
+// 更新
+void UNaEntityManipulator::UpdateControl( UNaStateMachine* sm, float DeltaTime )
+{
+	OnControl( sm, DeltaTime );
 }
 
 // 更新処理
-void UNaEntityManipulator::OnControl( float DeltaTime )
+void UNaEntityManipulator::OnControl( UNaStateMachine* sm, float DeltaTime )
 {
-	if ( m_Target ){
-		UNaStateMachine*	sm = m_Target->GetStateMachine();
-
-		switch ( sm->GetState() ){
-		case UNaEntityCharacter::EState::EndTurn:
-			{
-				UNaTurnActionComponent*	tac = m_Target->GetTurnAction();
-				tac->EndTurn();
-			}
-			break;
-		}
+	switch ( sm->GetState() ){
+	case UNaEntityCharacter::EState::EndTurn:
+		ProcEndTurn( sm, DeltaTime );
+		break;
 	}
 }
 
@@ -41,4 +44,12 @@ void UNaEntityManipulator::OnControl( float DeltaTime )
 UWorld* UNaEntityManipulator::GetWorldContext() const
 {
 	return m_Target->GetWorldContext();
+}
+
+//! ターンエンド処理
+void UNaEntityManipulator::ProcEndTurn( UNaStateMachine* sm, float DeltaTime )
+{
+	UNaTurnActionComponent*	tac = m_Target->GetTurnAction();
+
+	tac->EndTurn();
 }

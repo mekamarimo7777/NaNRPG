@@ -22,6 +22,8 @@ bool UNaMenuWidget::Initialize()
 		if ( m_LvParty ){
 		}
 
+		m_SM->RegisterState( EState::Main, this, &UNaMenuWidget::ProcMain );
+
 		return true;
 	}
 	else {
@@ -39,20 +41,14 @@ void UNaMenuWidget::NativeConstruct()
 void UNaMenuWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick( MyGeometry, InDeltaTime );
-
-	switch ( m_StateMachine->GetState() ){
-	case EState::Main:
-		ProcMain( m_StateMachine, InDeltaTime );
-		break;
-	}
 }
 
 //! キー入力
 FReply UNaMenuWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
-	switch ( m_StateMachine->GetState() ){
+	switch ( m_SM->GetState() ){
 	case EState::Main:
-		ProcMain( m_StateMachine, 0.0f, &InKeyEvent );
+		ProcMainKeyDown( m_SM, &InKeyEvent );
 		break;
 	}
 
@@ -62,7 +58,7 @@ FReply UNaMenuWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEve
 //! ステート設定
 void UNaMenuWidget::SetState( EState state )
 {
-	m_StateMachine->ChangeState( state );
+	m_SM->ChangeState( state );
 }
 
 //! メニュー項目追加
@@ -93,8 +89,9 @@ void UNaMenuWidget::ClearParty()
 // protected methods
 //////////////////////////////////////////////////
 //! 
-void UNaMenuWidget::ProcMain( UNaStateMachine* sm, float DeltaTime, const FKeyEvent* KeyEvent )
+void UNaMenuWidget::ProcMain( UNaStateMachine* sm, float DeltaTime )
 {
+	//! 
 	enum EPhase
 	{
 		//! 
@@ -110,49 +107,65 @@ void UNaMenuWidget::ProcMain( UNaStateMachine* sm, float DeltaTime, const FKeyEv
 		End,
 	};
 
-	if ( !KeyEvent ){
-		//! メイン
-		switch ( sm->GetPhase() ){
-		case Init:
-			UpdateMenuItems();
-			UpdatePartyItems();
-			sm->SetPhase( Start );
-			break;
+	//! メイン
+	switch ( sm->GetPhase() ){
+	case Init:
+		UpdateMenuItems();
+		UpdatePartyItems();
+		sm->SetPhase( Start );
+		break;
 
+	//! 
+	case Start:
+		Transition( "Show" );
+		sm->Advance();
+		break;
+	case StartWait:
+		if ( !IsTransition() ){
+			m_LvParty->SetKeyboardFocus();
+			sm->SetPhase( Main );
+		}
+		break;
+
+	case Main:
+		break;
+
+	case Decided:
+		break;
+
+	case End:
+		break;
+	}
+}
+FReply UNaMenuWidget::ProcMainKeyDown( UNaStateMachine* sm, const FKeyEvent* KeyEvent )
+{
+	//! 
+	enum EPhase
+	{
 		//! 
-		case Start:
-			Transition( "Show" );
-			sm->AdvancePhase();
-			break;
-		case StartWait:
-			if ( !IsTransition() ){
-				m_LvParty->SetKeyboardFocus();
-				sm->SetPhase( Main );
-			}
-			break;
+		Init,
+		//! 
+		Start,
+		StartWait,
+		//! 
+		Main,
+		//! 
+		Decided,
+		//! 
+		End,
+	};
+	const FKey	key = KeyEvent->GetKey();
 
-		case Main:
-			break;
-
-		case Decided:
-			break;
-
-		case End:
-			break;
+	//! キーイベント
+	switch ( sm->GetPhase() ){
+	case Main:
+		if ( key == EKeys::Enter ){
+			sm->SetPhase( Decided );
 		}
+		break;
 	}
-	else {
-		const FKey	key = KeyEvent->GetKey();
 
-		//! キーイベント
-		switch ( sm->GetPhase() ){
-		case Main:
-			if ( key == EKeys::Enter ){
-				sm->SetPhase( Decided );
-			}
-			break;
-		}
-	}
+	return FReply::Handled();
 }
 
 //! メニューカテゴリ生成

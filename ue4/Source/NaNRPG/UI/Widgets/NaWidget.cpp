@@ -8,7 +8,7 @@
 bool UNaWidget::Initialize()
 {
 	if ( Super::Initialize() ){
-		m_StateMachine	= NewObject<UNaStateMachine>();
+		m_SM	= NewObject<UNaStateMachine>();
 		return true;
 	}
 	else {
@@ -27,7 +27,7 @@ void UNaWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick( MyGeometry, InDeltaTime );
 
-	m_StateMachine->Update( InDeltaTime );
+	m_SM->Execute( InDeltaTime );
 }
 
 //!

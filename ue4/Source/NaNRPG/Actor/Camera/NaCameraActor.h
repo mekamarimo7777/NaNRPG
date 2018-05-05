@@ -15,32 +15,42 @@ class NANRPG_API ANaCameraActor : public ACameraActor
 	GENERATED_BODY()
 	
 public:
-	//
+	//! コンストラクタ
+	ANaCameraActor( const FObjectInitializer& ObjectInitializer );
+
+	//! 開始
 	virtual void BeginPlay() override;
 
-	// 
+	//! 更新処理
 	virtual void Update( float DeltaSeconds );
 
 public:
-	//
+	//! バインド先設定
 	void	AttachTarget( AActor* target );
-	//
-	void	SetOrbitalAngle( float angle )	{OrbitalAngleTo = angle;}
-
-public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = CameraActor)
-	FVector	OrbitalPos;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = CameraActor)
-	float	OrbitalAngle;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = CameraActor)
-	float	OrbitalAngleTo;
-	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = CameraActor)
-	FVector	BirdEyePos;
+	//! アングル設定
+	void	SetAngle( float angle );
 
 protected:
+	//! カメラ角度設定
+	void	ApplyCameraAngle();
+
+public:
+	//! カメラピッチ
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = CameraActor)
+	float	OrbitalPitch;
+	//! カメラ距離
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = CameraActor)
+	float	OrbitalRange;
+
+protected:
+	//! 注視ターゲット
 	UPROPERTY()
 	AActor*	m_pTarget;
 
-	bool	m_UseBirdEye;
+	//! 
+	FVector	m_CurrentPos;
+	//! カレント角度
+	float	m_CurrentAngle;
+	//! リクエスト角度
+	float	m_RequestAngle;
 };

@@ -52,11 +52,11 @@ public:
 
 protected:
 	//! 
-	void	ProcEvent( UNaStateMachine* sm );
+	void	ProcEvent( UNaStateMachine* sm, float DeltaTime );
 	//! 
-	void	ProcMessage( UNaStateMachine* sm );
+	void	ProcMessage( UNaStateMachine* sm, float DeltaTime );
 	//! 
-	void	ProcSelection( UNaStateMachine* sm );
+	void	ProcSelection( UNaStateMachine* sm, float DeltaTime );
 
 	//! コマンド解析
 	bool	ParseCommand( UNaStateMachine* sm, const FNaEventCommand* cmd );
@@ -70,7 +70,7 @@ protected:
 
 	// ステート管理
 	UPROPERTY(Transient)
-	UNaStateMachine*		m_StateMachine;
+	UNaStateMachine*		m_SM;
 
 	//! イベント
 	UPROPERTY(Transient)

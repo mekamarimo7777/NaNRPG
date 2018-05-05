@@ -26,6 +26,7 @@ class NANRPG_API ANaWorldActor : public AActor
 	GENERATED_BODY()
 
 public:
+	//! ステート
 	enum EState
 	{
 		Main,
@@ -40,46 +41,29 @@ public:
 	//! 更新
 	virtual void Tick( float DeltaSeconds ) override;
 
-public:
-	//! 
+	//! ワールドオープン
+	UNaWorld*	OpenWorld( FName id, FName assetID = FName() );
+	//! ワー	ルドクローズ
+	void		CloseWorld( FName id );
+	//! アクティブワールド変更リクエスト
+	void		SwitchWorld( FName id );
 
+	//! カメラ設定
+	void	BindCamera( ANaCameraActor* camera )	{ m_Camera = camera; }
 
-
-
-	// @obsolete マップ読み込み //
-	void	LoadMap( int32 mapID );
-
-	// ワールド設定 //
-	void	AssignWorld( UNaWorld* world );
-
-	// //
-	void	CloseWorld();
-
-	//
-	void	ChangeState(EState state, int32 param = 0, bool immediate = false);
-
-	//! 
+	//! 表示チャンク範囲設定
 	void	SetRenderSize( FIntVector size, FIntVector margin = FIntVector::ZeroValue );
-	//! 
-	void	UpdateChunkActor();
-	//! 
+	//! チャンクアクター取得
 	ANaMapChunkActor*	GetChunkActor( const FIntVector& chunkPos );
-
-	//
-	void	UpdateMap( const FIntVector& pos );
-
-	//
+	//! ブロックマテリアル取得
 	UMaterialInstanceDynamic*	FindBlockMaterial(int32 id);
 
-	//! カメラセット
-	void	SetCamera(ANaCameraActor* camera)	{ m_Camera = camera; }
-
 protected:
-	//
-	bool	ProcMain( UNaStateMachine* sm, float DeltaTime );
+	//! メイン
+	void	ProcMain( UNaStateMachine* sm, float DeltaTime );
 
-	//
-	void	ProcMainOld(float DeltaTime);
+	//! チャンクアクター更新
+	void	UpdateChunkActor();
 	
 public:
 	//! ポストプロセスマテリアル
@@ -91,16 +75,20 @@ protected:
 	UPROPERTY()
 	UNaStateMachine*	m_SM;
 
-	//! ゲームワールド
+	//! オープン中のワールド
 	UPROPERTY()
-	UNaWorld*		m_World;
+	TArray<UNaWorld*>	m_Worlds;
+	//! アクティブワールド（表示中のワールド）
+	UPROPERTY()
+	UNaWorld*			m_ActiveWorld;
+	//! トランジション予約先ワールド
+	UPROPERTY()
+	UNaWorld*			m_NextWorld;
 
-	//! チャンクアクター
-//	TMap<FIntVector, ANaMapChunkActor*>	m_ChunkActors;
 	//! 管理チャンクアクター
 	UPROPERTY()
 	TArray<ANaMapChunkActor*>	m_ChunkActors;
-
+//	TMap<FIntVector, ANaMapChunkActor*>	m_ChunkActors;
 	//! 描画チャンク距離
 	UPROPERTY()
 	FIntVector		m_RenderSize;
@@ -108,21 +96,13 @@ protected:
 	UPROPERTY()
 	FIntVector		m_RenderSizeMargin;
 
-	//! 視界遮蔽用キャプチャ
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-	USceneCaptureComponentCube*	m_CaptureCube;
-	//! ポストプロセス
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
-	UPostProcessComponent*		m_PostProcess;
-
+	//! プレイヤーアクター
+	UPROPERTY()
+	ANaActorBase*	m_Player;
 	//! カレント座標
 	FIntVector		m_CurrentPos;
 	//! カレントチャンク
 	FIntVector		m_CurrentChunkPos;
-
-	//! プレイヤーアクター
-	UPROPERTY()
-	ANaActorBase*	m_Player;
 
 	// ワールドアクター実体（プレイヤー、敵、その他動くもの） //
 	UPROPERTY()
@@ -133,14 +113,19 @@ protected:
 	// 行動待ちキュー //
 	UPROPERTY()
 	TArray<ANaActorBase*>	m_ActionActors;
-
 	//! カメラ
 	UPROPERTY()
 	ANaCameraActor*			m_Camera;
-
-	// ライト //
+	//! ライト
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Light")
 	UDirectionalLightComponent*	m_pDirLight;
+
+	//! 視界遮蔽用キャプチャ
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+	USceneCaptureComponentCube*	m_CaptureCube;
+	//! ポストプロセス
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
+	UPostProcessComponent*		m_PostProcess;
 
 	// マテリアル //
 	UPROPERTY()
@@ -148,9 +133,4 @@ protected:
 	//! ポストプロセスマテリアル
 	UPROPERTY()
 	UMaterialInstanceDynamic*				m_MIDPost;
-
-	//! ステート
-	EState	m_State;
-	int32	m_StateParam;
-	int32	m_StateStep;
 };

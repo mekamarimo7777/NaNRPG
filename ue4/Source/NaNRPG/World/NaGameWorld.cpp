@@ -15,18 +15,18 @@ UNaGameWorld::UNaGameWorld()
 }
 
 //! ‰Šú‰»
-void UNaGameWorld::Initialize( UWorld* world )
+void UNaGameWorld::Setup( UWorld* world )
 {
-	Super::Initialize( world );
+	Super::Setup( world );
 
 	m_EventManager	= NewObject<UNaEventManager>();
 	m_EventManager->Initialize( this );
 }
 
 //! 
-void UNaGameWorld::Tick( float DeltaTime )
+void UNaGameWorld::Update( float DeltaTime )
 {
-	Super::Tick( DeltaTime );
+	Super::Update( DeltaTime );
 
 	if ( m_EventManager ){
 		m_EventManager->Tick( DeltaTime );

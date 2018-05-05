@@ -21,9 +21,9 @@ public:
 	UNaGameWorld();
 
 	//! 初期化
-	virtual void	Initialize( UWorld* world ) override;
+	virtual void	Setup( UWorld* world ) override;
 	//! 
-	virtual void	Tick( float DeltaTime ) override;
+	virtual void	Update( float DeltaTime ) override;
 
 	//! イベントマネージャ取得
 	virtual UNaEventManager*	GetEventManager() override	{ return m_EventManager; }

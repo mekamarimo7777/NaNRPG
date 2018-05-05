@@ -24,9 +24,9 @@ void UNaEntitySpawnManager::OnAwake()
 	}
 
 	//@obsolete
-	m_bAbstract	= true;
-	m_Speed		= 5;
-	m_SpawnMax	= 10;
+	m_IsAbstract	= true;
+	m_Speed			= 5;
+	m_SpawnMax		= 10;
 }
 
 // ターン開始

@@ -47,13 +47,13 @@ public:
 	// ID除去
 	void	ResetID();
 
-	// スポーン処理
+	// スポーン処理（チャンクデータへの追加）
 	void	Spawn();
-	// デスポーン処理
+	// デスポーン処理（チャンクデータから削除）
 	void	Despawn();
-	// 入場処理（ワールドへの表示処理）
+	// 入場処理（チャンク起動時の処理）
 	void	Enter();
-	// 退場処理（ワールドからの一時的な非表示処理）
+	// 退場処理（チャンク消去時の退避処理）
 	void	Leave();
 
 	// Naワールド設定
@@ -61,15 +61,19 @@ public:
 	// Naワールド取得
 	UNaWorld*	GetNaWorld() const				{ return m_pWorld; }
 
+	//! 所属ワールドID設定
+	void		SetWorldID( FName id )			{ m_WorldID = id; }
+	//! 所属ワールドID取得
+	FName		GetWorldID() const				{ return m_WorldID; }
+	//! 所属マップID設定
+	void		SetMapID( int32 id )			{ m_MapID = id; }
+	//! 所属マップID取得
+	int32		GetMapID() const				{ return m_MapID; }
+
 	// UEワールド取得
 	UWorld*		GetWorldContext() const			{ return m_pWorld ? m_pWorld->GetWorldContext() : nullptr; }
 	// UEHUD取得
 	ANaGameHUD*	GetHUD() const					{ return Cast<ANaGameHUD>( GWorld->GetFirstPlayerController()->GetHUD() ); }
-
-	//! 所属ワールドID設定
-	void	SetWorldID( int32 wid );
-	//! 所属マップID設定
-	void	SetMapID( int32 mid );
 
 	//! エンティティ情報生成
 	virtual void	CreateFromAsset( const FNaEntityDataAsset& asset );
@@ -89,7 +93,7 @@ public:
 	//! スポーン判定
 	bool	IsSpawned() const	{ return m_Spawned; }
 	//! 生存判定
-	bool	IsAlive() const		{ return !m_bKill; }
+	bool	IsAlive() const		{ return !m_IsKill; }
 
 	//! イベントセット
 	void	SetEvent( FName eventID );
@@ -132,7 +136,7 @@ public:
 	// ステート
 	//==================================================
 	//!
-	virtual UNaStateMachine*		GetStateMachine() const			{ return m_StateMachine; }
+	virtual UNaStateMachine*	GetStateMachine() const			{ return m_SM; }
 
 	//==================================================
 	// ターンアクション
@@ -143,9 +147,9 @@ public:
 	FORCEINLINE bool	HasTurnAction() const	{ return GetTurnAction() != nullptr; }
 
 	// 削除
-	void	Kill()	{ m_bKill = true; }
+	void	Kill()	{ m_IsKill = true; }
 	// 削除待ち
-	virtual bool	IsPendingKill() const	{ return m_bKill; }
+	virtual bool	IsPendingKill() const	{ return m_IsKill; }
 
 	//!
 	virtual UNaEntityManipulator*	GetManipulator() const			{ return nullptr; }
@@ -155,22 +159,20 @@ public:
 	//
 	ENaEntityStage::Type	GetStage() const	{return m_Stage;}
 
-	// 無形エンティティ（チャンクに所属しない）
-	virtual bool	IsIntangible() const	{return false;}
+	//! 無形エンティティ（チャンクに所属しない）
+	virtual bool	IsIntangible() const	{ return m_IsAbstract; }
+	// コリジョンの有無
+	virtual bool	IsCollidable() const	{ return !m_IsAbstract && m_Collidable; }
 
 	// 
-	virtual bool	IsAbstract() const		{return m_bAbstract;}
+	//virtual bool	IsAbstract() const		{return m_IsAbstract;}
 	// 
-	virtual bool	IsStationaly() const	{return m_bStationary;}
+	//virtual bool	IsStationaly() const	{return m_IsStationary;}
 	// 
-	virtual bool	IsCollidable() const	{return !m_bAbstract && m_Collidable;}
-	// 
-	virtual bool	IsNoSave() const		{return m_bNoSave;}
+	//virtual bool	IsNoSave() const		{return m_bNoSave;}
 
 	// シリアライズ
 	virtual	void	Serialize( FArchive& ar ) override;
-
-public:
 
 protected:
 	// 生成後の初期化
@@ -193,28 +195,28 @@ protected:
 	void	UpdateTransientData( const FNaEntityDataAsset* asset );
 
 public:
-	// フラグ類 //
-	bool	m_bStationary;		// アクションしない（アクションチェインに繋がない）
-	bool	m_bUnique;			// ユニークエンティティ（自然デスポーンしない）
-	bool	m_bLocal;			// チャンクに従属するエンティティ
-	bool	m_bAbstract;		// 座標管理しないエンティティ（チャンクに属さない）
-	bool	m_bNoSave;			// 
-	bool	m_bKill;			// 削除待ち
+	//! アクションしない（アクションチェインに繋がない）
+	bool	m_IsStationary;
+	//! 座標管理しないエンティティ（チャンクに属さない）
+	bool	m_IsAbstract;
+	//! キルフラグ
+	bool	m_IsKill;
 	
 protected:
 	//*** Serialize ***//
 	//! エンティティ種別
 	TEnumAsByte<ENaEntity::Type>	m_Type;
+	//! アセットID
 	FName							m_AssetID;
-	uint32							m_ID;			// エンティティID //
-
+	//! 固有ID
+	uint32							m_ID;
 	//! エンティティ情報
 	FNaEntityProfile				m_Profile;
 
 	//! 所属レベル
 	TEnumAsByte<ENaEntityStage::Type>	m_Stage;
-	//! 所属ワールドID
-	int32								m_WorldID;
+	//! 所属ワールドID（Worldステージ以上に設定）
+	FName								m_WorldID;
 	//! 所属マップID（-1で未所属）
 	int32								m_MapID;
 	//! 
@@ -252,7 +254,7 @@ protected:
 
 	//! ステート管理
 	UPROPERTY(Transient)
-	UNaStateMachine*	m_StateMachine;
+	UNaStateMachine*	m_SM;
 
 	//! ソースアセット
 	const FNaEntityDataAsset*	m_Asset;

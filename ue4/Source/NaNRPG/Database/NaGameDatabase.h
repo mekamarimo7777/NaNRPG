@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "NaDatabaseConst.h"
+
 #include "Entity/Character/NaEntityPlayer.h"
 
 #include "NaGameDatabase.generated.h"
@@ -30,8 +32,21 @@ public:
 
 	//! プレイヤーエンティティ登録
 	void				RegisterPlayer( UNaEntityPlayer* player );
+	//! グローバルエンティティ登録
+	void				RegisterGlobalEntity( UNaEntity* entity );
+	//! 指定ワールド内エンティティ収集
+	void				GatherEntities( FName id, TArray<UNaEntity*>& outVal );
 	//! プレイヤーエンティティ取得
 	UNaEntityPlayer*	GetPlayer() const	{ return m_Player; }
+
+	//! ワールドエントリ登録
+	void				RegisterWorldEntry( FName id, uint32 dataID );
+	//! ワールドエントリ取得
+	FNaWorldRecord*		FindWorldEntry( FName id );
+	//! ワールドエントリ確認
+	bool				ExistWorldEntry( FName id );
+	//! ワールドデータID生成
+	uint32				GenerateWorldDataID();
 
 protected:
 	//
@@ -48,16 +63,16 @@ public:
 	//! パーティメンバー
 	UPROPERTY()
 	TArray<UNaEntityCharacter*>	m_PartyMember;
-	//! その他汎用グローバルエンティティ
+	//! グローバルエンティティ
 	UPROPERTY()
 	TArray<UNaEntity*>			m_GlobalEntities;
 
-	//! カレントのローカルマップ
+	//! 生成ワールド一覧
 	UPROPERTY()
-	FName	m_CurrentWorld;
-	//! 非ユニークマップの払い出しID
+	TArray<FNaWorldRecord>	m_WorldRecords;
+	//! カレントのローカルマップ（未設定時はグローバルマップ）
 	UPROPERTY()
-	int32	m_NextWorldID;
+	FName					m_WorldID;
 
 	//! イベントフラグ
 //	UPROPERTY()

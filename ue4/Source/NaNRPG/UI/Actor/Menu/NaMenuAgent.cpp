@@ -11,12 +11,15 @@
 ANaMenuAgent::ANaMenuAgent( const FObjectInitializer& ObjectInitializer )
 : Super( ObjectInitializer )
 {
+	m_SM->RegisterState( EState::Main, this, &ANaMenuAgent::ProcMain );
+	m_SM->RegisterState( EState::Inventory, this, &ANaMenuAgent::ProcInventory );
+	m_SM->RegisterState( EState::Equipment, this, &ANaMenuAgent::ProcEquipment );
 }
 
 //! メニュー操作開始
 void ANaMenuAgent::Start( int32 param )
 {
-	m_StateMachine->ChangeState( param );
+	m_SM->ChangeState( param );
 }
 
 //! 結果取得
@@ -33,22 +36,6 @@ void ANaMenuAgent::GetItemResult()
 //////////////////////////////////////////////////
 // protected methods
 //////////////////////////////////////////////////
-//! 更新
-void ANaMenuAgent::OnTick( UNaStateMachine* sm, float DeltaTime )
-{
-	switch ( sm->GetState() ){
-	case EState::Main:
-		ProcMain( sm, DeltaTime );
-		break;
-	case EState::Inventory:
-		ProcInventory( sm, DeltaTime );
-		break;
-	case EState::Equipment:
-		ProcEquipment( sm, DeltaTime );
-		break;
-	}
-}
-
 //! メイン
 void ANaMenuAgent::ProcMain( UNaStateMachine* sm, float DeltaTime )
 {
@@ -70,11 +57,11 @@ void ANaMenuAgent::ProcMain( UNaStateMachine* sm, float DeltaTime )
 			m_MenuWidget	= CreateWidget<UNaMenuWidget>( GetWorld(), MenuWidgetClass );
 			m_MenuWidget->Open();
 		}
-		sm->AdvancePhase();
+		sm->Advance();
 		break;
 	case Start:
 		m_MenuWidget->SetState( UNaMenuWidget::Main );
-		sm->AdvancePhase();
+		sm->Advance();
 		break;
 
 	//! メイン

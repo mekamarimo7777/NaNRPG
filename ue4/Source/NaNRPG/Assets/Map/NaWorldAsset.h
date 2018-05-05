@@ -14,7 +14,7 @@ struct FNaWorldMapEntry
 {
 	GENERATED_BODY()
 
-	//! アセット
+	//! マップアセット
 	UPROPERTY( EditDefaultsOnly, Category = "General", Meta = (AllowedClasses = "NaMapAsset") )
 	FStringAssetReference	Map;
 	//! 配置座標（チャンク単位）
@@ -31,13 +31,11 @@ class NANRPG_API UNaWorldAsset : public UNaDataAsset
 	GENERATED_BODY()
 	
 public:
-
-public:
-	//!
+	//! 表示名
 	UPROPERTY( EditDefaultsOnly, Category = "General" )
 	FText	DisplayName;
 
-	//! 
+	//! 配置マップアセット
 	UPROPERTY( EditDefaultsOnly, Category = "Map" )
 	TArray<FNaWorldMapEntry>	MapEntries;
 

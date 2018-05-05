@@ -1,9 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+Ôªø// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "NaNRPG.h"
 #include "NaStateMachine.h"
 
 
+//////////////////////////////////////////////////
+// public methods
+//////////////////////////////////////////////////
 //!
 UNaStateMachine::UNaStateMachine( const FObjectInitializer& ObjectInitializer )
 : Super( ObjectInitializer )
@@ -16,7 +19,7 @@ UNaStateMachine::UNaStateMachine( const FObjectInitializer& ObjectInitializer )
 	m_StateFunc.Reserve( 16 );
 }
 
-//! ÉXÉeÅ[Égìoò^
+//! „Çπ„ÉÜ„Éº„ÉàÁôªÈå≤
 void UNaStateMachine::RegisterState( int32 state, FNaStateDelegate func )
 {
 	if ( m_StateFunc.Num() <= state ){
@@ -25,12 +28,24 @@ void UNaStateMachine::RegisterState( int32 state, FNaStateDelegate func )
 	m_StateFunc[state]	= func;
 }
 
-//! é¿çs
+//! „Çπ„ÉÜ„Éº„ÉàËß£Èô§
+void UNaStateMachine::UnregisterState( int32 state )
+{
+	if ( m_StateFunc.IsValidIndex( state ) ){
+		m_StateFunc[state].Unbind();
+	}
+}
+
+//! ÂÆüË°å
 void UNaStateMachine::Execute( float DeltaTime )
 {
 	FNaStateDelegate	func;
 
-	while ( true ){
+	m_Again	= true;
+
+	while ( m_Again ){
+		m_Again	= false;
+
 		if ( m_State != m_NextState ){
 			ChangeState( m_NextState, m_NextStateParam, true );
 		}
@@ -38,16 +53,9 @@ void UNaStateMachine::Execute( float DeltaTime )
 		if ( m_StateFunc.IsValidIndex( m_State ) ){
 			func	= m_StateFunc[m_State];
 			if ( func.IsBound() ){
-				bool	finished;
-
-				finished	= func.Execute( this, DeltaTime );
-				if ( !finished ){
-					continue;
-				}
+				func.Execute( this, DeltaTime );
 			}
 		}
-
-		break;
 	}
 }
 
@@ -62,13 +70,5 @@ void UNaStateMachine::ChangeState(int32 state, int32 param, bool immediate)
 	else {
 		m_NextState			= state;
 		m_NextStateParam	= param;
-	}
-}
-
-//! 
-void UNaStateMachine::Update(float DeltaTime)
-{
-	if ( m_State != m_NextState ){
-		ChangeState( m_NextState, m_NextStateParam, true );
 	}
 }

@@ -9,22 +9,19 @@
 #include "Entity/Character/NaEntityCharacter.h"
 
 // XVˆ—
-void UNaAIManipulator::OnControl( float DeltaTime )
+void UNaAIManipulator::OnControl( UNaStateMachine* sm, float DeltaTime )
 {
-	if ( m_Target ){
-		UNaStateMachine*	sm = m_Target->GetStateMachine();
-		ANaActorBase*		actor = m_Target->GetActor();
+	ANaActorBase*	actor = m_Target->GetActor();
 
-		switch ( sm->GetState() ){
-		case UNaEntityCharacter::EState::Waiting:
-			break;
-		case UNaEntityCharacter::EState::Action:
-			ProcAction( sm, DeltaTime );
-			break;
-		}
+	switch ( sm->GetState() ){
+	case UNaEntityCharacter::EState::Waiting:
+		break;
+	case UNaEntityCharacter::EState::Action:
+		ProcAction( sm, DeltaTime );
+		break;
 	}
 
-	Super::OnControl( DeltaTime );
+	Super::OnControl( sm, DeltaTime );
 }
 
 //
@@ -45,7 +42,7 @@ void UNaAIManipulator::ProcAction( UNaStateMachine* sm, float DeltaTime )
 
 	switch ( sm->GetPhase() ){
 	case Start:
-		sm->AdvancePhase();
+		sm->Advance();
 		// fall through
 	case Main:
 		//! 
@@ -99,7 +96,7 @@ void UNaAIManipulator::ProcAction( UNaStateMachine* sm, float DeltaTime )
 	case Attack:
 		if ( !actor->IsMoving() ){
 			actor->ChangeState( ANaActorBase::EState::Attack );
-			sm->AdvancePhase();
+			sm->Advance();
 		}
 		break;
 	case WaitAttack:
@@ -122,7 +119,7 @@ void UNaAIManipulator::LockTarget()
 	m_LockTarget	= nullptr;
 
 	for ( auto& it : entities ){
-		if ( it->IsAbstract() ){
+		if ( it->IsIntangible() ){
 			continue;
 		}
 		if ( it->GetType() == ENaEntity::Player ){

@@ -296,7 +296,7 @@ void UNaChunk::CreateTestChunk()
 			if ( worldPos.Y == 0 ){
 				mid_height	+= worldPos.X * 7.0f;
 			}*/
-			switch ( m_pRegion->GetNaWorld()->WorldID ){
+			switch ( m_pRegion->GetNaWorld()->GetDataID() ){
 			case 0:
 				mid_height	= -FMath::Abs( tpos.X * tpos.Y ) / 64.0f;
 				break;

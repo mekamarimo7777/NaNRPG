@@ -16,7 +16,12 @@
 //
 UNaEventManager::UNaEventManager()
 {
-	m_StateMachine	= NewObject<UNaStateMachine>();
+	m_SM	= NewObject<UNaStateMachine>();
+	if ( m_SM ){
+		m_SM->RegisterState( EState::Playing, this, &UNaEventManager::ProcEvent );
+		m_SM->RegisterState( EState::Message, this, &UNaEventManager::ProcMessage );
+		m_SM->RegisterState( EState::Selection, this, &UNaEventManager::ProcSelection );
+	}
 }
 
 //！初期化
@@ -28,19 +33,7 @@ void UNaEventManager::Initialize( UNaWorld* world )
 //! 更新
 void UNaEventManager::Tick( float DeltaTime )
 {
-	m_StateMachine->Update( DeltaTime );
-
-	switch ( m_StateMachine->GetState() ){
-	case EState::Playing:
-		ProcEvent( m_StateMachine );
-		break;
-	case EState::Message:
-		ProcMessage( m_StateMachine );
-		break;
-	case EState::Selection:
-		ProcSelection( m_StateMachine );
-		break;
-	}
+	m_SM->Execute( DeltaTime );
 }
 
 //! 実行要求
@@ -54,20 +47,20 @@ void UNaEventManager::PlayEvent( const UNaEventAsset* evt, int32 sheet )
 	m_CurrentSheet	= sheet;
 	m_PC			= -1;
 
-	m_StateMachine->ChangeState( EState::Playing );
+	m_SM->ChangeState( EState::Playing );
 }
 
 //! 実行中判定
 bool UNaEventManager::IsPlaying() const
 {
-	return m_StateMachine->GetState() != EState::Idle;
+	return m_SM->GetState() != EState::Idle;
 }
 
 //////////////////////////////////////////////////
 // protected methods
 //////////////////////////////////////////////////
 //! イベント実行メイン
-void UNaEventManager::ProcEvent( UNaStateMachine* sm )
+void UNaEventManager::ProcEvent( UNaStateMachine* sm, float DeltaTime )
 {
 	enum EPhase
 	{
@@ -93,7 +86,7 @@ void UNaEventManager::ProcEvent( UNaStateMachine* sm )
 				m_PC	= 0;
 			}
 
-			sm->AdvancePhase();
+			sm->Advance();
 		}
 		break;
 	//! メイン
@@ -122,7 +115,7 @@ void UNaEventManager::ProcEvent( UNaStateMachine* sm )
 }
 
 //! 
-void UNaEventManager::ProcMessage( UNaStateMachine* sm )
+void UNaEventManager::ProcMessage( UNaStateMachine* sm, float DeltaTime )
 {
 	enum EPhase
 	{
@@ -151,7 +144,7 @@ void UNaEventManager::ProcMessage( UNaStateMachine* sm )
 			const FNaEventCommand*	cmd = m_Commands[m_PC];
 			
 			m_UIASkit->ShowMessage( FText::FromString( cmd->Arg0 ) );
-			sm->AdvancePhase();
+			sm->Advance();
 		}
 		else {
 			sm->SetPhase( End );
@@ -160,7 +153,7 @@ void UNaEventManager::ProcMessage( UNaStateMachine* sm )
 	//! メイン
 	case Main:
 		if ( m_UIASkit->WaitForAction() ){
-			sm->AdvancePhase();
+			sm->Advance();
 		}
 		break;
 	//! 終了
@@ -172,7 +165,7 @@ void UNaEventManager::ProcMessage( UNaStateMachine* sm )
 }
 
 //! 
-void UNaEventManager::ProcSelection( UNaStateMachine* sm )
+void UNaEventManager::ProcSelection( UNaStateMachine* sm, float DeltaTime )
 {
 }
 

@@ -51,9 +51,6 @@ public:
 	FSelectionResultEvent&	SelectionResult()	{ return m_SelectionResultEvent; }
 
 protected:
-	//! 更新
-	virtual void	OnTick( UNaStateMachine* sm, float DeltaTime ) override;
-
 	//! メッセージ表示
 	void	ProcMessage( UNaStateMachine* sm, float DeltaTime );
 	//! 選択肢表示

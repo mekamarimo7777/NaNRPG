@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "NaNRPGEd.h"
 #include "NaMapPartsEditor.h"
@@ -96,7 +96,7 @@ void FNaMapPartsEditor::UnregisterTabSpawners(const TSharedRef<class FTabManager
 	InTabManager->UnregisterTabSpawner( s_BlockListTabId );
 }
 
-//! ƒGƒfƒBƒ^‰Šú‰»
+//! ã‚¨ãƒ‡ã‚£ã‚¿åˆæœŸåŒ–
 void FNaMapPartsEditor::InitEditor( const EToolkitMode::Type Mode, const TSharedPtr< class IToolkitHost >& InitToolkitHost, UNaMapPartsAsset* ObjectToEdit )
 {
 	m_CurrentObject	= ObjectToEdit;
@@ -109,7 +109,7 @@ void FNaMapPartsEditor::InitEditor( const EToolkitMode::Type Mode, const TShared
 	//! 
 	FNaMapPartsEditorCommands::Register();
 
-	{//! ƒƒCƒ“ƒrƒ…[ƒ|[ƒg
+	{//! ãƒ¡ã‚¤ãƒ³ãƒ“ãƒ¥ãƒ¼ãƒãƒ¼ãƒˆ
 		m_Viewport = SNew( SNaMapPartsEditorViewport );
 //			.StaticMeshEditor(SharedThis(this))
 //			.ObjectToEdit(ObjectToEdit);
@@ -118,7 +118,7 @@ void FNaMapPartsEditor::InitEditor( const EToolkitMode::Type Mode, const TShared
 		m_Viewport->SetMapParts( ObjectToEdit );
 	}
 
-	{//! Ú×ƒpƒlƒ‹iC#‚Å‚ÌPropertyGridj
+	{//! è©³ç´°ãƒ‘ãƒãƒ«ï¼ˆC#ã§ã®PropertyGridï¼‰
 		FPropertyEditorModule&	PropertyEditorModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>(TEXT("PropertyEditor"));
 		FDetailsViewArgs		DetailsViewArgs;
 //		FOnGetDetailCustomizationInstance	LayoutCustomStaticMeshProperties = FOnGetDetailCustomizationInstance::CreateSP( this, &FStaticMeshEditor::MakeStaticMeshDetails );
@@ -136,7 +136,7 @@ void FNaMapPartsEditor::InitEditor( const EToolkitMode::Type Mode, const TShared
 		m_DetailsView->SetObject( m_DetailsObject );
 	}
 
-	{//! ƒuƒƒbƒNƒŠƒXƒg
+	{//! ãƒ–ãƒ­ãƒƒã‚¯ãƒªã‚¹ãƒˆ
 		UNaAssetLibrary*	alib = UNaAssetLibrary::Get();
 		const TArray<FNaBlockDataAsset*>&	blocks = alib->GetMapBlockList();
 		
@@ -163,7 +163,7 @@ void FNaMapPartsEditor::InitEditor( const EToolkitMode::Type Mode, const TShared
 
 	BuildSubTools();
 
-	//! ƒŒƒCƒAƒEƒg’è‹`
+	//! ãƒ¬ã‚¤ã‚¢ã‚¦ãƒˆå®šç¾©
 	const TSharedRef<FTabManager::FLayout>	StandaloneDefaultLayout = FTabManager::NewLayout( "NaMapPartsEditor_Layout_v0" )
 	->AddArea
 	(
@@ -405,7 +405,7 @@ void FNaMapPartsEditor::ExtendMenu()
 {
 }
 
-//! ƒc[ƒ‹ƒo[Šg’£
+//! ãƒ„ãƒ¼ãƒ«ãƒãƒ¼æ‹¡å¼µ
 void FNaMapPartsEditor::ExtendToolBar()
 {
 	struct Local
@@ -497,7 +497,7 @@ void FNaMapPartsEditor::ExtendToolBar()
 	AddToolbarExtender( AssetToolsModule.GetToolBarExtensibilityManager()->GetAllExtenders( GetToolkitCommands(), GetEditingObjects() ) );
 }
 
-//! •â•ƒc[ƒ‹ì¬
+//! è£œåŠ©ãƒ„ãƒ¼ãƒ«ä½œæˆ
 void FNaMapPartsEditor::BuildSubTools()
 {
 	//! 

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "NaNRPGEd.h"
 #include "NaMapPartsActor.h"
@@ -12,7 +12,7 @@ ANaMapPartsActor::ANaMapPartsActor( const FObjectInitializer& ObjectInitializer)
  	// 
 	PrimaryActorTick.bCanEverTick = true;
 
-	// ƒ‹[ƒgƒRƒ“ƒ|[ƒlƒ“ƒg //
+	// ãƒ«ãƒ¼ãƒˆã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆ //
 	m_ProcMesh		= CreateDefaultSubobject<UProceduralMeshComponent>( TEXT("ProceduralMesh") );
 	m_ProcMesh->SetSimulatePhysics( false );
 //	m_ProcMesh->SetCollisionEnabled( ECollisionEnabled::NoCollision );
@@ -68,7 +68,7 @@ void ANaMapPartsActor::UpdateMesh()
 		vertNum		= 0;
 		indexNum	= 0;
 
-		//! •`‰æ–Ê”
+		//! æç”»é¢æ•°
 		for ( int32 j = 0; j < rm->CellIndices.Num(); ++j ){
 			int32	fnum = m_RenderCells[ rm->CellIndices[j] ].Faces;
 		
@@ -170,7 +170,7 @@ void ANaMapPartsActor::GatherRenderCells()
 		}
 	}
 
-	//! •`‰æ–ÊŒvZ
+	//! æç”»é¢è¨ˆç®—
 	{
 		const FIntVector	dirVec[6] = 
 		{

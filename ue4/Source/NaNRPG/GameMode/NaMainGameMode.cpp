@@ -18,22 +18,20 @@
 
 #include "Controller/MyPlayerController.h"
 
-// コンストラクタ //
+//! コンストラクタ
 ANaMainGameMode::ANaMainGameMode(const FObjectInitializer& ObjectInitializer)
 : Super( ObjectInitializer )
-, m_State( -1 )
 {
 	DefaultPawnClass		= ANaPawn::StaticClass();
 	PlayerControllerClass	= AMyPlayerController::StaticClass();
 }
 
-// 
+//! 開始処理
 void ANaMainGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UWorld*	const		world = GetWorld();
-	APlayerController*	pc = world->GetFirstPlayerController();
+	UWorld*	const	world = GetWorld();
 
 #if WITH_EDITOR
 	{// 直接エディタから来た場合のGameDatabase読み込み
@@ -41,80 +39,87 @@ void ANaMainGameMode::BeginPlay()
 
 		db->LoadDB( "test" );
 
+		//! 初期データ構築（そのうちアセットからの生成に変更）
 		if ( !db->GetPlayer() ){
 			UNaAssetLibrary*			alib = UNaAssetLibrary::Get();
 			UNaEntityPlayer*			player;
 			const FNaEntityDataAsset*	asset;
 
+			//! プレイヤーデータ生成
 			player	= INaEntityFactory::NewEntity<UNaEntityPlayer>( ENaEntity::Player );
 
 			asset	= alib->FindEntityAsset( "Player" );
 			player->CreateFromAsset( *asset );
+			player->SetWorldID( "Home" );
+			player->SetWorldPosition( FIntVector( 0, 0, 64 ) );
 			db->RegisterPlayer( player );
 		}
 	}
 #endif
 
-	{// ワールド生成
+	//! カメラ生成
+	if ( world ){
+		APlayerController*	pc = world->GetFirstPlayerController();
+
+		m_Camera	= world->SpawnActor<ANaCameraActor>( CameraActorClass );
+		check( m_Camera );
+
+		pc->SetViewTargetWithBlend( m_Camera );
+	}
+
+	//! ステート管理
+	m_SM	= NewObject<UNaStateMachine>();
+	if ( m_SM ){
+		m_SM->RegisterState( EState::Main, this, &ANaMainGameMode::ProcMain );
+	}
+	m_SM->ChangeState( EState::Main );
+
+/*	{// ワールド生成
 		m_NaWorld	= LoadWorld( 0, "TestWorld" );
 
 		if ( world ){
-			m_pCamera	= world->SpawnActor<ANaCameraActor>( CameraActorClass );
-			pc->SetViewTargetWithBlend( m_pCamera );
+			m_Camera	= world->SpawnActor<ANaCameraActor>( CameraActorClass );
+			pc->SetViewTargetWithBlend( m_Camera );
 
 			m_pMapActor	= world->SpawnActor<ANaWorldActor>( WorldActorClass );
 	//		m_pMapActor->LoadMap( 0 );
-			m_pMapActor->SetCamera( m_pCamera );
+			m_pMapActor->SetCamera( m_Camera );
 			m_pMapActor->AssignWorld( m_NaWorld );
 		}
-	}
-
-	ChangeState( 0 );
+	}*/
 }
 
-//
+//! 終了処理
 void ANaMainGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	switch ( EndPlayReason ){
 	case EEndPlayReason::EndPlayInEditor:
-		if ( m_pMapActor ){
-			m_pMapActor->CloseWorld();
-		}
+//		if ( m_pMapActor ){
+//			m_pMapActor->CloseWorld();
+//		}
 		break;
 	}
 
 	Super::EndPlay( EndPlayReason );
 }
 
-//
+//! 更新
 void ANaMainGameMode::Tick(float DeltaTime)
 {
 	Super::Tick( DeltaTime );
 
-	switch ( m_State ){
-	case 0:
-		ProcMain( DeltaTime );
-		break;
-	}
+	m_SM->Execute( DeltaTime );
 
-	m_pCamera->Update( DeltaTime );
+	m_Camera->Update( DeltaTime );
 }
 
 //////////////////////////////////////////////////
 // public methods
 //////////////////////////////////////////////////
 //
-void ANaMainGameMode::ChangeState(int32 state, int32 param, bool immediate)
-{
-	m_State			= state;
-	m_StateParam	= param;
-	m_StateStep		= 0;
-}
-
-//
 void ANaMainGameMode::TravelToWorld(int32 worldID)
 {
-	m_pMapActor->LoadMap( worldID );
+//	m_pMapActor->LoadMap( worldID );
 }
 
 //! ワールド読み込み（今後どこかのstaticに移動）
@@ -128,13 +133,13 @@ UNaWorld* ANaMainGameMode::LoadWorld( int32 uid, FName worldID )
 //@	naw	= UNaWorld::Open( uid );
 
 	if ( !naw ){
-		UNaAssetLibrary*	alib = UNaAssetLibrary::Get();
+/*		UNaAssetLibrary*	alib = UNaAssetLibrary::Get();
 		UNaGameDatabase*	db = UNaGameDatabase::GetDB();
 		UNaWorldAsset*		worldAsset;
 		UNaEntity*			entity;
 
 		naw	= NewObject<UNaGameWorld>();
-		naw->Initialize( GetWorld() );
+		naw->Setup( GetWorld() );
 
 		worldAsset	= alib->FindWorldAsset( worldID );
 		naw->CreateWorld( uid, worldAsset );
@@ -142,7 +147,7 @@ UNaWorld* ANaMainGameMode::LoadWorld( int32 uid, FName worldID )
 		// プレイヤー配置
 		entity	= db->GetPlayer();
 		naw->SetCurrentPosition( ppos );
-		naw->SpawnEntity( entity, ppos );
+		naw->SpawnEntity( entity, ppos );*/
 	}
 /*
 	if ( m_pWorld ){
@@ -182,38 +187,48 @@ UNaWorld* ANaMainGameMode::LoadWorld( int32 uid, FName worldID )
 //////////////////////////////////////////////////
 // protected methods
 //////////////////////////////////////////////////
-//
-void ANaMainGameMode::ProcMain(float DeltaTime)
+//! メイン
+void ANaMainGameMode::ProcMain( UNaStateMachine* sm, float DeltaTime )
 {
-	enum StateStep
+	enum EPhase
 	{
 		Start,
 		Main,
 		End
 	};
 
-	switch ( m_StateStep ){
+	switch ( sm->GetPhase() ){
 	case Start:
+		//! ワールドアクタ生成
+		CreateWorldActor();
+
+		//! ワールド読み込み
 		{
-			UNaEntityCharacter*	player = m_NaWorld->GetPlayer();
-			ANaGameHUD*			hud;
-//			UNaMainHUD*			mainHUD;
+			UNaGameDatabase*	db = UNaGameDatabase::GetDB();
+			UNaEntityPlayer*	player = db->GetPlayer();
+			UNaWorld*			naw;
 
-			hud		= player->GetHUD();
-//			mainHUD	= hud->GetMainHUD();
-//			mainHUD->BindTarget( player );
-
-			m_StateStep++;
+			naw	= m_WorldActor->OpenWorld( player->GetWorldID() );
 		}
+
+		sm->Advance();
 		break;
 
 	case Main:
-		if ( m_NaWorld ){
-			m_NaWorld->Tick( DeltaTime );
-		}
 		break;
 
 	case End:
 		break;
 	}
+}
+
+//! ワールド管理アクター生成
+void ANaMainGameMode::CreateWorldActor()
+{
+	UWorld*	world = GetWorld();
+
+	m_WorldActor	= world->SpawnActor<ANaWorldActor>( WorldActorClass );
+	check( m_WorldActor );
+
+	m_WorldActor->BindCamera( m_Camera );
 }

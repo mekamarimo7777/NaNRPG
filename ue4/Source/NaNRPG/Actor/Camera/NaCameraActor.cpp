@@ -4,67 +4,85 @@
 
 #include "NaCameraActor.h"
 
-//
+//====================================================================================================
+
+//! コンストラクタ
+ANaCameraActor::ANaCameraActor( const FObjectInitializer& ObjectInitializer )
+: Super( ObjectInitializer )
+, OrbitalPitch( 35.0f )
+, OrbitalRange( 100.0f )
+, m_CurrentAngle( 0.0f )
+, m_RequestAngle( 0.0f )
+{
+}
+
+//! 開始処理
 void ANaCameraActor::BeginPlay()
 {
 	Super::BeginPlay();
-
-	OrbitalPos.Set( -100.0f, 0.0f, 75.0f );
-	BirdEyePos.Set( -300.0f, 0.0f, 400.0f );
-	OrbitalAngle	= 0.0f;
-
-	m_UseBirdEye	= false;
 }
 
-//
+//! 更新
 void ANaCameraActor::Update( float DeltaSeconds )
 {
-	if ( m_pTarget ){
-		FVector	tpos,pos,opos;
+	//! 角度移動
+	if ( FMath::Abs( m_RequestAngle - m_CurrentAngle ) >= FLT_EPSILON ){
+		float	diff;
 
-		pos		= GetActorLocation();
-		tpos	= m_pTarget->GetActorLocation();
-
-		if ( m_UseBirdEye ){
-			opos	= BirdEyePos.RotateAngleAxis( OrbitalAngle, FVector::UpVector );
+		diff	= m_RequestAngle - m_CurrentAngle;
+		if ( diff >= 180.0f ){
+			diff	= diff - 360.0f;
 		}
-		else {
-			opos	= OrbitalPos.RotateAngleAxis( OrbitalAngle, FVector::UpVector );
+		else if ( diff <= -180.0f ){
+			diff	= diff + 360.0f;
 		}
-		
-		pos	= tpos + opos;
-		SetActorLocation( pos );
 
-		SetActorRotation( FRotationMatrix::MakeFromX( tpos - pos ).Rotator() );
+		diff			= FMath::Clamp( diff, -10.0f, 10.0f );
+		m_CurrentAngle	= FMath::Fmod( m_CurrentAngle + diff, 360.0f );
+		ApplyCameraAngle();
 	}
 
-	{
-		UWorld*				world = GetWorld();
-		APlayerController*	pc = world->GetFirstPlayerController();
+	//! 位置移動
+	if ( m_pTarget ){
+		FVector	pos,dir;
 
-		if ( pc->WasInputKeyJustPressed( EKeys::R ) ){
-			OrbitalPos.Z	+= 10.0f;
-		}
-		else if ( pc->WasInputKeyJustPressed( EKeys::F ) ){
-			OrbitalPos.Z	-= 10.0f;
-		}
+		pos				= m_pTarget->GetActorLocation();
+		m_CurrentPos	= FMath::Lerp( m_CurrentPos, pos, 0.1f );
 
-		if ( OrbitalAngleTo - OrbitalAngle > 180.0f ){
-			OrbitalAngleTo	-= 360.0f;
-		}
-		else if ( OrbitalAngleTo - OrbitalAngle < -180.0f ){
-			OrbitalAngleTo	+= 360.0f;
-		}
-		OrbitalAngle	+= (OrbitalAngleTo - OrbitalAngle) * 0.5f;
+		dir	= GetActorForwardVector();
+		pos	= m_CurrentPos - dir * OrbitalRange;
 
-		if ( pc->WasInputKeyJustPressed( EKeys::B ) ){
-			m_UseBirdEye	^= m_UseBirdEye;
-		}
+		SetActorLocation( pos );
 	}
 }
 
-//
+//! バインド先設定
 void ANaCameraActor::AttachTarget( AActor* target )
 {
-	m_pTarget	= target;
+	if ( m_pTarget != target ){
+		m_pTarget		= target;
+		m_CurrentPos	= m_pTarget->GetActorLocation();
+
+		ApplyCameraAngle();
+	}
+}
+
+//! アングル設定
+void ANaCameraActor::SetAngle( float angle )
+{
+	m_RequestAngle	= FMath::Fmod( angle, 360.0f );
+}
+
+//====================================================================================================
+
+//! カメラ角度設定
+void ANaCameraActor::ApplyCameraAngle()
+{
+	FVector	dir;
+
+	dir	= FVector::ForwardVector;
+	dir	= dir.RotateAngleAxis( OrbitalPitch, FVector::RightVector );
+	dir	= dir.RotateAngleAxis( m_CurrentAngle, FVector::UpVector );
+
+	SetActorRotation( FRotationMatrix::MakeFromX( dir ).Rotator() );
 }

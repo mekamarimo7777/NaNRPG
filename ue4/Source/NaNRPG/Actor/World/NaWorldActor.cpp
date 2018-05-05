@@ -15,26 +15,21 @@
 
 #include "Database/NaGameDatabase.h"
 
+//////////////////////////////////////////////////
+// public methods
+//////////////////////////////////////////////////
+//! 
 ANaWorldActor::ANaWorldActor( const FObjectInitializer& ObjectInitializer )
 : Super( ObjectInitializer )
 {
- 	// 
+ 	//! 
 	PrimaryActorTick.bCanEverTick = true;
 
-	//! 
-	m_SM	= NewObject<UNaStateMachine>();
-	if ( m_SM ){
-		FNaStateDelegate	func;
-
-		func.BindUObject( this, &ANaWorldActor::ProcMain );
-		m_SM->RegisterState( EState::Main, func );
-	}
-
-	// ルートコンポーネント //
+	//! ルートコンポーネント
 	UStaticMeshComponent*	comp = CreateDefaultSubobject<UStaticMeshComponent>( TEXT("RootComponent") );
 	RootComponent	= comp;
 
-	// ライト //
+	//! ライト
 	m_pDirLight	= CreateDefaultSubobject<UDirectionalLightComponent>( TEXT("DiretionalLight") );
 	m_pDirLight->SetRelativeRotation( FRotator( -31.0f, 36.0f, -51.0f ) );
 	m_pDirLight->AttachToComponent( RootComponent, FAttachmentTransformRules::KeepRelativeTransform );
@@ -53,10 +48,11 @@ ANaWorldActor::ANaWorldActor( const FObjectInitializer& ObjectInitializer )
 		m_PostProcess->AttachToComponent( RootComponent, FAttachmentTransformRules::KeepRelativeTransform );
 	}
 
-	m_CurrentChunkPos.Z	= INT_MAX;
+	m_CurrentPos.Z		= INT_MAX;
+	m_CurrentChunkPos.Z	= SHORT_MAX;
 }
 
-// 
+//! 
 void ANaWorldActor::BeginPlay()
 {
 	Super::BeginPlay();
@@ -70,157 +66,94 @@ void ANaWorldActor::BeginPlay()
 
 	SetRenderSize( FIntVector( 3, 3, 0 ), FIntVector( 1, 1, 0 ) );
 
+	//! ステート管理
+	m_SM	= NewObject<UNaStateMachine>();
+	if ( m_SM ){
+		m_SM->RegisterState( EState::Main, this, &ANaWorldActor::ProcMain );
+	}
 	m_SM->ChangeState( EState::Main );
 }
 	
-// 
+//! 
 void ANaWorldActor::Tick( float DeltaSeconds )
 {
 	Super::Tick( DeltaSeconds );
 
 	m_SM->Execute( DeltaSeconds );
-
-	switch ( m_State ){
-	case EState::Main:
-		ProcMainOld( DeltaSeconds );
-		break;
-	}
-
-	if ( m_World ){
-		UNaEntityPlayer*	player;
-		AActor*	actor;
-
-		player	= m_World->GetPlayer();
-		actor	= player->GetActor();
-
-		for ( auto& it : m_MIDMap ){
-			if ( actor ){
-				it.Value->SetVectorParameterValue( "PlayerLocation", actor->GetActorLocation() );
-			}
-			it.Value->SetScalarParameterValue( "CeilZ", m_World->GetCeilZ() );
-		}
-
-		int32	dir = int32( m_World->GetWorldDirection() );
-		m_Camera->SetOrbitalAngle( dir * 45.0f );
-
-		FIntVector	cpos;
-		FVector		v;
-
-		cpos	= m_World->GetCurrentPosition();
-		if ( cpos != m_CurrentPos ){
-			FNaWorldBlockWork	work;
-
-			v.X		= cpos.X * 10.0f + 5.0f;
-			v.Y		= cpos.Y * 10.0f + 5.0f;
-			v.Z		= cpos.Z * 10.0f + 7.5f;
-
-			m_World->GetBlock( cpos, work );
-			v.Z		+= work.GetCenterHeight() / 256.0f * 10.0f;
-
-			if ( m_CaptureCube ){
-				m_CaptureCube->SetRelativeLocation( v );
-				m_CaptureCube->CaptureSceneDeferred();
-			}
-			if ( m_MIDPost ){
-				m_MIDPost->SetVectorParameterValue( "CapturePosition", v );
-			}
-			m_CurrentPos	= cpos;
-
-			cpos.X	= cpos.X >> 4;
-			cpos.Y	= cpos.Y >> 4;
-			cpos.Z	= cpos.Z >> 4;
-
-			if ( m_CurrentChunkPos != cpos ){
-				m_CurrentChunkPos	= cpos;
-				UpdateChunkActor();
-			}
-		}
-	}
 }
 
-//////////////////////////////////////////////////
-// public methods
-//////////////////////////////////////////////////
-// マップ読み込み
-void ANaWorldActor::LoadMap(int32 mapID)
+//! ワールドオープン
+UNaWorld* ANaWorldActor::OpenWorld( FName id, FName assetID )
 {
+	UNaGameDatabase*	db = UNaGameDatabase::GetDB();
 	UWorld*	const		world = GetWorld();
-	APlayerController*	pc = world->GetFirstPlayerController();
-	FIntVector	ppos( 0, 0, 64 );
+	UNaWorld*			naw = nullptr;
 
-	CloseWorld();
-
-	if ( mapID != 3 ){
-		m_World	= UNaWorld::Open( mapID );
+	//! エントリ問い合わせ
+	if ( FNaWorldRecord* rec = db->FindWorldEntry( id ) ){
+		naw	= UNaWorld::Open( rec->DataID );
 	}
-	if ( !m_World ){
-		m_World	= UNaWorld::Create( mapID );
+	else {
+		//! 新規生成
+		naw	= UNaWorld::Create( id, assetID );
+		check( naw );
+
+		db->RegisterWorldEntry( id, naw->GetDataID() );
 	}
 
-	if ( m_World ){
-		UNaGameDatabase*	db = UNaGameDatabase::GetDB();
-		UNaEntity*			entity;
+	naw->Setup( world );
 
-		m_World->Initialize( GetWorld() );
-		if ( mapID == 2 ){
-			m_World->SetChunkLimit( FIntVector(0, 0, -1), FIntVector(4, 4, 1) );
+	m_Worlds.Add( naw );
+
+	if ( !m_ActiveWorld ){
+		m_NextWorld	= naw;
+	}
+
+	return naw;
+}
+
+//! ワールドクローズ
+void ANaWorldActor::CloseWorld( FName id )
+{
+	int32	idx;
+
+	idx	= m_Worlds.IndexOfByPredicate( [id]( UNaWorld* p )
+	{
+		return p->GetUID() == id;
+	});
+
+	if ( idx >= 0 ){
+		UNaWorld*	naw = m_Worlds[idx];
+
+		naw->CloseWorld();
+
+		if ( naw == m_NextWorld ){
+			m_NextWorld		= nullptr;
 		}
-		if ( mapID == 3 ){
-			UNaMapAsset*	asset = NewObject<UNaMapAsset>();
-			UNaMap*			map = NewObject<UNaMap>();
-
-			asset->CreateSimpleRandomMap( FIntVector( 4, 4, 1 ) );
-			map->Instantiate( asset );
-
-//			m_World->EntryMap( FIntVector( -2, -2, 0 ), map );
+		if ( naw == m_ActiveWorld ){
+			m_ActiveWorld	= nullptr;
 		}
-		m_World->SetCurrentPosition( ppos );
-	
-		// プレイヤー配置
-		entity	= db->GetPlayer();
-		entity->SetWorldPosition( ppos );
-		m_World->SpawnEntity( entity, ppos );
 
-		// 
-//		entity	= INaEntityFactory::NewEntity( ENaEntity::GLOBAL_SPAWNER );
-//		entity->SetStage( ENaEntityStage::Transient );
-//		m_World->SpawnEntity( entity );
+		m_Worlds.RemoveAt( idx );
 	}
 }
 
-//!
-void ANaWorldActor::AssignWorld( UNaWorld* world )
+//! アクティブワールド変更リクエスト
+void ANaWorldActor::SwitchWorld( FName id )
 {
-	CloseWorld();
+	int32	idx;
 
-	m_World	= world;
-}
+	idx	= m_Worlds.IndexOfByPredicate( [id]( UNaWorld* p )
+	{
+		return p->GetUID() == id;
+	});
 
-// //
-void ANaWorldActor::CloseWorld()
-{
-	if ( !m_World ){
-		return;
+	if ( idx >= 0 ){
+		m_NextWorld	= m_Worlds[idx];
 	}
-
-//	for ( auto& it : m_ChunkActors ){
-//		it->Destroy();
-//	}
-//	m_ChunkActors.Reset();
-
-	m_World->CloseWorld();
-	m_World	= nullptr;
 }
 
-//
-void ANaWorldActor::ChangeState(EState state, int32 param, bool immediate)
-{
-	m_State			= state;
-	m_StateParam	= param;
-	m_StateStep		= 0;
-}
-
-//! 
+//! 表示チャンク範囲設定
 void ANaWorldActor::SetRenderSize( FIntVector size, FIntVector margin )
 {
 	m_RenderSize		= size;
@@ -234,7 +167,6 @@ void ANaWorldActor::SetRenderSize( FIntVector size, FIntVector margin )
 	int32		count;
 
 	vec		= size + margin * 2;
-//	count	= vec.X * vec.Y * vec.Z;
 	count	= vec.X * vec.Y;
 	m_ChunkActors.SetNum( count );
 
@@ -255,47 +187,7 @@ void ANaWorldActor::SetRenderSize( FIntVector size, FIntVector margin )
 	}
 }
 
-//! 
-void ANaWorldActor::UpdateChunkActor()
-{
-	FIntVector	chunkPos;
-
-	chunkPos.Z	= m_CurrentChunkPos.Z - (m_RenderSize.Z >> 1);
-
-//	for ( int32 iz = 0; iz < m_RenderSize.Z; ++iz ){
-	for ( int32 iz = 0; iz < 16; ++iz ){
-
-		chunkPos.Z	= iz;
-		chunkPos.Y	= m_CurrentChunkPos.Y - (m_RenderSize.Y >> 1);
-
-		for ( int32 iy = 0; iy < m_RenderSize.Y; ++iy ){
-
-			chunkPos.X	= m_CurrentChunkPos.X - (m_RenderSize.X >> 1);
-
-			for ( int32 ix = 0; ix < m_RenderSize.X; ++ix ){
-				UNaChunk*			chunk;
-				ANaMapChunkActor*	actor;
-
-				chunk	= m_World->GetChunk( chunkPos );
-				if ( chunk ){
-					actor	= GetChunkActor( chunkPos );
-
-					if ( actor ){
-						actor->SetChunk( chunk );
-					}
-				}
-
-				chunkPos.X++;
-			}
-
-			chunkPos.Y++;
-		}
-
-		chunkPos.Z++;
-	}
-}
-
-//! 
+//! チャンクアクター取得
 ANaMapChunkActor* ANaWorldActor::GetChunkActor( const FIntVector& chunkPos )
 {
 	FIntVector	apos,vec;
@@ -304,128 +196,21 @@ ANaMapChunkActor* ANaWorldActor::GetChunkActor( const FIntVector& chunkPos )
 	vec		= m_RenderSize + m_RenderSizeMargin * 2;
 	apos.X	= chunkPos.X % vec.X;
 	apos.Y	= chunkPos.Y % vec.Y;
-//	apos.Z	= chunkPos.Z % vec.Z;
 	apos.Z	= 0;
+
 	if ( apos.X < 0 ){
 		apos.X	+= vec.X;
 	}
 	if ( apos.Y < 0 ){
 		apos.Y	+= vec.Y;
 	}
-//	if ( apos.Z < 0 ){
-//		apos.Z	+= vec.Z;
-//	}
 
-//	tmp	= apos.X + apos.Y * vec.X + apos.Z * vec.X * vec.Y;
 	tmp	= apos.X + apos.Y * vec.X;
 
 	return m_ChunkActors[tmp];
 }
 
-#if 0
-//
-void ANaWorldActor::UpdateMap( const FIntVector& pos )
-{
-	const FIntVector	c_DrawRange( 3, 3, 3 );
-	FIntVector	cpos;
-
-	cpos		= m_World->GetCurrentPosition();
-	cpos.X	= cpos.X >> 4;
-	cpos.Y	= cpos.Y >> 4;
-	cpos.Z	= cpos.Z >> 4;
-
-	if ( m_CurrentChunkPos != cpos ){
-		TMap<FIntVector, ANaMapChunkActor*>	pool;
-		TArray<UNaChunk*>	newChunks;
-		FIntVector			tpos;
-		ANaMapChunkActor*	chunkActor;
-		UNaChunk*			chunk;
-
-		pool	= m_ChunkActors;
-		m_ChunkActors.Reset();
-
-		tpos.X	= cpos.X - (c_DrawRange.X >> 1);
-
-		for ( int32 ix = 0; ix < c_DrawRange.X; ++ix, ++tpos.X ){
-			//
-			tpos.Y	= cpos.Y - (c_DrawRange.Y >> 1);
-
-			for ( int32 iy = 0; iy < c_DrawRange.Y; ++iy, ++tpos.Y ){
-				//
-				tpos.Z	= cpos.Z - (c_DrawRange.Z >> 1);
-
-				for ( int32 iz = 0; iz < c_DrawRange.Z; ++iz, ++tpos.Z ){
-					//
-					chunkActor	= pool.FindRef( tpos );
-
-					if ( chunkActor ){
-						m_ChunkActors.Add( tpos, chunkActor );
-						pool.Remove( tpos );
-					}
-					else {
-						chunk	= m_World->GetChunk( tpos );
-						if ( chunk ){
-							newChunks.Add( chunk );
-						}
-					}
-				}
-			}
-		}
-
-		if ( newChunks.Num() ){
-			UWorld*						world = GetWorld();
-			TArray<ANaMapChunkActor*>	pools;
-
-			pool.GenerateValueArray( pools );
-
-			for ( int32 i = 0; i < newChunks.Num(); ++i ){
-				if ( pools.Num() > 0 ){
-					chunkActor	= pools.Pop();
-				}
-				else {
-					chunkActor	= world->SpawnActor<ANaMapChunkActor>();
-					chunkActor->SetWorldActor( this );
-				}
-
-				if ( chunkActor ){
-					chunkActor->SetChunk( newChunks[i] );
-//					chunkActor->UpdateChunkMesh();
-#if WITH_EDITOR
-					chunkActor->SetFolderPath( "/MapChunks" );
-#endif							
-					m_ChunkActors.Add( newChunks[i]->GetPositionInWorld(), chunkActor );
-				}
-			}
-		}
-
-		m_CurrentChunkPos	= cpos;
-	}
-
-	{// 天井再計算 //
-#if 0
-		int32	cz = m_World->GetCeilZ();
-
-		if ( m_CurrentZ != cz ){
-			TArray<ANaMapChunkActor*>	list;
-			
-			m_ChunkActors.GenerateValueArray( list );
-			for ( auto& it : list ){
-				it->UpdateChunkMesh();
-			}
-			m_CurrentZ	= cz;
-		}
-		if ( cz >= 64 ){
-			m_pDirLight->SetVisibility( true );
-		}
-		else {
-			m_pDirLight->SetVisibility( false );
-		}
-#endif
-	}
-}
-#endif
-
-//
+//! ブロックマテリアル取得
 UMaterialInstanceDynamic* ANaWorldActor::FindBlockMaterial( int32 id )
 {
 	UMaterialInstanceDynamic*	retVal = m_MIDMap.FindRef( id );
@@ -444,81 +229,137 @@ UMaterialInstanceDynamic* ANaWorldActor::FindBlockMaterial( int32 id )
 }
 
 //////////////////////////////////////////////////
-// public methods
+// protected methods
 //////////////////////////////////////////////////
 //
-bool ANaWorldActor::ProcMain( UNaStateMachine* sm, float DeltaTime )
+void ANaWorldActor::ProcMain( UNaStateMachine* sm, float DeltaTime )
 {
-	return true;
-}
-
-//
-void ANaWorldActor::ProcMainOld(float DeltaTime)
-{
-	enum StateStep
+	enum EPhase
 	{
+		//! 
 		Start,
+		//! 
 		Main,
+		//! 
 		End
 	};
-	UWorld*				world = GetWorld();
-	APlayerController*	pc = world->GetFirstPlayerController();
 
-	switch ( m_StateStep ){
+	switch ( sm->GetPhase() ){
 	case Start:
-/*		for ( auto it : m_WorldActors ){
-			m_ActionActors.Add( it );
-		}
-
-		m_ActionActors.StableSort( []( const ANaActorBase& lhs, const ANaActorBase& rhs )
-		{
-			return lhs.GetWaitTime() < rhs.GetWaitTime();
-		});
-		*/
-		m_StateStep++;
+		sm->Advance();
 		break;
 
 	case Main:
-		//
-		m_World->AdvanceTurn();
+		//! ワールド更新
+		for ( auto& it : m_Worlds ){
+			it->Update( DeltaTime );
+		}
 
-/*		while ( true ){
-			if ( !m_pCurrentActor ){
-				m_pCurrentActor	= m_ActionActors[0];
-				m_ActionActors.RemoveAt( 0 );
+		if ( m_ActiveWorld ){
+			UNaEntityPlayer*	player;
+			AActor*	actor;
 
-				for ( auto it : m_ActionActors ){
-					it->DecreaseWaitTime( m_pCurrentActor->GetWaitTime() );
-				}
-				m_pCurrentActor->StartTurn();
-			}
+			player	= m_ActiveWorld->GetPlayer();
+			if ( player ){
+				actor	= player->GetActor();
 
-			m_pCurrentActor->ExecuteTurn();
-
-			if ( m_pCurrentActor->IsEndTurn() ){
-				int32	i;
-
-				if ( m_pCurrentActor == m_Player ){
-					UpdateMap( m_Player->GetWorldPosition() );
+				//! マテリアルパラメータ設定
+				for ( auto& it : m_MIDMap ){
+					if ( actor ){
+						it.Value->SetVectorParameterValue( "PlayerLocation", actor->GetActorLocation() );
+					}
+					it.Value->SetScalarParameterValue( "CeilZ", m_ActiveWorld->GetCeilZ() );
 				}
 
-				m_pCurrentActor->ResetWaitTime();
-				for ( i = 0; i < m_ActionActors.Num(); ++i ){
-					if ( m_pCurrentActor->GetWaitTime() < m_ActionActors[i]->GetWaitTime() ){
-						break;
+				//! カメラアングル設定
+				int32	dir = int32( m_ActiveWorld->GetWorldDirection() );
+				m_Camera->SetAngle( dir * 45.0f );
+
+				//! 視界表示更新
+				{
+					FIntVector	cpos;
+					FVector		v;
+
+					cpos	= m_ActiveWorld->GetCurrentPosition();
+					if ( cpos != m_CurrentPos ){
+						FNaWorldBlockWork	work;
+
+						v.X		= cpos.X * 10.0f + 5.0f;
+						v.Y		= cpos.Y * 10.0f + 5.0f;
+						v.Z		= cpos.Z * 10.0f + 7.5f;
+
+						m_ActiveWorld->GetBlock( cpos, work );
+						v.Z		+= work.GetCenterHeight() / 256.0f * 10.0f;
+
+						if ( m_CaptureCube ){
+							m_CaptureCube->SetRelativeLocation( v );
+							m_CaptureCube->CaptureSceneDeferred();
+						}
+						if ( m_MIDPost ){
+							m_MIDPost->SetVectorParameterValue( "CapturePosition", v );
+						}
+						m_CurrentPos	= cpos;
+
+						cpos.X	= cpos.X >> 4;
+						cpos.Y	= cpos.Y >> 4;
+						cpos.Z	= cpos.Z >> 4;
+
+						if ( m_CurrentChunkPos != cpos ){
+							m_CurrentChunkPos	= cpos;
+							UpdateChunkActor();
+						}
 					}
 				}
-				m_ActionActors.Insert( m_pCurrentActor, i );
-
-				m_pCurrentActor	= nullptr;
-				continue;
 			}
+		}
 
-			break;
-		}*/
+		//! 表示ワールド変更
+		if ( m_NextWorld ){
+			m_ActiveWorld	= m_NextWorld;
+			m_NextWorld		= nullptr;
+		}
 		break;
 
 	case End:
 		break;
+	}
+}
+
+//! チャンクアクター更新
+void ANaWorldActor::UpdateChunkActor()
+{
+	FIntVector	chunkPos;
+
+	chunkPos.Z	= m_CurrentChunkPos.Z - (m_RenderSize.Z >> 1);
+
+	for ( int32 iz = 0; iz < 16; ++iz ){
+
+		chunkPos.Z	= iz;
+		chunkPos.Y	= m_CurrentChunkPos.Y - (m_RenderSize.Y >> 1);
+
+		for ( int32 iy = 0; iy < m_RenderSize.Y; ++iy ){
+
+			chunkPos.X	= m_CurrentChunkPos.X - (m_RenderSize.X >> 1);
+
+			for ( int32 ix = 0; ix < m_RenderSize.X; ++ix ){
+				UNaChunk*			chunk;
+				ANaMapChunkActor*	actor;
+
+				chunk	= m_ActiveWorld->GetChunk( chunkPos );
+				if ( chunk ){
+					actor	= GetChunkActor( chunkPos );
+
+					if ( actor ){
+						actor->SetChunk( chunk );
+					}
+				}
+
+				chunkPos.X++;
+			}
+
+			chunkPos.Y++;
+		}
+
+		chunkPos.Z++;
 	}
 }

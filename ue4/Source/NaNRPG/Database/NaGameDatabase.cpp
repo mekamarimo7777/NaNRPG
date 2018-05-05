@@ -102,6 +102,76 @@ void UNaGameDatabase::RegisterPlayer( UNaEntityPlayer* player )
 	m_Player->SetStage( ENaEntityStage::Global );
 }
 
+//! グローバルエンティティ登録
+void UNaGameDatabase::RegisterGlobalEntity( UNaEntity* entity )
+{
+	entity->SetStage( ENaEntityStage::Global );
+	m_GlobalEntities.Add( entity );
+}
+
+//! 指定ワールド内エンティティ収集
+void UNaGameDatabase::GatherEntities( FName id, TArray<UNaEntity*>& outVal )
+{
+	outVal	= m_GlobalEntities.FilterByPredicate( [id]( UNaEntity* p )
+	{
+		return p->GetWorldID() == id;
+	});
+
+	if ( m_Player->GetWorldID() == id ){
+		outVal.Add( m_Player );
+	}
+}
+
+//! ワールドエントリ登録
+void UNaGameDatabase::RegisterWorldEntry( FName id, uint32 dataID )
+{
+	FNaWorldRecord	rec;
+
+	rec.UID		= id;
+	rec.DataID	= dataID;
+
+	m_WorldRecords.Add( rec );
+}
+
+//! ワールドエントリ取得
+FNaWorldRecord* UNaGameDatabase::FindWorldEntry( FName id )
+{
+	FNaWorldRecord*	rec;
+
+	rec	= m_WorldRecords.FindByPredicate( [id]( FNaWorldRecord& p )
+	{
+		return p.UID == id;
+	});
+
+	return rec;
+}
+
+//! ワールドエントリ確認
+bool UNaGameDatabase::ExistWorldEntry( FName id )
+{
+	return m_WorldRecords.FindByPredicate( [id]( FNaWorldRecord& p )
+	{
+		return p.UID == id;
+	}) != nullptr;
+}
+
+//! ワールドデータID生成
+uint32 UNaGameDatabase::GenerateWorldDataID()
+{
+	uint32	dataID;
+
+#if 0
+	//! ランダムでID生成
+	do {
+		dataID	= FMath::Rand();
+	} while ( m_WorldRecords.ContainsByPredicate( [dataID]( FNaWorldRecord& p ){ return p.DataID == dataID; }) );
+#else
+	dataID	= m_WorldRecords.Num();
+#endif
+
+	return dataID;
+}
+
 //
 FString	UNaGameDatabase::GetDBDirName()
 {

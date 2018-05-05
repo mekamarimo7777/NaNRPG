@@ -300,13 +300,13 @@ void UNaEntityCharacter::SetItemProperty( UNaItem* item )
 // ターン開始
 void UNaEntityCharacter::OnBeginTurn()
 {
-	m_StateMachine->ChangeState( EState::Action );
+	m_SM->ChangeState( EState::Action );
 }
 
 // ターン更新
 void UNaEntityCharacter::OnUpdateTurn( float DeltaTime )
 {
-	m_StateMachine->Update( DeltaTime );
+	m_SM->Execute( DeltaTime );
 
 	if ( m_Profile.AIType < 0 ){
 		m_TurnAction->EndTurn();
@@ -314,7 +314,7 @@ void UNaEntityCharacter::OnUpdateTurn( float DeltaTime )
 	}
 
 	if ( m_Manipulator ){
-		m_Manipulator->UpdateControl( DeltaTime );
+		m_Manipulator->UpdateControl( m_SM, DeltaTime );
 	}
 }
 

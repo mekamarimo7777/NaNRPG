@@ -11,12 +11,14 @@
 ANaSkitAgent::ANaSkitAgent( const FObjectInitializer& ObjectInitializer )
 : Super( ObjectInitializer )
 {
+	m_SM->RegisterState( EState::Message, this, &ANaSkitAgent::ProcMessage );
+	m_SM->RegisterState( EState::Selection, this, &ANaSkitAgent::ProcSelection );
 }
 
 //! 開始
 void ANaSkitAgent::Start( int32 param )
 {
-//	m_StateMachine->ChangeState( EState::Main );
+//	m_SM->ChangeState( EState::Main );
 }
 
 //! メッセージ表示
@@ -24,13 +26,13 @@ void ANaSkitAgent::ShowMessage( FText message )
 {
 	m_Message	= message;
 
-	m_StateMachine->ChangeState( EState::Message );
+	m_SM->ChangeState( EState::Message );
 }
 
 //! 
 void ANaSkitAgent::HideMessage()
 {
-	m_StateMachine->ChangeState( EState::Selection );
+	m_SM->ChangeState( EState::Selection );
 }
 
 //! 選択肢表示
@@ -47,19 +49,6 @@ int32 ANaSkitAgent::GetSelectionIndex()
 //////////////////////////////////////////////////
 // protected methods
 //////////////////////////////////////////////////
-//! 更新
-void ANaSkitAgent::OnTick( UNaStateMachine* sm, float DeltaTime )
-{
-	switch ( sm->GetState() ){
-	case EState::Message:
-		ProcMessage( sm, DeltaTime );
-		break;
-	case EState::Selection:
-		ProcSelection( sm, DeltaTime );
-		break;
-	}
-}
-
 //! メッセージ表示
 void ANaSkitAgent::ProcMessage( UNaStateMachine* sm, float DeltaTime )
 {
@@ -79,13 +68,13 @@ void ANaSkitAgent::ProcMessage( UNaStateMachine* sm, float DeltaTime )
 
 		m_MessageWidget->MessageReached().AddLambda( [sm]()
 		{
-			sm->AdvancePhase();
+			sm->Advance();
 		});
 
 		m_MessageWidget->SetText( m_Message );
 		m_MessageWidget->Transition( "Show" );
 
-		sm->AdvancePhase();
+		sm->Advance();
 		break;
 
 	case Main:
@@ -117,7 +106,7 @@ void ANaSkitAgent::ProcMain( UNaStateMachine* sm, float DeltaTime )
 	switch ( sm->GetPhase() ){
 	case Init:
 		if ( PortalWidgetClass ){
-			sm->AdvancePhase();
+			sm->Advance();
 		}
 		else {
 			sm->SetPhase( End );

@@ -99,7 +99,7 @@ protected:
 protected:
 	//! ステートマシン
 	UPROPERTY(Transient)
-	UNaStateMachine*		m_StateMachine;
+	UNaStateMachine*		m_SM;
 
 	//! 汎用パラメータ
 	UPROPERTY()

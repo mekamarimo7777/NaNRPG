@@ -18,7 +18,7 @@ public:
 
 protected:
 	// XVˆ—
-	virtual void	OnControl( float DeltaTime );
+	virtual void	OnControl( UNaStateMachine* sm, float DeltaTime );
 
 	//
 	void	ProcAction( UNaStateMachine* sm, float DeltaTime );
