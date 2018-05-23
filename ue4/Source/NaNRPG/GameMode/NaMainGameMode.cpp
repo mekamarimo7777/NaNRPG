@@ -12,8 +12,6 @@
 
 #include "HUD/NaGameHUD.h"
 
-#include "UI/Widgets/HUD_old/NaMainHUD.h"
-
 #include "Entity/INaEntityFactory.h"
 
 #include "Controller/MyPlayerController.h"

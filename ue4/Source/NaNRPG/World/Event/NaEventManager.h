@@ -14,6 +14,40 @@
 //! 前方宣言
 class UNaStateMachine;
 
+//! 
+enum class ENaEventParam
+{
+	//! なし
+	None,
+	//! 数値
+	Number,
+	//! 文字列
+	String,
+	//! テキストID
+	TextSymbol,
+	//! グローバル変数
+	GlobalVariable,
+	//! グローバルフラグ
+	GlobalFlag,
+	//! エンティティ変数
+	EntityVariable,
+	//! ローカル変数
+	LocalVariable,
+	//! システム定数
+	SystemConst,
+};
+
+//! イベントパラメータ
+struct FNaEventParam
+{
+	//! 種別
+	ENaEventParam	Type;
+	//! 名前（変数系）
+	FName			Name;
+	//! 値
+	FString			Value;
+};
+
 /**
  * イベントマネージャ
  */
@@ -61,6 +95,16 @@ protected:
 	//! コマンド解析
 	bool	ParseCommand( UNaStateMachine* sm, const FNaEventCommand* cmd );
 
+	//! SkitAgent生成
+	void	SpawnSkitAgent();
+	//! メッセージUI消去
+	void	CloseMessage();
+
+	//! 
+	void	ParseEventParam( FString arg, FNaEventParam& outVal );
+	//! 変数書き換え
+	void	StoreVariable( FNaEventParam& dst, FNaEventParam& src );
+
 public:
 	
 protected:
@@ -83,7 +127,7 @@ protected:
 	//! 実行中コード
 	int32						m_PC;
 
-	//! 
+	//! 寸劇用
 	UPROPERTY(Transient)
 	ANaSkitAgent*	m_UIASkit;
 };

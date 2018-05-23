@@ -75,9 +75,11 @@ public:
 	UTexture*	GetParameterAsTexture( FName key ) const;
 
 protected:
+	//! トランジションイベント
+	virtual bool	OnTransition( FName id );
 	//! トランジション開始イベント
 	UFUNCTION(BlueprintImplementableEvent, Category = "Transition")
-	void	OnBeginTransition( FName id );
+	void	OnBeginTransition( FName id, FName prev );
 
 
 
@@ -105,9 +107,12 @@ protected:
 	UPROPERTY()
 	TMap<FName, FString>	m_Parameters;
 
-	//! 
+	//! 現在表示
 	UPROPERTY(Transient)
 	FName	m_CurrentTrans;
+	//! トランジションリクエスト
+	UPROPERTY(Transient)
+	FName	m_RequestTrans;
 
 	//! @obsolete BP側レスポンス
 	UPROPERTY()

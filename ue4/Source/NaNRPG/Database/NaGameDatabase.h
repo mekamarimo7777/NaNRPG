@@ -48,6 +48,16 @@ public:
 	//! ワールドデータID生成
 	uint32				GenerateWorldDataID();
 
+	//! イベントフラグ設定
+	void	SetEventFlag( int32 num, bool value );
+	//! イベントフラグ設定
+	bool	GetEventFlag( int32 num );
+
+	//! グローバル変数設定
+	void	SetGlobalVariable( FName key, FString value );
+	//! グローバル変数取得
+	FString	GetGlobalVariable( FName key );
+
 protected:
 	//
 	FString	GetDBDirName();
@@ -77,9 +87,9 @@ public:
 	//! イベントフラグ
 //	UPROPERTY()
 //	TBitArray<FDefaultBitArrayAllocator>	m_EventFlags;
-	//! イベント変数
+	//! グローバル変数
 	UPROPERTY()
-	TMap<FName, FString>					m_EventVariables;
+	TMap<FName, FString>					m_GlobalVariables;
 
 protected:
 

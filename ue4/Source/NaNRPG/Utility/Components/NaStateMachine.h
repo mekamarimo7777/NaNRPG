@@ -48,9 +48,9 @@ public:
 	void	Again()					{ m_Again = true; }
 
 	//! フェーズ設定
-	void	SetPhase( int32 phase, bool again = true );
+	void	SetPhase( int32 phase, bool again = false );
 	//! フェーズ進行
-	void	Advance( bool again = true );
+	void	Advance( bool again = false );
 	//! フェーズ取得
 	int32	GetPhase() const				{ return m_StatePhase; }
 

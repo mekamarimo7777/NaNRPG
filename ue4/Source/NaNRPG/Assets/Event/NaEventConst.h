@@ -42,9 +42,14 @@ enum class ENaEventCode
 	//! ラベル
 	Label,
 
+	//! 時間待ち
+	Wait,
+
 	//! エンティティ生成
 	SpawnEntity,
 	//! インベントリ生成
+	//! ワールド生成
+	GenerateWorld,
 
 	//! マップ移動
 	TransLevel,

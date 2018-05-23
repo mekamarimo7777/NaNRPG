@@ -19,7 +19,7 @@ class NANRPG_API UNaMessageWidget : public UNaWidget
 		//! 非表示
 		Hide,
 		//! 表示メイン
-		Main,
+		Show,
 	};
 	
 public:
@@ -47,10 +47,11 @@ protected:
 	//! 非表示ステート
 	void	ProcHide( UNaStateMachine* sm, float DeltaTime );
 	//! メイン
-	void	ProcMain( UNaStateMachine* sm, float DeltaTime );
-	FReply	ProcMainKeyDown( UNaStateMachine* sm, const FKeyEvent* KeyEvent );
+	void	ProcShow( UNaStateMachine* sm, float DeltaTime );
+	FReply	ProcShowKeyDown( UNaStateMachine* sm, const FKeyEvent* KeyEvent );
 
-
+	//! トランジションイベント
+	virtual bool	OnTransition( FName id ) override;
 
 protected:
 	//! 表示テキスト

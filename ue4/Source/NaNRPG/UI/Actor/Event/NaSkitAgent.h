@@ -30,12 +30,9 @@ public:
 	//! コンストラクタ
 	ANaSkitAgent( const FObjectInitializer& ObjectInitializer );
 
-	//! 開始
-	virtual void	Start( int32 param = 0 ) override;
-
 	//! メッセージ表示
 	void	ShowMessage( FText message );
-	//! 
+	//! メッセージ消去
 	void	HideMessage();
 
 	//! 選択肢表示

@@ -6,11 +6,6 @@
 
 #include "UI/Widgets/HUD/NaHUDWidget.h"
 
-#include "UI/Widgets/HUD_old/NaMainHUD.h"
-#include "UI/Widgets/Menu_old/Main/NaUIMainMenu.h"
-#include "UI/Widgets/Menu_old/Inventory/NaUIInventory.h"
-#include "UI/Widgets/Menu_old/Equipment/NaEquipmentWidget.h"
-
 #include "NaGameHUD.generated.h"
 
 //! HUDŠî’ê

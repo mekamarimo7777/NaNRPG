@@ -22,15 +22,24 @@ void UNaWidget::NativeConstruct()
 	Super::NativeConstruct();
 }
 
-//!
+//! 更新処理
 void UNaWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick( MyGeometry, InDeltaTime );
 
+	if ( m_CurrentTrans != m_RequestTrans ){
+		if ( OnTransition( m_RequestTrans ) ){
+			//! BP
+			OnBeginTransition( m_RequestTrans, m_CurrentTrans );
+
+			m_CurrentTrans	= m_RequestTrans;
+		}
+	}
+
 	m_SM->Execute( InDeltaTime );
 }
 
-//!
+//! ビューポートへの追加
 void UNaWidget::Open( int32 ZOrder )
 {
 	if ( !IsInViewport() ){
@@ -40,22 +49,21 @@ void UNaWidget::Open( int32 ZOrder )
 	EventOpen();
 }
 
-//!
+//! ビューポートから削除
 void UNaWidget::Close()
 {
 	EventClose();
 }
 
-//! 
+//! トランジションリクエスト
 void UNaWidget::Transition( FName id )
 {
-	if ( m_CurrentTrans != id ){
-		m_CurrentTrans	= id;
-		OnBeginTransition( id );
+	if ( m_CurrentTrans != id && m_RequestTrans != id ){
+		m_RequestTrans	= id;
 	}
 }
 
-//! 
+//! トランジション判定
 bool UNaWidget::IsTransition() const
 {
 	return false;
@@ -163,4 +171,10 @@ UTexture* UNaWidget::GetParameterAsTexture( FName key ) const
 	}
 
 	return tex;
+}
+
+//! トランジション開始イベント
+bool UNaWidget::OnTransition( FName id )
+{
+	return true;
 }

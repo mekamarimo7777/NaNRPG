@@ -15,12 +15,6 @@ ANaSkitAgent::ANaSkitAgent( const FObjectInitializer& ObjectInitializer )
 	m_SM->RegisterState( EState::Selection, this, &ANaSkitAgent::ProcSelection );
 }
 
-//! 開始
-void ANaSkitAgent::Start( int32 param )
-{
-//	m_SM->ChangeState( EState::Main );
-}
-
 //! メッセージ表示
 void ANaSkitAgent::ShowMessage( FText message )
 {
@@ -29,15 +23,18 @@ void ANaSkitAgent::ShowMessage( FText message )
 	m_SM->ChangeState( EState::Message );
 }
 
-//! 
+//! メッセージ消去
 void ANaSkitAgent::HideMessage()
 {
-	m_SM->ChangeState( EState::Selection );
+	if ( m_MessageWidget ){
+		m_MessageWidget->Transition( "Hide" );
+	}
 }
 
 //! 選択肢表示
 void ANaSkitAgent::ShowSelection( const TArray<FText>& selections, int32 defaultIndex )
 {
+	m_SM->ChangeState( EState::Selection );
 }
 
 //! 選択インデックス取得
@@ -91,34 +88,3 @@ void ANaSkitAgent::ProcMessage( UNaStateMachine* sm, float DeltaTime )
 void ANaSkitAgent::ProcSelection( UNaStateMachine* sm, float DeltaTime )
 {
 }
-
-/*
-//! 
-void ANaSkitAgent::ProcMain( UNaStateMachine* sm, float DeltaTime )
-{
-	enum EPhase
-	{
-		Init,
-		Main,
-		End,
-	};
-	
-	switch ( sm->GetPhase() ){
-	case Init:
-		if ( PortalWidgetClass ){
-			sm->Advance();
-		}
-		else {
-			sm->SetPhase( End );
-		}
-		break;
-
-	case Main:
-		break;
-
-	case End:
-		sm->ChangeState( EState::None );
-		break;
-	}
-}
-*/

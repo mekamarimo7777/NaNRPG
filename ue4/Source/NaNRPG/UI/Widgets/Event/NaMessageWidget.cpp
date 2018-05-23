@@ -11,7 +11,7 @@ bool UNaMessageWidget::Initialize()
 {
 	if ( Super::Initialize() ){
 		m_SM->RegisterState( EState::Hide, this, &UNaMessageWidget::ProcHide );
-		m_SM->RegisterState( EState::Main, this, &UNaMessageWidget::ProcMain );
+		m_SM->RegisterState( EState::Show, this, &UNaMessageWidget::ProcShow );
 		return true;
 	}
 	else {
@@ -24,7 +24,7 @@ void UNaMessageWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	m_SM->ChangeState( EState::Main );
+	Transition( "Hide" );
 }
 
 //! Tick
@@ -37,8 +37,8 @@ void UNaMessageWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 FReply UNaMessageWidget::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
 	switch ( m_SM->GetState() ){
-	case EState::Main:
-		ProcMainKeyDown( m_SM, &InKeyEvent );
+	case EState::Show:
+		ProcShowKeyDown( m_SM, &InKeyEvent );
 		break;
 	}
 
@@ -90,7 +90,7 @@ void UNaMessageWidget::ProcHide( UNaStateMachine* sm, float DeltaTime )
 }
 
 //! メイン
-void UNaMessageWidget::ProcMain( UNaStateMachine* sm, float DeltaTime )
+void UNaMessageWidget::ProcShow( UNaStateMachine* sm, float DeltaTime )
 {
 	//! 
 	enum EPhase
@@ -132,7 +132,7 @@ void UNaMessageWidget::ProcMain( UNaStateMachine* sm, float DeltaTime )
 		break;
 	}
 }
-FReply UNaMessageWidget::ProcMainKeyDown( UNaStateMachine* sm, const FKeyEvent* KeyEvent )
+FReply UNaMessageWidget::ProcShowKeyDown( UNaStateMachine* sm, const FKeyEvent* KeyEvent )
 {
 	//! 
 	enum EPhase
@@ -160,4 +160,17 @@ FReply UNaMessageWidget::ProcMainKeyDown( UNaStateMachine* sm, const FKeyEvent* 
 	}
 
 	return FReply::Handled();
+}
+
+//! トランジションイベント
+bool UNaMessageWidget::OnTransition( FName id )
+{
+	if ( id == "Hide" || id == "Exit" ){
+		m_SM->ChangeState( EState::Hide );
+	}
+	else if ( id == "Show" ){
+		m_SM->ChangeState( EState::Show );
+	}
+
+	return true;
 }
