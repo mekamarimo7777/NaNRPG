@@ -30,7 +30,7 @@ struct FNaMapGen
 // 簡易ランダムマップ生成 //
 void UNaMapAsset::CreateSimpleRandomMap( FIntVector size )
 {
-	FNaMapGen	gen;
+/*	FNaMapGen	gen;
 	FNaMapNode	root;
 	UNaMapPartsAsset*	partsAsset;
 
@@ -86,7 +86,7 @@ void UNaMapAsset::CreateSimpleRandomMap( FIntVector size )
 				bEnter	= true;
 			}
 		}
-	}
+	}*/
 }
 //
 void UNaMapAsset::DivideNode( FNaMapGen* gen )

@@ -65,7 +65,7 @@ void UNaMessageWidget::ProcHide( UNaStateMachine* sm, float DeltaTime )
 		//! 
 		Init,
 		//! 
-		Wait,
+		Transition,
 		//! 
 		Main,
 		//! 
@@ -75,10 +75,15 @@ void UNaMessageWidget::ProcHide( UNaStateMachine* sm, float DeltaTime )
 	//! メイン
 	switch ( sm->GetPhase() ){
 	case Init:
+		BeginTransition();
 		sm->Advance();
 		break;
 
-	case Wait:
+	case Transition:
+		if ( !HasTransTask() ){
+			EndTransition();
+			sm->Advance();
+		}
 		break;
 
 	case Main:
@@ -98,8 +103,9 @@ void UNaMessageWidget::ProcShow( UNaStateMachine* sm, float DeltaTime )
 		//! 
 		Init,
 		//! 
-		Wait,
+		Transition,
 		//! 
+		StartMain,
 		Main,
 		//! 
 		Decided,
@@ -110,22 +116,29 @@ void UNaMessageWidget::ProcShow( UNaStateMachine* sm, float DeltaTime )
 	//! メイン
 	switch ( sm->GetPhase() ){
 	case Init:
+		BeginTransition();
 		sm->Advance();
 		break;
 
-	case Wait:
-		if ( !m_Text.IsEmpty() ){
+	case Transition:
+		if ( !HasTransTask() ){
+			EndTransition();
 			sm->Advance();
 		}
 		break;
 
+	case StartMain:
+		if ( !m_Text.IsEmpty() ){
+			sm->Advance();
+		}
+		break;
 	case Main:
 		break;
 
 	case Decided:
 		m_MessageReachedEvent.Broadcast();
 		m_Text	= FText();
-		sm->SetPhase( Wait );
+		sm->SetPhase( StartMain );
 		break;
 
 	case End:
@@ -140,8 +153,9 @@ FReply UNaMessageWidget::ProcShowKeyDown( UNaStateMachine* sm, const FKeyEvent* 
 		//! 
 		Init,
 		//! 
-		Wait,
+		Transition,
 		//! 
+		StartMain,
 		Main,
 		//! 
 		Decided,

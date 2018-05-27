@@ -23,10 +23,54 @@ namespace EUIResult
 	};
 }
 
+//! トランジションタスク種別
+UENUM()
+enum class ENaTransitionTask
+{
+	//! 子ウィジェットトランジション
+	Transition	= 0,
+	//! アニメーション
+	Animation	= 1,
+};
+//! トランジションタスク状態
+UENUM()
+enum class ENaTransitionTaskState
+{
+	//! 開始待ち
+	Ready		= 0,
+	//! 実行中
+	Processing	= 1,
+	//! 完了
+	Completed	= 2,
+};
+
+//! トランジションタスク
+USTRUCT()
+struct FNaTransitionTask
+{
+	GENERATED_BODY()
+
+	//! 種別
+	UPROPERTY()
+	ENaTransitionTask		Type;
+	//! 状態
+	UPROPERTY()
+	ENaTransitionTaskState	State;
+
+	//! 対象オブジェクト
+	UPROPERTY()
+	UObject*		Object;
+	//! 
+	UPROPERTY()
+	TArray<FString>	Params;
+};
+
 UCLASS(abstract)
 class NANRPG_API UNaWidget : public UUserWidget
 {
 	GENERATED_BODY()
+
+protected:
 	
 public:
 	//! ウィジェット初期化
@@ -41,19 +85,18 @@ public:
 	//! ウィジェットクローズ（ビューポートからの削除）
 	virtual void	Close();
 
-	//! 状態変更
+	//! トランジションリクエスト
 	UFUNCTION(BlueprintCallable, Category = "Transition")
 	void	Transition( FName id );
-	//! トランジション判定
+	//! トランジション中判定
 	bool	IsTransition() const;
-
-	//! 
-	bool	HasNestFocus() const;
 
 	//! フォーカス退避
 	void	StorePrevFocus();
 	//! フォーカス復元
 	void	RestorePrevFocus();
+	//! フォーカス判定
+	bool	HasNestFocus() const;
 
 	//! 入力モード切り替え
 	void	SetInputModeUI();
@@ -75,28 +118,29 @@ public:
 	UTexture*	GetParameterAsTexture( FName key ) const;
 
 protected:
-	//! トランジションイベント
+	//! トランジションイベント（内部通知）
 	virtual bool	OnTransition( FName id );
-	//! トランジション開始イベント
+	//! トランジション開始
+	void			BeginTransition();
+	//! トランジション完了
+	void			EndTransition();
+	//! トランジション開始イベント（BP）
 	UFUNCTION(BlueprintImplementableEvent, Category = "Transition")
-	void	OnBeginTransition( FName id, FName prev );
+	bool			OnBeginTransition( FName id );
+	//! トランジション終了イベント（BP）
+	UFUNCTION(BlueprintImplementableEvent, Category = "Transition")
+	bool			OnEndTransition( FName id );
 
-
-
-	//!@obsolete
-	UFUNCTION(BlueprintImplementableEvent, Category = "Widget")
-	void	EventOpen();
-	//!@obsolete
-	UFUNCTION(BlueprintImplementableEvent, Category = "Widget")
-	void	EventClose();
-
-	//!@obsolete
-	UFUNCTION(BlueprintCallable, Category = "Response")
-	void	SetResponse( const FString& key, int32 value );
-	//!@obsolete
-	int32	GetResponse(  const FString& key ) const;
-	//!@obsolete
-	int32	TakeResponse(  const FString& key );
+	//! 
+	UFUNCTION(BlueprintCallable, Category = "Transition")
+	void	RequestTransition( UNaWidget* widget, FString value );
+	//! 
+	UFUNCTION(BlueprintCallable, Category = "Transition")
+	void	RequestAnimation( UWidgetAnimation* anim );
+	//!
+	void	ExecTransTask();
+	//! 
+	bool	HasTransTask() const	{ return m_TransTask.Num() > 0; }
 
 protected:
 	//! ステートマシン
@@ -104,7 +148,7 @@ protected:
 	UNaStateMachine*		m_SM;
 
 	//! 汎用パラメータ
-	UPROPERTY()
+	UPROPERTY(Transient)
 	TMap<FName, FString>	m_Parameters;
 
 	//! 現在表示
@@ -113,10 +157,12 @@ protected:
 	//! トランジションリクエスト
 	UPROPERTY(Transient)
 	FName	m_RequestTrans;
-
-	//! @obsolete BP側レスポンス
-	UPROPERTY()
-	TMap<FString, int32>	m_Response;
+	//! 
+	UPROPERTY(Transient)
+	bool	m_IsTransition;
+	//! トランジションタスク
+	UPROPERTY(Transient)
+	TArray<FNaTransitionTask>	m_TransTask;
 
 	//! 直前のフォーカススレート
 	TSharedPtr<SWidget>		m_PrevFocus;

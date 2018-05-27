@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "NaNRPG.h"
 #include "NaChunk.h"
@@ -38,7 +38,7 @@ void UNaChunk::Open()
 	RecalcRenderCells();
 	m_pRegion->ConnectChunk( this );
 
-	//! ƒGƒ“ƒeƒBƒeƒB¶¬
+	//! ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ç”Ÿæˆ
 	for ( auto& it : m_Entities ){
 		m_pRegion->GetNaWorld()->EnterEntity( it );
 	}
@@ -65,7 +65,7 @@ FIntVector UNaChunk::GetPositionInWorld() const
 	return m_pRegion->GetRegionPos() * 16 + m_ChunkPos;
 }
 
-//! ƒuƒƒbƒNƒf[ƒ^İ’è
+//! ãƒ–ãƒ­ãƒƒã‚¯ãƒ‡ãƒ¼ã‚¿è¨­å®š
 void UNaChunk::SetBlock( const FIntVector& pos, const FNaWorldBlockWork& inVal )
 {
 	SetBlock( pos.X, pos.Y, pos.Z, inVal );
@@ -90,7 +90,7 @@ void UNaChunk::SetBlock( int32 idx, const FNaWorldBlockWork& inVal )
 	SetInvalidate( true );
 }
 
-//! ƒuƒƒbƒNƒf[ƒ^æ“¾
+//! ãƒ–ãƒ­ãƒƒã‚¯ãƒ‡ãƒ¼ã‚¿å–å¾—
 bool UNaChunk::GetBlock( const FIntVector& pos, FNaWorldBlockWork& outVal )
 {
 	return GetBlock( pos.X, pos.Y, pos.Z, outVal );
@@ -99,7 +99,7 @@ bool UNaChunk::GetBlock( int32 x, int32 y, int32 z, FNaWorldBlockWork& outVal )
 {
 	int32	idx = CELL_OFS( x, y, z );
 
-	//! —×Ú‚àl—¶‚·‚éê‡
+	//! éš£æ¥ã‚‚è€ƒæ…®ã™ã‚‹å ´åˆ
 	if ( x < 0 ){
 		if ( m_pNeighborChunk[0] ){
 			return m_pNeighborChunk[0]->GetBlock( x + 16, y, z, outVal );
@@ -179,7 +179,7 @@ void UNaChunk::StoreBlocks( const uint8* id, const uint8* param, const uint32* m
 	SetInvalidate( true );
 }
 
-// ƒGƒ“ƒeƒBƒeƒB“o˜^ //
+// ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ç™»éŒ² //
 void UNaChunk::AttachEntity( UNaEntity* entity )
 {
 	if ( !m_Entities.Contains( entity ) ){
@@ -187,13 +187,13 @@ void UNaChunk::AttachEntity( UNaEntity* entity )
 	}
 }
 
-// ƒGƒ“ƒeƒBƒeƒBœ‹ //
+// ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£é™¤å» //
 void UNaChunk::DetachEntity( UNaEntity* entity )
 {
 	m_Entities.Remove( entity );
 }
 
-// ƒoƒCƒg—ñ‚©‚çƒf[ƒ^¶¬ //
+// ãƒã‚¤ãƒˆåˆ—ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ç”Ÿæˆ //
 void UNaChunk::ArrayToChunk( const TArray<uint8>& buff )
 {
 	FArchiveLoadCompressedProxy	proxy( buff, ECompressionFlags::COMPRESS_ZLIB );
@@ -201,7 +201,7 @@ void UNaChunk::ArrayToChunk( const TArray<uint8>& buff )
 	Serialize( proxy );
 }
 
-// ƒ`ƒƒƒ“ƒN‚ğƒoƒCƒg—ñ‚É•ÏŠ· //
+// ãƒãƒ£ãƒ³ã‚¯ã‚’ãƒã‚¤ãƒˆåˆ—ã«å¤‰æ› //
 void UNaChunk::ChunkToArray( TArray<uint8>& outBuff )
 {
 	FArchiveSaveCompressedProxy	proxy( outBuff, ECompressionFlags::COMPRESS_ZLIB );
@@ -217,7 +217,7 @@ void UNaChunk::Serialize( FArchive& ar )
 	ar.Serialize( m_MetaData, sizeof(m_MetaData) );
 	ar.Serialize( m_Blightness, sizeof(m_Blightness) );
 
-	//! ƒGƒ“ƒeƒBƒeƒB
+	//! ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£
 	{
 		TEnumAsByte<ENaEntity::Type>	etype;
 		int32	tmpNum;
@@ -266,7 +266,7 @@ void UNaChunk::CreateTestChunk()
 	FIntVector	worldPos,tpos;
 //	float		heightMap[16][16];
 
-/*	{// ‹N•šŒvZ //
+/*	{// èµ·ä¼è¨ˆç®— //
 		float	height[4];
 
 		height[0]	= 0;
@@ -279,7 +279,7 @@ void UNaChunk::CreateTestChunk()
 	worldPos	= GetPositionInWorld();
 	tpos.X		= worldPos.X << 4;
 
-	// ƒZƒ‹¶¬ //
+	// ã‚»ãƒ«ç”Ÿæˆ //
 	for ( int32 ix = 0; ix < DIM_X; ++ix, ++tpos.X ){
 		//
 		tpos.Y	= worldPos.Y << 4;
@@ -333,7 +333,7 @@ void UNaChunk::CreateTestChunk()
 		}
 	}
 
-	// ƒ}ƒbƒvƒ`ƒƒƒ“ƒN‚ÌƒRƒs[i“K“–j
+	// ãƒãƒƒãƒ—ãƒãƒ£ãƒ³ã‚¯ã®ã‚³ãƒ”ãƒ¼ï¼ˆé©å½“ï¼‰
 	/*
 	{
 		UNaMap*		map;
@@ -373,7 +373,7 @@ void UNaChunk::RecalcVisibleFaces()
 
 	wpos	= GetPositionInWorld() * 16;
 
-	// “VˆäˆÊ’uXV //
+	// å¤©äº•ä½ç½®æ›´æ–° //
 	wz		= m_pRegion->GetNaWorld()->GetCeilZ();
 	if ( m_Revision > 0 ){
 		bool	b0,b1;
@@ -431,13 +431,13 @@ void UNaChunk::RecalcVisibleFaces()
 					m_VisibleFace[i]	|= 0x8;
 				}
 
-				// ã–Ê
+				// ä¸Šé¢
 				if ( wpos.Z + z == wz - 1 || !GetBlock( x, y, z + 1, work ) || work.BlockID <= 1 ){
 					m_VisibleFace[i]	|= 0x20;
 				}
 			}
 
-			// ‰º–Ê
+			// ä¸‹é¢
 			if ( !GetBlock( x, y, z - 1, work ) || work.BlockID <= 1 ){
 				m_VisibleFace[i]	|= 0x10;
 			}
@@ -465,7 +465,7 @@ void UNaChunk::RecalcRenderCells()
 		}
 	}
 
-	//! •`‰æ–ÊŒvZ
+	//! æç”»é¢è¨ˆç®—
 	for ( auto& it : m_RenderCells ){
 		for ( int32 i = 0; i < 6; ++i ){
 			if ( CheckVisibleFace( it, i ) ){
@@ -483,9 +483,9 @@ bool UNaChunk::CheckVisibleFace( int32 index, int32 dir )
 {
 	const FIntVector	c_dirVec[6] = 
 	{
-		//! ‘OA¶A‰œA‰E
+		//! å‰ã€å·¦ã€å¥¥ã€å³
 		FIntVector( -1, 0, 0 ), FIntVector( 0, -1, 0 ), FIntVector( 1, 0, 0 ), FIntVector( 0, 1, 0 ),
-		//! ‰ºAã
+		//! ä¸‹ã€ä¸Š
 		FIntVector( 0, 0, -1 ), FIntVector( 0, 0, 1 )
 	};
 	const int32			c_dirHeight[4][4] =
@@ -548,7 +548,7 @@ void UNaChunk::RecalcNeighborCells( int32 dir )
 {
 	int32	x,y,z;
 
-	//! •`‰æ–ÊŒvZ
+	//! æç”»é¢è¨ˆç®—
 	for ( auto& it : m_RenderCells ){
 		x	= it & 0xF;
 		y	= (it >> SHIFT_Y) & 0xF;

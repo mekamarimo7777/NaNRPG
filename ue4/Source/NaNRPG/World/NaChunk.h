@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -12,7 +12,7 @@ class UNaEntity;
 #define	CELL_OFS(x, y, z)	(x + (y << UNaChunk::SHIFT_Y) + (z << UNaChunk::SHIFT_Z))
 
 /**
- * ƒ`ƒƒƒ“ƒNî•ñ
+ * ãƒãƒ£ãƒ³ã‚¯æƒ…å ±
  */
 UCLASS()
 class NANRPG_API UNaChunk : public UObject
@@ -28,18 +28,18 @@ public:
 	static const int	ELEMENTS = DIM_X * DIM_Y * DIM_Z;
 
 public:
-	// ‰Šú‰»
+	// åˆæœŸåŒ–
 	void		Initialize( UNaRegion* region, FIntVector cpos );
-	// ƒ`ƒƒƒ“ƒNƒI[ƒvƒ“
+	// ãƒãƒ£ãƒ³ã‚¯ã‚ªãƒ¼ãƒ—ãƒ³
 	void		Open();
-	// ƒ`ƒƒƒ“ƒNƒNƒ[ƒY
+	// ãƒãƒ£ãƒ³ã‚¯ã‚¯ãƒ­ãƒ¼ã‚º
 	void		Close();
 
 	//! 
 	void		SetPosition( FIntVector pos )	{m_ChunkPos = pos;}
-	// ƒ`ƒƒƒ“ƒNÀ•Wæ“¾iƒŠ[ƒWƒ‡ƒ“‹óŠÔj
+	// ãƒãƒ£ãƒ³ã‚¯åº§æ¨™å–å¾—ï¼ˆãƒªãƒ¼ã‚¸ãƒ§ãƒ³ç©ºé–“ï¼‰
 	FIntVector	GetPosition() const				{return m_ChunkPos;}
-	// ƒ[ƒ‹ƒh‹óŠÔ‚Ìƒ`ƒƒƒ“ƒNÀ•Wæ“¾
+	// ãƒ¯ãƒ¼ãƒ«ãƒ‰ç©ºé–“ã®ãƒãƒ£ãƒ³ã‚¯åº§æ¨™å–å¾—
 	FIntVector	GetPositionInWorld() const;
 
 	//
@@ -55,32 +55,32 @@ public:
 		return m_MetaData[ CELL_OFS(x, y, z) ];
 	}
 
-	//! ƒuƒƒbƒNƒf[ƒ^İ’è
+	//! ãƒ–ãƒ­ãƒƒã‚¯ãƒ‡ãƒ¼ã‚¿è¨­å®š
 	void	SetBlock( const FIntVector& pos, const FNaWorldBlockWork& inVal );
 	void	SetBlock( int32 x, int32 y, int32 z, const FNaWorldBlockWork& inVal );
 	void	SetBlock( int32 idx, const FNaWorldBlockWork& inVal );
-	//! ƒuƒƒbƒNƒf[ƒ^æ“¾
+	//! ãƒ–ãƒ­ãƒƒã‚¯ãƒ‡ãƒ¼ã‚¿å–å¾—
 	bool	GetBlock( const FIntVector& pos, FNaWorldBlockWork& outVal );
 	bool	GetBlock( int32 x, int32 y, int32 z, FNaWorldBlockWork& outVal );
 	bool	GetBlock( int32 idx, FNaWorldBlockWork& outVal );
 
-	//! ƒuƒƒbƒNƒf[ƒ^ˆêŠ‡ƒRƒs[
+	//! ãƒ–ãƒ­ãƒƒã‚¯ãƒ‡ãƒ¼ã‚¿ä¸€æ‹¬ã‚³ãƒ”ãƒ¼
 	void	StoreBlocks( const uint8* id, const uint8* param, const uint32* meta );
 
-	// —LŒøƒuƒƒbƒNƒCƒ“ƒfƒbƒNƒX—ñ‹“
+	// æœ‰åŠ¹ãƒ–ãƒ­ãƒƒã‚¯ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹åˆ—æŒ™
 	void	EnumValidCellIndices( TArray<int16>& outVal );
 
-	// ƒGƒ“ƒeƒBƒeƒB“o˜^ //
+	// ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ç™»éŒ² //
 	void	AttachEntity( UNaEntity* entity );
-	// ƒGƒ“ƒeƒBƒeƒBœ‹ //
+	// ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£é™¤å» //
 	void	DetachEntity( UNaEntity* entity );
 
-	// ƒoƒCƒg—ñ‚©‚çƒf[ƒ^¶¬ //
+	// ãƒã‚¤ãƒˆåˆ—ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ç”Ÿæˆ //
 	void	ArrayToChunk( const TArray<uint8>& buff );
-	// ƒ`ƒƒƒ“ƒN‚ğƒoƒCƒg—ñ‚É•ÏŠ· //
+	// ãƒãƒ£ãƒ³ã‚¯ã‚’ãƒã‚¤ãƒˆåˆ—ã«å¤‰æ› //
 	void	ChunkToArray( TArray<uint8>& outBuff );
 
-	//! ƒVƒŠƒAƒ‰ƒCƒY
+	//! ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚º
 	virtual void	Serialize( FArchive& ar ) override;
 
 	// 
@@ -119,41 +119,41 @@ public:
 protected:
 	//
 	UNaRegion*	m_pRegion;
-	// ƒ`ƒƒƒ“ƒNÀ•WiƒŠ[ƒWƒ‡ƒ“‹óŠÔj
+	// ãƒãƒ£ãƒ³ã‚¯åº§æ¨™ï¼ˆãƒªãƒ¼ã‚¸ãƒ§ãƒ³ç©ºé–“ï¼‰
 	FIntVector	m_ChunkPos;
 	//
 	bool		m_bOpen;
-	int32		m_Revision;		// ƒAƒNƒ^‘¤‚ÌXVƒ`ƒFƒbƒN—pi‰¼j //
+	int32		m_Revision;		// ã‚¢ã‚¯ã‚¿å´ã®æ›´æ–°ãƒã‚§ãƒƒã‚¯ç”¨ï¼ˆä»®ï¼‰ //
 	int32		m_PrevCeilZ;	// 
 
-	// ƒuƒƒbƒNî•ñi\‘¢‘Ì‚¶‚á‚È‚¢‚Ì‚Íˆ³k—¦Œüã‚Ì‚½‚ßj //
-	// ƒuƒƒbƒNID
+	// ãƒ–ãƒ­ãƒƒã‚¯æƒ…å ±ï¼ˆæ§‹é€ ä½“ã˜ã‚ƒãªã„ã®ã¯åœ§ç¸®ç‡å‘ä¸Šã®ãŸã‚ï¼‰ //
+	// ãƒ–ãƒ­ãƒƒã‚¯ID
 	uint8				m_BlockID[ELEMENTS];
-	// ƒuƒƒbƒNƒpƒ‰ƒ[ƒ^
+	// ãƒ–ãƒ­ãƒƒã‚¯ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿
 	uint8				m_BlockParam[ELEMENTS];
-	// ”Ä—pƒf[ƒ^
+	// æ±ç”¨ãƒ‡ãƒ¼ã‚¿
 	FNaWorldBlockMeta	m_MetaData[ELEMENTS];
-	// –¾‚é‚³
+	// æ˜ã‚‹ã•
 	uint8				m_Blightness[ELEMENTS / 2];
 
-	// ƒuƒƒbƒNƒGƒ“ƒeƒBƒeƒB //
+	// ãƒ–ãƒ­ãƒƒã‚¯ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ //
 //	UPROPERTY(Transient)
 //	TArray<UNaBlockEntity*>			m_CellEntities;	// 
 //	TArray<int16, UNaBlockEntity*>	m_CellEntityMap;
 
-	// ƒ`ƒƒƒ“ƒNŠÇ—‚ÌƒGƒ“ƒeƒBƒeƒBÀ‘Ì //
+	// ãƒãƒ£ãƒ³ã‚¯ç®¡ç†ã®ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£å®Ÿä½“ //
 	UPROPERTY(Transient)
-	TArray<UNaEntity*>	m_Entities;	// ƒ`ƒƒƒ“ƒNƒXƒe[ƒW‚ÌƒGƒ“ƒeƒBƒeƒB //
+	TArray<UNaEntity*>	m_Entities;	// ãƒãƒ£ãƒ³ã‚¯ã‚¹ãƒ†ãƒ¼ã‚¸ã®ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ //
 
-	//! •`‰æƒuƒƒbƒN 
+	//! æç”»ãƒ–ãƒ­ãƒƒã‚¯ 
 	TArray<int16>	m_RenderCells;
-	//! •`‰æ–Êiˆêƒf[ƒ^j
+	//! æç”»é¢ï¼ˆä¸€æ™‚ãƒ‡ãƒ¼ã‚¿ï¼‰
 	int32			m_VisibleFace[ELEMENTS];
 
-	//! XVƒtƒ‰ƒO
+	//! æ›´æ–°ãƒ•ãƒ©ã‚°
 	bool	m_bInvalidate;
 
-	// —×Úƒ`ƒƒƒ“ƒN //
+	// éš£æ¥ãƒãƒ£ãƒ³ã‚¯ //
 	UPROPERTY(Transient)
-	UNaChunk*	m_pNeighborChunk[6];	// ƒ_ƒ~[‚Â‚«‚ÌƒTƒCƒY8‚É‚·‚éH
+	UNaChunk*	m_pNeighborChunk[6];	// ãƒ€ãƒŸãƒ¼ã¤ãã®ã‚µã‚¤ã‚º8ã«ã™ã‚‹ï¼Ÿ
 };

@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "Assets/Map/NaWorldAsset.h"
+
 #include "NaWorldGenerator.generated.h"
 
 class UNaWorld;

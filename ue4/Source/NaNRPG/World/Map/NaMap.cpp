@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "NaNRPG.h"
 #include "NaMap.h"
@@ -10,14 +10,14 @@
 
 #include "Entity/INaEntityFactory.h"
 
-//! ƒ}ƒbƒv¶¬
+//! ãƒãƒƒãƒ—ç”Ÿæˆ
 void UNaMap::Create( UNaWorld* naw, int32 uid, FIntVector pos, const UNaMapAsset* asset )
 {
 	m_MapID			= uid;
 	m_MapLocation	= pos;
 	m_MapSize		= asset->m_MapSize;
 
-	//! ƒ}ƒbƒvƒ`ƒƒƒ“ƒN¶¬
+	//! ãƒãƒƒãƒ—ãƒãƒ£ãƒ³ã‚¯ç”Ÿæˆ
 	{
 		UNaChunk*	chunk;
 
@@ -31,7 +31,7 @@ void UNaMap::Create( UNaWorld* naw, int32 uid, FIntVector pos, const UNaMapAsset
 		}
 	}
 
-	//! ƒGƒ“ƒeƒBƒeƒB¶¬
+	//! ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ç”Ÿæˆ
 	{
 		UNaAssetLibrary*	alib = UNaAssetLibrary::Get();
 		FNaEntityDataAsset*	t_asset;
@@ -55,7 +55,7 @@ void UNaMap::Create( UNaWorld* naw, int32 uid, FIntVector pos, const UNaMapAsset
 	}
 }
 
-//! ƒ}ƒbƒv•Û‘¶
+//! ãƒãƒƒãƒ—ä¿å­˜
 void UNaMap::SaveMap( FString path )
 {
 	FBufferArchive	ar;
@@ -69,7 +69,7 @@ void UNaMap::SaveMap( FString path )
 	FFileHelper::SaveArrayToFile( ar, *fname );
 }
 
-//! ƒ}ƒbƒv“Ç‚İ‚İ
+//! ãƒãƒƒãƒ—èª­ã¿è¾¼ã¿
 void UNaMap::LoadMap( FString path, int32 id )
 {
 	FString	fname;
@@ -133,14 +133,14 @@ void UNaMap::Serialize( FArchive& ar )
 	ar << m_ChunkCache;
 }
 
-// @deprecated ƒAƒZƒbƒg‚©‚çƒCƒ“ƒXƒ^ƒ“ƒX‰» //
+// @deprecated ã‚¢ã‚»ãƒƒãƒˆã‹ã‚‰ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹åŒ– //
 void UNaMap::Instantiate( UNaMapAsset* src )
 {
 	m_MapSize	= src->m_MapSize;
 
 	FIntVector	cmin,cmax;
 
-	// ƒ`ƒƒƒ“ƒN¶¬ //
+	// ãƒãƒ£ãƒ³ã‚¯ç”Ÿæˆ //
 	for ( auto& it : src->m_Parts ){
 		cmin.X	= it.Position.X >> 4;
 		cmin.Y	= it.Position.Y >> 4;
@@ -174,7 +174,7 @@ void UNaMap::Instantiate( UNaMapAsset* src )
 	// 
 }
 
-// ƒp[ƒcî•ñ‚©‚çƒ`ƒƒƒ“ƒN‚É•ÏŠ· //
+// ãƒ‘ãƒ¼ãƒ„æƒ…å ±ã‹ã‚‰ãƒãƒ£ãƒ³ã‚¯ã«å¤‰æ› //
 void UNaMap::CopyPartsToChunk( FNaMapPartsEntry* parts, UNaChunk* chunk )
 {
 	FNaWorldBlockWork	work;

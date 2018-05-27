@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -11,7 +11,7 @@
 #include "NaMap.generated.h"
 
 /**
- * ’†ŠÔƒ}ƒbƒvƒCƒ“ƒXƒ^ƒ“ƒXi\‘¢•¨ƒf[ƒ^‚©‚ç¶¬Ï‚İ‚Ìƒ`ƒƒƒ“ƒN‚Å\¬‚³‚ê‚éj
+ * ä¸­é–“ãƒãƒƒãƒ—ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ï¼ˆæ§‹é€ ç‰©ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰ç”Ÿæˆæ¸ˆã¿ã®ãƒãƒ£ãƒ³ã‚¯ã§æ§‹æˆã•ã‚Œã‚‹ï¼‰
  */
 UCLASS()
 class NANRPG_API UNaMap : public UObject
@@ -19,23 +19,23 @@ class NANRPG_API UNaMap : public UObject
 	GENERATED_BODY()
 	
 public:
-	//! ƒ}ƒbƒv¶¬
+	//! ãƒãƒƒãƒ—ç”Ÿæˆ
 	void	Create( UNaWorld* naw, int32 uid, FIntVector pos, const UNaMapAsset* asset );
 
-	//! ƒ}ƒbƒv•Û‘¶
+	//! ãƒãƒƒãƒ—ä¿å­˜
 	void	SaveMap( FString path );
-	//! ƒ}ƒbƒv“Ç‚İ‚İ
+	//! ãƒãƒƒãƒ—èª­ã¿è¾¼ã¿
 	void	LoadMap( FString path, int32 id );
 
-	//!	ƒ`ƒƒƒ“ƒNæ“¾
+	//!	ãƒãƒ£ãƒ³ã‚¯å–å¾—
 	UNaChunk*	GetChunk( FIntVector cpos );
-	//! ƒ}ƒbƒvƒNƒ[ƒY
+	//! ãƒãƒƒãƒ—ã‚¯ãƒ­ãƒ¼ã‚º
 	void		CloseMap();
 
 	//! 
 	virtual void	Serialize( FArchive& ar ) override;
 
-	//! @deprecated ƒ}ƒbƒvƒAƒZƒbƒg‚©‚çƒCƒ“ƒXƒ^ƒ“ƒX¶¬
+	//! @deprecated ãƒãƒƒãƒ—ã‚¢ã‚»ãƒƒãƒˆã‹ã‚‰ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ç”Ÿæˆ
 	void	Instantiate( UNaMapAsset* src );
 	//
 	void	CopyPartsToChunk( FNaMapPartsEntry* parts, UNaChunk* chunk );
@@ -46,19 +46,19 @@ public:
 	FIntVector	GetLocation() const			{ return m_MapLocation; }
 
 protected:
-	//! ƒ}ƒbƒvID
+	//! ãƒãƒƒãƒ—ID
 	int32		m_MapID;
-	//! ƒ}ƒbƒvƒAƒZƒbƒg
+	//! ãƒãƒƒãƒ—ã‚¢ã‚»ãƒƒãƒˆ
 	int32		m_AssetID;
-	//! ƒ}ƒbƒv”z’uÀ•W
+	//! ãƒãƒƒãƒ—é…ç½®åº§æ¨™
 	FIntVector	m_MapLocation;
-	//! ƒ}ƒbƒvƒTƒCƒYiƒ`ƒƒƒ“ƒN’PˆÊj
+	//! ãƒãƒƒãƒ—ã‚µã‚¤ã‚ºï¼ˆãƒãƒ£ãƒ³ã‚¯å˜ä½ï¼‰
 	FIntVector	m_MapSize;
 
-	// ƒ`ƒƒƒ“ƒNî•ñ //
+	// ãƒãƒ£ãƒ³ã‚¯æƒ…å ± //
 	UPROPERTY()
-	TArray<UNaChunk*>				m_Chunks;		// À‘Ì•Û—p //
+	TArray<UNaChunk*>				m_Chunks;		// å®Ÿä½“ä¿æŒç”¨ //
 	TMap<FIntVector, UNaChunk*>		m_ChunkMap;
-	// ƒ`ƒƒƒ“ƒNƒLƒƒƒbƒVƒ… //
+	// ãƒãƒ£ãƒ³ã‚¯ã‚­ãƒ£ãƒƒã‚·ãƒ¥ //
 	TMap<FIntVector, TArray<uint8>>	m_ChunkCache;
 };

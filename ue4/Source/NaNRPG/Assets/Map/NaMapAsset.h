@@ -55,29 +55,20 @@ struct FNaMapPartsEntry
 	//! 向き
 	UPROPERTY()
 	int32		Direction;
-
-	//@obsolete
-	UPROPERTY()
-	TAssetPtr<UNaMapPartsAsset>	PartsAsset;
-	//@obsolete
-	UPROPERTY()
-	UNaMapPartsAsset*	Parts;	// 実体
-	//@obsolete
-	int32	TestIdx;
 };
 
-// マップ生成追加処理プロセス
+// ランダムマップ生成処理
 USTRUCT()
 struct FNaMapProcess
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
-	int32			Type;		// プロセス種別
-//	UPROPERTY()
-//	TArray<FNaMapProcessCond>	Conditions;		// 判定条件 //
-	UPROPERTY()
-	TArray<int32>	Params;		// パラメータ //
+	//! 種別
+	UPROPERTY(EditAnywhere, Category = "General")
+	int32		Type;
+	UPROPERTY(EditAnywhere, Category = "General")
+	//! 広さ（ブロック単位）
+	FVector2D	Range;
 };
 
 struct FNaMapGen;
@@ -111,6 +102,9 @@ public:
 	//! 
 	TArray<FNaChunkData>&	GetChunks()	{ return m_Chunks; }
 
+protected:
+	
+
 public:
 	//! ID
 	UPROPERTY()
@@ -119,19 +113,18 @@ public:
 	UPROPERTY()
 	FIntVector	m_MapSize;
 
-	//! 固有チャンク
+	//! ランダム生成設定
+
+	//! 固定チャンク
 	UPROPERTY()
 	TArray<FNaChunkData>		m_Chunks;
-	//! 構造物リスト
+	//! 固定配置構造物
 	UPROPERTY()
 	TArray<FNaMapPartsEntry>	m_Parts;
 
 	//! エンティティリスト
 	UPROPERTY(EditDefaultsOnly, Category = "Entity")
 	TArray<FNaEntityEntry>		m_Entities;
-	//! 特殊処理
-	UPROPERTY()
-	TArray<FNaMapProcess>		m_Process;
 
 	//! 一時情報
 

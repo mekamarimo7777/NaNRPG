@@ -4,6 +4,9 @@
 #include "NaWidget.h"
 
 
+//////////////////////////////////////////////////
+// public methods
+//////////////////////////////////////////////////
 //! ウィジェット初期化
 bool UNaWidget::Initialize()
 {
@@ -27,14 +30,15 @@ void UNaWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick( MyGeometry, InDeltaTime );
 
+	//! トランジション変更
 	if ( m_CurrentTrans != m_RequestTrans ){
 		if ( OnTransition( m_RequestTrans ) ){
-			//! BP
-			OnBeginTransition( m_RequestTrans, m_CurrentTrans );
-
 			m_CurrentTrans	= m_RequestTrans;
 		}
 	}
+
+	//! トランジションタスク実行
+	ExecTransTask();
 
 	m_SM->Execute( InDeltaTime );
 }
@@ -45,14 +49,11 @@ void UNaWidget::Open( int32 ZOrder )
 	if ( !IsInViewport() ){
 		AddToPlayerScreen( ZOrder );
 	}
-
-	EventOpen();
 }
 
 //! ビューポートから削除
 void UNaWidget::Close()
 {
-	EventClose();
 }
 
 //! トランジションリクエスト
@@ -66,7 +67,7 @@ void UNaWidget::Transition( FName id )
 //! トランジション判定
 bool UNaWidget::IsTransition() const
 {
-	return false;
+	return m_IsTransition;
 }
 
 //!
@@ -83,31 +84,6 @@ bool UNaWidget::HasNestFocus() const
 	}
 
 	return false;
-}
-
-//!
-void UNaWidget::SetResponse( const FString& key, int32 value )
-{
-	if ( value != 0 ){
-		m_Response[key]	= value;
-	}
-	else {
-		m_Response.Remove( key );
-	}
-}
-
-//!
-int32 UNaWidget::GetResponse(  const FString& key ) const
-{
-	return m_Response[key];
-}
-
-//!
-int32 UNaWidget::TakeResponse(  const FString& key )
-{
-	int32*	res = m_Response.Find( key );
-
-	return res ? *res : 0;
 }
 
 //! フォーカス退避
@@ -173,8 +149,106 @@ UTexture* UNaWidget::GetParameterAsTexture( FName key ) const
 	return tex;
 }
 
+//////////////////////////////////////////////////
+// protected methods
+//////////////////////////////////////////////////
 //! トランジション開始イベント
 bool UNaWidget::OnTransition( FName id )
 {
 	return true;
+}
+
+//! トランジション開始
+void UNaWidget::BeginTransition()
+{
+	m_IsTransition	= true;
+	OnBeginTransition( m_CurrentTrans );
+}
+
+//! トランジション完了
+void UNaWidget::EndTransition()
+{
+	OnEndTransition( m_CurrentTrans );
+	m_IsTransition	= false;
+}
+
+//! 
+void UNaWidget::RequestTransition( UNaWidget* widget, FString value )
+{
+	FNaTransitionTask	task;
+
+	task.Type	= ENaTransitionTask::Transition;
+	task.State	= ENaTransitionTaskState::Ready;
+	task.Object	= widget;
+	task.Params.Add( value );
+
+	m_TransTask.Add( task );
+}
+
+//! 
+void UNaWidget::RequestAnimation( UWidgetAnimation* anim )
+{
+	FNaTransitionTask	task;
+
+	task.Type	= ENaTransitionTask::Animation;
+	task.State	= ENaTransitionTaskState::Ready;
+	task.Object	= anim;
+
+	m_TransTask.Add( task );
+}
+
+//!
+void UNaWidget::ExecTransTask()
+{
+	for ( auto& it : m_TransTask ){
+		switch ( it.Type ){
+		//! トランジション
+		case ENaTransitionTask::Transition:
+			if ( UNaWidget* widget = Cast<UNaWidget>( it.Object ) ){
+				switch ( it.State ){
+				case ENaTransitionTaskState::Ready:
+					widget->Transition( FName( *it.Params[0] ) );
+					it.State	= ENaTransitionTaskState::Processing;
+					break;
+
+				case ENaTransitionTaskState::Processing:
+					if ( !widget->IsTransition() ){
+						it.State	= ENaTransitionTaskState::Completed;
+					}
+					break;
+				}
+			}
+			else {
+				it.State	= ENaTransitionTaskState::Completed;
+			}
+			break;
+
+		//! アニメーション
+		case ENaTransitionTask::Animation:
+			if ( UWidgetAnimation* anim = Cast<UWidgetAnimation>( it.Object ) ){
+				switch ( it.State ){
+				case ENaTransitionTaskState::Ready:
+					PlayAnimation( anim, 0.0f, 1, EUMGSequencePlayMode::Forward, 1.0f );
+					it.State	= ENaTransitionTaskState::Processing;
+					break;
+
+				case ENaTransitionTaskState::Processing:
+					if ( IsAnimationPlaying( anim ) ){
+						it.State	= ENaTransitionTaskState::Completed;
+					}
+					break;
+				}
+			}
+			else {
+				it.State	= ENaTransitionTaskState::Completed;
+			}
+			break;
+		}
+	}
+
+	//! 削除
+	m_TransTask.RemoveAll( []( FNaTransitionTask& p )
+	{
+		return p.State == ENaTransitionTaskState::Completed;
+	});
 }
