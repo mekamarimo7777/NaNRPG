@@ -9,6 +9,11 @@
 
 #include "Actor/Entity/NaActorBase.h"
 
+//! コンストラクタ
+UNaChunk::UNaChunk( const FObjectInitializer& ObjectInitializer )
+: Super( ObjectInitializer )
+{
+}
 
 //
 void UNaChunk::Initialize( UNaRegion* region, FIntVector cpos )
@@ -22,7 +27,7 @@ void UNaChunk::Initialize( UNaRegion* region, FIntVector cpos )
 
 	SetInvalidate( true );
 
-	FMemory::Memset( m_BlockID, 0, sizeof( m_BlockID ) );
+	FMemory::Memset( m_BlockID, INVALID_BLOCK_ID, sizeof( m_BlockID ) );
 	FMemory::Memset( m_BlockParam, 0, sizeof( m_BlockParam ) );
 	FMemory::Memset( m_MetaData, 0, sizeof( m_MetaData ) );
 	FMemory::Memset( m_Blightness, 0, sizeof( m_Blightness ) );
@@ -154,7 +159,7 @@ bool UNaChunk::GetBlock( int32 idx, FNaWorldBlockWork& outVal )
 
 	outVal.VisibleFace	= m_VisibleFace[idx];
 
-	return true;
+	return outVal.BlockID != INVALID_BLOCK_ID;
 }
 
 //
@@ -163,7 +168,7 @@ void UNaChunk::EnumValidCellIndices( TArray<int16>& outVal )
 	outVal.Reserve( ELEMENTS );
 
 	for ( int32 i = 0; i < ELEMENTS; ++i ){
-		if ( m_BlockID[i] ){
+		if ( m_BlockID[i] != INVALID_BLOCK_ID ){
 			outVal.Add( i );
 		}
 	}
@@ -260,195 +265,6 @@ void UNaChunk::Serialize( FArchive& ar )
 	}
 }
 
-//
-void UNaChunk::CreateTestChunk()
-{
-	FIntVector	worldPos,tpos;
-//	float		heightMap[16][16];
-
-/*	{// 起伏計算 //
-		float	height[4];
-
-		height[0]	= 0;
-		height[1]	= 0;
-		height[2]	= 0;
-		height[3]	= 0;
-		CreateDisplacementMap( (float*)heightMap, 0, 0, 16, height[0], height[1], height[2], height[3] );
-	}*/
-
-	worldPos	= GetPositionInWorld();
-	tpos.X		= worldPos.X << 4;
-
-	// セル生成 //
-	for ( int32 ix = 0; ix < DIM_X; ++ix, ++tpos.X ){
-		//
-		tpos.Y	= worldPos.Y << 4;
-
-		for ( int32 iy = 0; iy < DIM_Y; ++iy, ++tpos.Y ){
-			//
-			tpos.Z	= worldPos.Z << 4;
-
-			float	mid_height = 16;
-
-//			mid_height	= heightMap[iy][ix];
-//			mid_height	= (ix * iy) / 32.0f + (ChunkPos.X) * 7.0f;
-/*			mid_height	= (ix * iy) / 32.0f;
-			if ( worldPos.Y == 0 ){
-				mid_height	+= worldPos.X * 7.0f;
-			}*/
-			switch ( m_pRegion->GetNaWorld()->GetDataID() ){
-			case 0:
-				mid_height	= -FMath::Abs( tpos.X * tpos.Y ) / 64.0f;
-				break;
-			case 1:
-				mid_height	= FMath::Abs( tpos.X * tpos.Y ) / 32.0f;
-				break;
-			default:
-				mid_height	= 2;
-				break;
-			}
-//			mid_height	= 2;
-
-			for ( int32 iz = 0; iz < DIM_Z; ++iz, ++tpos.Z ){
-				int32	idx = CELL_OFS(ix, iy, iz);
-
-				if ( tpos.Z < mid_height ){
-//				if ( tpos.Z < 0 ){
-//					m_BlockID[idx]				= 2 + (FMath::Abs( tpos.Z ) + 3) / 4;
-					m_BlockID[idx]				= 1;
-					m_BlockParam[idx]			= 0;
-					m_MetaData[idx].Height[0]	= FMath::Clamp( (int32)((mid_height - tpos.Z) * 255), 0, 255 );
-//					m_MetaData[idx].Height[0]	= 255;
-					m_MetaData[idx].Height[1]	= m_MetaData[idx].Height[0];
-					m_MetaData[idx].Height[2]	= m_MetaData[idx].Height[0];
-					m_MetaData[idx].Height[3]	= m_MetaData[idx].Height[0];
-//					m_Blightness[idx >> 1]		= 0;
-
-					m_VisibleFace[idx]	= 0;
-				}
-				else {
-					m_BlockID[idx]	= 0;
-				}
-			}
-		}
-	}
-
-	// マップチャンクのコピー（適当）
-	/*
-	{
-		UNaMap*		map;
-		UNaChunk*	chunk;
-		FIntVector	cpos;
-
-		map	= m_pRegion->GetNaWorld()->GetMap( 0 );
-		if ( map ){
-			cpos	= GetPositionInWorld() - map->GetLocation();
-			chunk	= map->GetMapChunk( cpos );
-			if ( chunk ){
-				for ( int32 i = 0; i < ELEMENTS; ++i ){
-					if ( chunk->m_BlockID[i] != 0 ){
-						m_BlockID[i]	= chunk->m_BlockID[i];
-						m_MetaData[i].Height[0]	= 0;
-						m_MetaData[i].Height[1]	= 0;
-						m_MetaData[i].Height[2]	= 0;
-						m_MetaData[i].Height[3]	= 0;
-					}
-				}
-			}
-		}
-	}
-	*/
-
-	SetInvalidate( true );
-}
-
-#if 0
-//
-void UNaChunk::RecalcVisibleFaces()
-{
-	FNaWorldBlockWork	work;
-	FIntVector	wpos;
-	int32		x,y,z;
-	int32		wz;
-
-	wpos	= GetPositionInWorld() * 16;
-
-	// 天井位置更新 //
-	wz		= m_pRegion->GetNaWorld()->GetCeilZ();
-	if ( m_Revision > 0 ){
-		bool	b0,b1;
-
-		b0	= m_PrevCeilZ > wpos.Z && m_PrevCeilZ < wpos.Z + 17;
-		b1	= wz > wpos.Z && wz < wpos.Z + 17;
-		if ( !(b0 ||  b1) ){
-			return;
-		}
-	}
-	m_PrevCeilZ	= wz;
-
-	for ( int32 i = 0; i < ELEMENTS; ++i ){
-		x	= i & 0xF;
-		y	= (i >> SHIFT_Y) & 0xF;
-		z	= (i >> SHIFT_Z) & 0xF;
-
-		m_VisibleFace[i]	= 0;
-
-		if ( m_BlockID[i] > 1 ){
-			if ( wpos.Z + z < wz ){
-				// X
-				if ( GetBlock( x - 1, y, z, work ) ){
-					if ( m_MetaData[i].Height[0] > work.MetaData.Height[2] && m_MetaData[i].Height[1] > work.MetaData.Height[3] ){
-						m_VisibleFace[i]	|= 0x1;
-					}
-				}
-				else {
-					m_VisibleFace[i]	|= 0x1;
-				}
-				if ( GetBlock( x + 1, y, z, work ) ){
-					if ( m_MetaData[i].Height[2] > work.MetaData.Height[0] && m_MetaData[i].Height[3] > work.MetaData.Height[1] ){
-						m_VisibleFace[i]	|= 0x2;
-					}
-				}
-				else {
-					m_VisibleFace[i]	|= 0x2;
-				}
-
-				//Y
-				if ( GetBlock( x, y - 1, z, work ) ){
-					if ( m_MetaData[i].Height[0] > work.MetaData.Height[1] && m_MetaData[i].Height[2] > work.MetaData.Height[3] ){
-						m_VisibleFace[i]	|= 0x4;
-					}
-				}
-				else {
-					m_VisibleFace[i]	|= 0x4;
-				}
-				if ( GetBlock( x, y + 1, z, work ) ){
-					if ( m_MetaData[i].Height[1] > work.MetaData.Height[0] && m_MetaData[i].Height[3] > work.MetaData.Height[2] ){
-						m_VisibleFace[i]	|= 0x8;
-					}
-				}
-				else {
-					m_VisibleFace[i]	|= 0x8;
-				}
-
-				// 上面
-				if ( wpos.Z + z == wz - 1 || !GetBlock( x, y, z + 1, work ) || work.BlockID <= 1 ){
-					m_VisibleFace[i]	|= 0x20;
-				}
-			}
-
-			// 下面
-			if ( !GetBlock( x, y, z - 1, work ) || work.BlockID <= 1 ){
-				m_VisibleFace[i]	|= 0x10;
-			}
-		}
-	}
-
-	m_Revision++;
-	SetInvalidate( true );
-}
-#endif
-
 //!
 void UNaChunk::RecalcRenderCells()
 {
@@ -460,7 +276,7 @@ void UNaChunk::RecalcRenderCells()
 
 	//! 
 	for ( int32 i = 0; i < ELEMENTS; ++i ){
-		if ( m_BlockID[i] != 0 ){
+		if ( m_BlockID[i] != INVALID_BLOCK_ID ){
 			m_RenderCells.Add( i );
 		}
 	}
@@ -501,6 +317,9 @@ bool UNaChunk::CheckVisibleFace( int32 index, int32 dir )
 	FIntVector			vec;
 
 	srcBlock = alib->FindBlockAsset( m_BlockID[index] );
+	if ( !srcBlock || !srcBlock->IsOpaque ){
+		return false;
+	}
 
 	vec.X	= index & 0xF;
 	vec.Y	= (index >> SHIFT_Y) & 0xF;
@@ -508,13 +327,13 @@ bool UNaChunk::CheckVisibleFace( int32 index, int32 dir )
 	vec		+= c_dirVec[dir];
 
 	if ( GetBlock( vec.X, vec.Y, vec.Z, work ) ){
-		if ( work.BlockID == 0 ){
+		if ( work.BlockID == 255 ){
 			return true;
 		}
 		else {
 			FNaBlockDataAsset*	dstBlock = alib->FindBlockAsset( work.BlockID );
 
-			if ( srcBlock->IsOpaque && !dstBlock->IsOpaque ){
+			if ( srcBlock->IsOpaque && (!dstBlock || !dstBlock->IsOpaque) ){
 				return true;
 			}
 			else {

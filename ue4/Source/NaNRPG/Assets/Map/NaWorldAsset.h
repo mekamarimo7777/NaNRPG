@@ -33,7 +33,13 @@ class NANRPG_API UNaWorldAsset : public UNaDataAsset
 public:
 	//! 表示名
 	UPROPERTY( EditDefaultsOnly, Category = "General" )
-	FText	DisplayName;
+	FText		DisplayName;
+	//! ワールド下限チャンク
+	UPROPERTY( EditDefaultsOnly, Category = "General" )
+	FIntPoint	WorldMin;
+	//! ワールド上限チャンク
+	UPROPERTY( EditDefaultsOnly, Category = "General" )
+	FIntPoint	WorldMax;
 
 	//! 配置マップアセット
 	UPROPERTY( EditDefaultsOnly, Category = "Map" )

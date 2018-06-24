@@ -124,7 +124,9 @@ protected:
 
 	//! 実行中データ
 	TArray<FNaEventCommand*>	m_Commands;
-	//! 実行中コード
+	//! カレントコマンド
+	FNaEventCommand*			m_Current;
+	//! プログラムカウンタ
 	int32						m_PC;
 
 	//! 寸劇用

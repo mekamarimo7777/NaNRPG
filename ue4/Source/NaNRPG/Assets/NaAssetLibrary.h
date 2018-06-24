@@ -18,6 +18,7 @@
 #include "Entity/NaRaceDataTable.h"
 
 #include "Map/NaWorldAsset.h"
+#include "Map/NaMapAsset.h"
 
 #include "Event/NaEventAsset.h"
 
@@ -106,11 +107,11 @@ protected:
 
 	//! マップアセット
 	UPROPERTY()
-	UObjectLibrary*						m_LibBlockData;
-	TArray<FNaBlockDataAsset*>			m_BlockDataList;
+	UObjectLibrary*								m_LibBlockData;
+	TArray<FNaBlockDataAsset*>					m_BlockDataList;
 	UPROPERTY()
-	UObjectLibrary*						m_LibBlockMaterialData;
-	TArray<FNaBlockMaterialAsset*>		m_BlockMaterialDataList;
+	UObjectLibrary*								m_LibBlockMaterialData;
+	TArray<FNaBlockMaterialAsset*>				m_BlockMaterialDataList;
 
 	//! ワールドアセット
 	UPROPERTY()

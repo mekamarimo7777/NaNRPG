@@ -157,7 +157,6 @@ UNaChunk* UNaRegion::CreateChunk( FIntVector cpos )
 		if ( gen ){
 			gen->GenerateChunk( chunk );
 		}
-//		chunk->CreateTestChunk();
 	}
 
 	m_Chunks.Add( chunk );

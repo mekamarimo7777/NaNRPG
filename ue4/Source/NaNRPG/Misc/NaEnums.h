@@ -313,21 +313,3 @@ namespace ENaActorAnimation
 		ENUM_MAX	UMETA(Hidden)
 	};
 }
-
-// マップ追加プロセス種別 //
-UENUM()
-namespace ENaMapProcess
-{
-	enum Type
-	{
-		// ブロック埋め込み（設定ブロック） //
-		FillBlocks,
-		// ブロック変換（変換対象、変換ブロック） //
-		ReplaceBlocks,
-
-		// アイテム配置 //
-		StrewItem,
-
-		ENUM_MAX	UMETA(Hidden)
-	};
-}

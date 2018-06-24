@@ -15,7 +15,7 @@ void UNaEditorWorld::SetupFromMap( UNaMapAsset* asset )
 {
 	m_MapAsset	= asset;
 
-	SetChunkLimit( FIntVector(0, 0, 0), asset->m_MapSize - FIntVector( 1, 1, 1 ) );
+	SetChunkLimit( FIntVector(0, 0, 0), asset->MapSize - FIntVector( 1, 1, 1 ) );
 
 	//! マップデータからコピー
 	if ( m_MapAsset ){

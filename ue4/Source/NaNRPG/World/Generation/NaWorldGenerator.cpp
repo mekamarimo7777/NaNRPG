@@ -20,8 +20,8 @@ UNaWorldGenerator::UNaWorldGenerator()
 void UNaWorldGenerator::GenerateChunk( UNaChunk* chunk )
 {
 	//! 地形生成
-	MakeTerrain( chunk );
-	//MakeFlatland( chunk );
+	//MakeTerrain( chunk );
+	MakeFlatland( chunk );
 
 	//! マップ反映
 	CopyMapData( chunk );
@@ -93,6 +93,12 @@ void UNaWorldGenerator::MakeTerrain( UNaChunk* chunk )
 
 					chunk->SetBlock( idx, block );
 				}
+				else {
+					block.BlockID			= 0;
+					block.MetaData.Value	= 0;
+					block.VisibleFace		= 0;
+					chunk->SetBlock( idx, block );
+				}
 			}
 		}
 	}
@@ -126,7 +132,7 @@ void UNaWorldGenerator::MakeFlatland( UNaChunk* chunk )
 				int32	idx = CELL_OFS(ix, iy, iz);
 				int32	h;
 
-				h	= 0;
+				h	= 48;
 
 				if ( tpos.Z < h ){
 					block.BlockID		= 1;
@@ -137,6 +143,12 @@ void UNaWorldGenerator::MakeFlatland( UNaChunk* chunk )
 					block.MetaData.Height[2]	= block.MetaData.Height[0];
 					block.MetaData.Height[3]	= block.MetaData.Height[0];
 					block.VisibleFace	= 0;
+					chunk->SetBlock( idx, block );
+				}
+				else {
+					block.BlockID			= 0;
+					block.MetaData.Value	= 0;
+					block.VisibleFace		= 0;
 					chunk->SetBlock( idx, block );
 				}
 			}
@@ -163,8 +175,9 @@ void UNaWorldGenerator::CopyMapData( UNaChunk* chunk )
 			for ( int32 i = 0; i < UNaChunk::ELEMENTS; ++i ){
 				FNaWorldBlockWork	work;
 
-				mapChunk->GetBlock( i, work );
-				chunk->SetBlock( i, work );
+				if ( mapChunk->GetBlock( i, work ) ){
+					chunk->SetBlock( i, work );
+				}
 			}
 		}
 	}

@@ -54,6 +54,7 @@ void UNaWidget::Open( int32 ZOrder )
 //! ビューポートから削除
 void UNaWidget::Close()
 {
+	RemoveFromParent();
 }
 
 //! トランジションリクエスト
@@ -155,6 +156,7 @@ UTexture* UNaWidget::GetParameterAsTexture( FName key ) const
 //! トランジション開始イベント
 bool UNaWidget::OnTransition( FName id )
 {
+	//! @abstract
 	return true;
 }
 
@@ -172,7 +174,7 @@ void UNaWidget::EndTransition()
 	m_IsTransition	= false;
 }
 
-//! 
+//! トランジションタスク要求
 void UNaWidget::RequestTransition( UNaWidget* widget, FString value )
 {
 	FNaTransitionTask	task;
@@ -185,7 +187,7 @@ void UNaWidget::RequestTransition( UNaWidget* widget, FString value )
 	m_TransTask.Add( task );
 }
 
-//! 
+//! アニメーションタスク要求
 void UNaWidget::RequestAnimation( UWidgetAnimation* anim )
 {
 	FNaTransitionTask	task;
@@ -197,7 +199,7 @@ void UNaWidget::RequestAnimation( UWidgetAnimation* anim )
 	m_TransTask.Add( task );
 }
 
-//!
+//! トランジションタスク実行
 void UNaWidget::ExecTransTask()
 {
 	for ( auto& it : m_TransTask ){

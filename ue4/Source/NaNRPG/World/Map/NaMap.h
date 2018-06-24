@@ -34,16 +34,15 @@ public:
 
 	//! 
 	virtual void	Serialize( FArchive& ar ) override;
-
-	//! @deprecated マップアセットからインスタンス生成
-	void	Instantiate( UNaMapAsset* src );
-	//
-	void	CopyPartsToChunk( FNaMapPartsEntry* parts, UNaChunk* chunk );
 	
 	//! 
 	void		SetLocation(FIntVector pos)	{ m_MapLocation = pos; }
 	//! 
 	FIntVector	GetLocation() const			{ return m_MapLocation; }
+
+protected:
+	//! ランダムマップ生成
+	void	CreateRandomMap( const UNaMapAsset* asset );
 
 protected:
 	//! マップID

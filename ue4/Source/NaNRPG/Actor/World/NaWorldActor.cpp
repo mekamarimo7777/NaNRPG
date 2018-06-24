@@ -306,12 +306,13 @@ void ANaWorldActor::ProcMain( UNaStateMachine* sm, float DeltaTime )
 					if ( cpos != m_CurrentPos ){
 						FNaWorldBlockWork	work;
 
-						v.X		= cpos.X * 10.0f + 5.0f;
-						v.Y		= cpos.Y * 10.0f + 5.0f;
-						v.Z		= cpos.Z * 10.0f + 7.5f;
+						v.X	= cpos.X * 10.0f + 5.0f;
+						v.Y	= cpos.Y * 10.0f + 5.0f;
+						v.Z	= cpos.Z * 10.0f + 7.5f;
 
-						m_ActiveWorld->GetBlock( cpos, work );
-						v.Z		+= work.GetCenterHeight() / 256.0f * 10.0f;
+						if ( m_ActiveWorld->GetBlock( cpos, work ) ){
+							v.Z	+= work.GetCenterHeight() / 256.0f * 10.0f;
+						}
 
 						if ( m_CaptureCube ){
 							m_CaptureCube->SetRelativeLocation( v );

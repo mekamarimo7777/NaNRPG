@@ -111,7 +111,7 @@ void FNaMapEditor::InitEditor( const EToolkitMode::Type Mode, const TSharedPtr< 
 
 	m_DetailsObject	= NewObject<UNaMapEditorDetail>();
 	if ( m_DetailsObject ){
-		m_DetailsObject->MapSize	= m_CurrentObject->m_MapSize;
+		m_DetailsObject->MapSize	= m_CurrentObject->MapSize;
 	}
 
 	m_PrevWorld	= NewObject<UNaEditorWorld>();
@@ -332,7 +332,7 @@ void FNaMapEditor::OnFinishedChangingProperties(const FPropertyChangedEvent& Pro
 				//! 
 				m_WorldActor->UpdateInvalidateChunk();
 
-				m_CurrentObject->m_MapSize	= m_DetailsObject->MapSize;
+				m_CurrentObject->MapSize	= m_DetailsObject->MapSize;
 				m_CurrentObject->MarkPackageDirty();
 			}
 			else if ( prop->GetName() == "CreateRandomMap" ){

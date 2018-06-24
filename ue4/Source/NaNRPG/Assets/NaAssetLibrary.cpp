@@ -85,7 +85,12 @@ FNaItemDataAsset* UNaAssetLibrary::FindItemAsset( FName uid ) const
 //!
 FNaBlockDataAsset* UNaAssetLibrary::FindBlockAsset( int32 uid ) const
 {
-	return m_BlockDataList[uid];
+	if ( m_BlockDataList.IsValidIndex( uid ) ){
+		return m_BlockDataList[uid];
+	}
+	else {
+		return nullptr;
+	}
 }
 
 //!

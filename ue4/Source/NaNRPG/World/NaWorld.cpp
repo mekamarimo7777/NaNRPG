@@ -694,7 +694,7 @@ void UNaWorld::CreateMap( FIntVector location, const UNaMapAsset* mapAsset )
 
 	entry.MapID		= m_MapEntries.Num();
 	entry.Location	= location;
-	entry.Range		= mapAsset->m_MapSize;
+	entry.Range		= mapAsset->MapSize;
 	m_MapEntries.Add( entry );
 
 	map	= NewObject<UNaMap>();

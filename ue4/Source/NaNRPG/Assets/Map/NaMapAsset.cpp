@@ -6,7 +6,7 @@
 #include "Actor/Entity/NaActorBase.h"
 
 #define	MAP_BLOCK_OFS(x, y, z)	(x + (y << FNaChunkData::SHIFT_Y) + (z << FNaChunkData::SHIFT_Z))
-
+/*
 struct FNaMapNode
 {
 	bool				Horizontal;
@@ -25,12 +25,12 @@ struct FNaMapNode
 struct FNaMapGen
 {
 	TArray<FNaMapNode>	Nodes;
-};
-
+};*/
+/*
 // 簡易ランダムマップ生成 //
 void UNaMapAsset::CreateSimpleRandomMap( FIntVector size )
 {
-/*	FNaMapGen	gen;
+	FNaMapGen	gen;
 	FNaMapNode	root;
 	UNaMapPartsAsset*	partsAsset;
 
@@ -86,7 +86,7 @@ void UNaMapAsset::CreateSimpleRandomMap( FIntVector size )
 				bEnter	= true;
 			}
 		}
-	}*/
+	}
 }
 //
 void UNaMapAsset::DivideNode( FNaMapGen* gen )
@@ -250,11 +250,11 @@ void UNaMapAsset::ConnectRoom( FNaMapNode* src, FNaMapNode* dst )
 		}
 	}
 }
-
+*/
 //! 
 void UNaMapAsset::ResizeMap( const FIntVector& size )
 {
-	m_MapSize	= size;
+	MapSize	= size;
 }
 
 //! 
@@ -267,7 +267,7 @@ void UNaMapAsset::SetBlock( const FIntVector& pos, const FNaWorldBlockWork& work
 	cpos.Y	= pos.Y >> 4;
 	cpos.Z	= pos.Z >> 4;
 
-	chunk	= m_Chunks.FindByPredicate( [&cpos]( const FNaChunkData& p )
+	chunk	= Chunks.FindByPredicate( [&cpos]( const FNaChunkData& p )
 	{
 		return p.Position == cpos;
 	});
@@ -275,8 +275,8 @@ void UNaMapAsset::SetBlock( const FIntVector& pos, const FNaWorldBlockWork& work
 	if ( !chunk ){
 		int32	index;
 
-		index	= m_Chunks.Add( FNaChunkData() );
-		chunk	= &m_Chunks[index];
+		index	= Chunks.Add( FNaChunkData() );
+		chunk	= &Chunks[index];
 		chunk->Position	= cpos;
 	}
 

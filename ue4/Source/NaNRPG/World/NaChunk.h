@@ -26,8 +26,12 @@ public:
 	static const int	SHIFT_Y = 4;
 	static const int	SHIFT_Z = 8;
 	static const int	ELEMENTS = DIM_X * DIM_Y * DIM_Z;
+	static const int	INVALID_BLOCK_ID = 255;
 
 public:
+	//! コンストラクタ
+	UNaChunk( const FObjectInitializer& ObjectInitializer );
+
 	// 初期化
 	void		Initialize( UNaRegion* region, FIntVector cpos );
 	// チャンクオープン
@@ -83,10 +87,6 @@ public:
 	//! シリアライズ
 	virtual void	Serialize( FArchive& ar ) override;
 
-	// 
-	void	CreateTestChunk();
-	//@obsolete
-	//void	RecalcVisibleFaces();
 	//
 	void	RecalcRenderCells();
 	//

@@ -42,20 +42,6 @@ void UNaMapPartsAsset::Resize(FIntVector newSize)
 		tmp			= newSize.X * newSize.Y * newSize.Z;
 		m_Cells.SetNum( tmp );
 
-		//!@
-	/*	for ( int32 z = 0; z < Size.Z; ++z ){
-			for ( int32 y = 0; y < Size.Y; ++y ){
-				for ( int32 x = 0; x < Size.X; ++x ){
-					tmp		= x + y * Size.X + z * Size.X * Size.Y;
-
-					m_Cells[tmp].BlockID	= FMath::RandRange( 0, 1 );
-					if ( m_Cells[tmp].BlockID == 0 && z  < 12 ){
-						m_Cells[tmp].BlockID	= 2;
-					}
-				}
-			}
-		}*/
-
 		tmpSize.X	= FMath::Min( newSize.X, oldSize.X );
 		tmpSize.Y	= FMath::Min( newSize.Y, oldSize.Y );
 		tmpSize.Z	= FMath::Min( newSize.Z, oldSize.Z );

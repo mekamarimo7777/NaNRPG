@@ -127,7 +127,9 @@ void ANaMapChunkActor::UpdateChunkMesh( int32 layer )
 
 			//! 描画面数
 			for ( int32 j = 0; j < rm->CellIndices.Num(); ++j ){
-				pLayer->Chunk->GetBlock( rm->CellIndices[j], work );
+				if ( !pLayer->Chunk->GetBlock( rm->CellIndices[j], work ) ){
+					continue;
+				}
 
 				int32	fnum = work.VisibleFace;
 		
@@ -149,17 +151,24 @@ void ANaMapChunkActor::UpdateChunkMesh( int32 layer )
 			idx		= 0;
 
 			for ( int32 j = 0; j < rm->CellIndices.Num(); ++j ){
+				FNaBlockDataAsset*	block;
 				int32	tmp,x,y,z;
 
-				pLayer->Chunk->GetBlock( rm->CellIndices[j], work );
+				if ( !pLayer->Chunk->GetBlock( rm->CellIndices[j], work ) ){
+					continue;
+				}
+
+				block = alib->FindBlockAsset( work.BlockID );
+				if ( !block ){
+					continue;
+				}
 
 				tmp	= rm->CellIndices[j];
 				x	= tmp & 0xF;
 				y	= (tmp >> 4) & 0xF;
 				z	= (tmp >> 8) & 0xF;
 
-				FVector				offset( x * 10.0f, y * 10.0f, z * 10.0f );
-				FNaBlockDataAsset*	block = alib->FindBlockAsset( work.BlockID );
+				FVector	offset( x * 10.0f, y * 10.0f, z * 10.0f );
 
 				c_Vertex[0].Z	= work.MetaData.Height[2] / 255.0f;
 				c_Vertex[1].Z	= work.MetaData.Height[3] / 255.0f;
@@ -229,9 +238,14 @@ void ANaMapChunkActor::GatherRenderCells( int32 layer )
 		FNaBlockDataAsset*	block;
 		FNaRenderMaterial*	section;
 
-		pLayer->Chunk->GetBlock( cells[i], work );
+		if ( !pLayer->Chunk->GetBlock( cells[i], work ) ){
+			continue;
+		}
 
 		block	= alib->FindBlockAsset( work.BlockID );
+		if ( !block ){
+			continue;
+		}
 
 		if ( block->MaterialID >= m_RenderMaterial.Num() ){
 			m_RenderMaterial.SetNum( block->MaterialID + 1 );

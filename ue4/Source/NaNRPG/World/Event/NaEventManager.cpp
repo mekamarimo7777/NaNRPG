@@ -77,29 +77,28 @@ void UNaEventManager::ProcEvent( UNaStateMachine* sm, float DeltaTime )
 	switch ( sm->GetPhase() ){
 	//! 初期化
 	case Init:
-		{
-			//! 実行データ初期化
-			if ( m_PC < 0 ){
-				const FNaEventSheet*	sheet = &m_Event->Sheets[m_CurrentSheet];
+		//! 実行データ初期化
+		if ( m_PC < 0 ){
+			const FNaEventSheet*	sheet = &m_Event->Sheets[m_CurrentSheet];
 
-				m_Commands.Reset();
-				sheet->GetCommandList( m_Commands );
-				m_PC	= 0;
-			}
-
-			sm->Advance();
+			m_Commands.Reset();
+			sheet->GetCommandList( m_Commands );
+			m_PC	= 0;
 		}
+
+		sm->Advance();
 		break;
 	//! メイン
 	case Main:
 		{
-			const FNaEventCommand*	cmd;
 			bool	isBreak = false;
 
 			while ( !isBreak ){
 				if ( m_Commands.IsValidIndex( m_PC ) ){
-					cmd		= m_Commands[m_PC];
-					isBreak	= ParseCommand( sm, cmd );
+					m_Current	= m_Commands[m_PC];
+					m_PC++;
+
+					isBreak	= ParseCommand( sm, m_Current );
 				}
 				else {
 					sm->SetPhase( End );
@@ -138,9 +137,7 @@ void UNaEventManager::ProcMessage( UNaStateMachine* sm, float DeltaTime )
 
 		//! メッセージ表示
 		if ( m_UIASkit ){
-			const FNaEventCommand*	cmd = m_Commands[m_PC];
-			
-			m_UIASkit->ShowMessage( FText::FromString( cmd->Arg0 ) );
+			m_UIASkit->ShowMessage( FText::FromString( m_Current->Arg0 ) );
 			sm->Advance();
 		}
 		else {
@@ -155,7 +152,6 @@ void UNaEventManager::ProcMessage( UNaStateMachine* sm, float DeltaTime )
 		break;
 	//! 終了
 	case End:
-		m_PC++;
 		sm->ChangeState( EState::Playing );
 		break;
 	}
@@ -177,11 +173,9 @@ bool UNaEventManager::ParseCommand( UNaStateMachine* sm, const FNaEventCommand* 
 		break;
 	case ENaEventCode::Selection:
 		GEngine->AddOnScreenDebugMessage( -1, 1.0, FColor::Green, cmd->Arg0 );
-		m_PC++;
 		break;
 	case ENaEventCode::Shop:
 		GEngine->AddOnScreenDebugMessage( -1, 1.0, FColor::Yellow, cmd->Arg0 );
-		m_PC++;
 		break;
 
 	//! 制御系
@@ -190,7 +184,7 @@ bool UNaEventManager::ParseCommand( UNaStateMachine* sm, const FNaEventCommand* 
 	case ENaEventCode::Calc:
 		break;
 
-	//! 
+	//! 新規ワールド生成
 	case ENaEventCode::GenerateWorld:
 		{
 			UNaGameDatabase*	db = UNaGameDatabase::GetDB();
