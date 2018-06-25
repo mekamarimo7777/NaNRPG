@@ -49,7 +49,7 @@ struct FNaBlockDataAsset : public FTableRowBase
 	GENERATED_BODY()
 	
 public:
-	//! ID（255は無）
+	//! ID（0～254まで。255以上は無効）
 	UPROPERTY(EditDefaultsOnly, Category = General)
 	int32	UID;
 	UPROPERTY(EditDefaultsOnly, Category = General)
@@ -57,6 +57,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = General)
 	FText	DisplayName;
 
+	//! 描画の有無
+	UPROPERTY(EditDefaultsOnly, Category = Rendering)
+	bool	IsRender;
 	//! メッシュ形状
 	UPROPERTY(EditDefaultsOnly, Category = Rendering)
 	int32	MeshType;
@@ -77,4 +80,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Attributes)
 	bool	ClimbDiff;
 
+	FNaBlockDataAsset()
+	: UID( 0 )
+	, IsRender( true )
+	{
+	}
 };

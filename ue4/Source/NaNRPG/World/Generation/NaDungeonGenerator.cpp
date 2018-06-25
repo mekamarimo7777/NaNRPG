@@ -127,6 +127,9 @@ void UNaDungeonGenerator::Generate( const UNaMapAsset* asset )
 				room.IsMain	= room.Size.X >= it.MainRoomSize.X && room.Size.Y >= it.MainRoomSize.Y;
 				room.IsSub	= false;
 
+				room.WorkPos.X	= room.Pos.X;
+				room.WorkPos.Y	= room.Pos.Y;
+
 				m_Rooms.Add( room );
 			}
 		}
@@ -288,15 +291,13 @@ void UNaDungeonGenerator::DiscreteRooms( TArray<FRoom>& rooms, int32 maxLoop )
 				FRoom&		room2 = m_Rooms[j];
 				FIntRect	rect2 = FIntRect( (int32)room2.WorkPos.X, (int32)room2.WorkPos.Y, room2.Pos.X + room2.Size.X, room2.Pos.Y + room2.Size.Y );
 
-				rect2.Clip( rect );
-
-				if ( rect2.Width() > 0 && rect2.Height() > 0 ){
+				if ( rect.Min.X <= rect2.Max.X && rect2.Min.X <= rect.Max.X )
+				if ( rect.Min.Y <= rect2.Max.Y && rect2.Min.Y <= rect.Max.Y ){
 					FVector2D	vec = room.WorkPos - room2.WorkPos;
 
-					if ( vec.X == 0 && vec.Y == 0 ){
+					if ( vec.IsZero() ){
 						vec	= room.WorkPos;
 					}
-
 					vec.Normalize();
 
 					room.WorkPos	+= vec;
@@ -317,10 +318,6 @@ void UNaDungeonGenerator::CreateCorridors()
 	m_Corridors.Reset();
 
 	for ( auto& it : m_Rooms ){
-		if ( !it.IsMain ){
-			continue;
-		}
-
 		for ( auto& it2 : it.Connection ){
 			FRoom&		dst = m_Rooms[it2];
 			FCorridor	cor;
@@ -337,7 +334,7 @@ void UNaDungeonGenerator::CreateCorridors()
 			if ( x1 - x0 >= 3 ){
 				cor.Pos.X	= (x0 + x1) / 2;
 				cor.Pos.Y	= y1;
-				cor.Size.X	= 0;
+				cor.Size.X	= 1;
 				cor.Size.Y	= y0 - y1;
 				m_Corridors.Add( cor );
 			}
@@ -345,7 +342,7 @@ void UNaDungeonGenerator::CreateCorridors()
 				cor.Pos.X	= x1;
 				cor.Pos.Y	= (y0 + y1) / 2;
 				cor.Size.X	= x0 - x1;
-				cor.Size.Y	= 0;
+				cor.Size.Y	= 1;
 				m_Corridors.Add( cor );
 			}
 			else {
@@ -364,38 +361,38 @@ void UNaDungeonGenerator::CreateCorridors()
 					cor.Pos.X	= x1;
 					cor.Pos.Y	= r0->Center.Y;
 					cor.Size.X	= r1->Center.X - x1;
-					cor.Size.Y	= 0;
+					cor.Size.Y	= 1;
 					m_Corridors.Add( cor );
 
 					cor.Pos.X	= r1->Center.X;
-					cor.Pos.Y	= r0->Center.Y;
-					cor.Size.X	= 0;
-
+					cor.Size.X	= 1;
 					if ( r0->Center.Y < r1->Center.Y ){
-						cor.Size.Y	= y0 - r0->Center.Y;
+						cor.Pos.Y	= r0->Center.Y;
+						cor.Size.Y	= r1->Pos.Y - cor.Pos.Y;
 					}
 					else {
-						cor.Size.Y	= y1 - r0->Center.Y;
+						cor.Pos.Y	= r1->Pos.Y + r1->Size.Y;
+						cor.Size.Y	= r0->Center.Y - cor.Pos.Y + 1;
 					}
 					m_Corridors.Add( cor );
 				}
 				else {
 					cor.Pos.X	= r0->Center.X;
-					cor.Size.X	= 0;
+					cor.Size.X	= 1;
 					if ( r0->Center.Y < r1->Center.Y ){
-						cor.Pos.Y	= y1;
-						cor.Size.Y	= r1->Center.Y - y1;
+						cor.Pos.Y	= r0->Pos.Y + r0->Size.Y;
+						cor.Size.Y	= r1->Center.Y - cor.Pos.Y;
 					}
 					else {
-						cor.Pos.Y	= y0;
-						cor.Size.Y	= r1->Center.Y - y0;
+						cor.Pos.Y	= r1->Center.Y;
+						cor.Size.Y	= r0->Pos.Y - cor.Pos.Y;
 					}
 					m_Corridors.Add( cor );
 
 					cor.Pos.X	= r0->Center.X;
 					cor.Size.X	= x0 - r0->Center.X;
 					cor.Pos.Y	= r1->Center.Y;
-					cor.Size.Y	= 0;
+					cor.Size.Y	= 1;
 					m_Corridors.Add( cor );
 				}
 			}
@@ -443,19 +440,23 @@ void UNaDungeonGenerator::BuildChunkData()
 		FNaWorldBlockWork	block;
 
 		block.BlockID			= 2;
-		block.MetaData.Value	= 0;
+		block.MetaData.Value	= 0xFFFFFFFF;
 
 		//! 
 		for ( auto& it : m_Rooms ){
+			if ( !it.IsMain && !it.IsSub ){
+				continue;
+			}
+
 			for ( int32 x = 0; x < it.Size.X; ++x ){
-				pos.X	= it.Pos.X + x + 64;
+				pos.X	= it.Pos.X + x + 32;
 				
 				if ( pos.X < 0 ){
 					continue;
 				}
 
 				for ( int32 y = 0; y < it.Size.Y; ++y ){
-					pos.Y	= it.Pos.Y + y + 64;
+					pos.Y	= it.Pos.Y + y + 32;
 					
 					if ( pos.Y < 0 ){
 						continue;
@@ -481,17 +482,19 @@ void UNaDungeonGenerator::BuildChunkData()
 			}
 		}
 
+		block.BlockID			= 1;
+
 		//! 
 		for ( auto& it : m_Corridors ){
 			for ( int32 x = 0; x < it.Size.X; ++x ){
-				pos.X	= it.Pos.X + x;
+				pos.X	= it.Pos.X + x + 32;
 				
 				if ( pos.X < 0 ){
 					continue;
 				}
 
 				for ( int32 y = 0; y < it.Size.Y; ++y ){
-					pos.Y	= it.Pos.Y + y;
+					pos.Y	= it.Pos.Y + y + 32;
 					
 					if ( pos.Y < 0 ){
 						continue;

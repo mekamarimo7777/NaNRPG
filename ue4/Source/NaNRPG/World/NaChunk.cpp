@@ -5,6 +5,9 @@
 
 #include "NaRegion.h"
 
+#include "Assets/NaAssetLibrary.h"
+#include "Assets/Map/NaBlockDataTable.h"
+
 #include "Entity/INaEntityFactory.h"
 
 #include "Actor/Entity/NaActorBase.h"
@@ -268,6 +271,9 @@ void UNaChunk::Serialize( FArchive& ar )
 //!
 void UNaChunk::RecalcRenderCells()
 {
+	UNaAssetLibrary*	alib = UNaAssetLibrary::Get();
+	FNaBlockDataAsset*	block;
+
 	//!
 	for ( auto& it : m_RenderCells ){
 		m_VisibleFace[it]	= 0;
@@ -277,7 +283,10 @@ void UNaChunk::RecalcRenderCells()
 	//! 
 	for ( int32 i = 0; i < ELEMENTS; ++i ){
 		if ( m_BlockID[i] != INVALID_BLOCK_ID ){
-			m_RenderCells.Add( i );
+			block	= alib->FindBlockAsset( m_BlockID[i] );
+			if ( block->IsRender ){
+				m_RenderCells.Add( i );
+			}
 		}
 	}
 
@@ -317,9 +326,7 @@ bool UNaChunk::CheckVisibleFace( int32 index, int32 dir )
 	FIntVector			vec;
 
 	srcBlock = alib->FindBlockAsset( m_BlockID[index] );
-	if ( !srcBlock || !srcBlock->IsOpaque ){
-		return false;
-	}
+	check( srcBlock );
 
 	vec.X	= index & 0xF;
 	vec.Y	= (index >> SHIFT_Y) & 0xF;
@@ -327,31 +334,26 @@ bool UNaChunk::CheckVisibleFace( int32 index, int32 dir )
 	vec		+= c_dirVec[dir];
 
 	if ( GetBlock( vec.X, vec.Y, vec.Z, work ) ){
-		if ( work.BlockID == 255 ){
+		FNaBlockDataAsset*	dstBlock = alib->FindBlockAsset( work.BlockID );
+
+		if ( srcBlock->IsOpaque && (!dstBlock || !dstBlock->IsOpaque || !dstBlock->IsRender) ){
 			return true;
 		}
 		else {
-			FNaBlockDataAsset*	dstBlock = alib->FindBlockAsset( work.BlockID );
-
-			if ( srcBlock->IsOpaque && (!dstBlock || !dstBlock->IsOpaque) ){
-				return true;
-			}
-			else {
-				switch ( dir ){
-				case ENaMapBlockFace::Front:
-				case ENaMapBlockFace::Back:
-				case ENaMapBlockFace::Left:
-				case ENaMapBlockFace::Right:
-					if ( m_MetaData[index].Height[ c_dirHeight[dir][0] ] > work.MetaData.Height[ c_dirHeight[dir][1] ] && m_MetaData[index].Height[ c_dirHeight[dir][2] ] > work.MetaData.Height[ c_dirHeight[dir][3] ] ){
-						return true;
-					}
-					break;
-				case ENaMapBlockFace::Top:
-					if ( ( m_MetaData[index].Height[0] & m_MetaData[index].Height[1] & m_MetaData[index].Height[2] & m_MetaData[index].Height[3] ) != 0xFF ){
-						return true;
-					}
-					break;
+			switch ( dir ){
+			case ENaMapBlockFace::Front:
+			case ENaMapBlockFace::Back:
+			case ENaMapBlockFace::Left:
+			case ENaMapBlockFace::Right:
+				if ( m_MetaData[index].Height[ c_dirHeight[dir][0] ] > work.MetaData.Height[ c_dirHeight[dir][1] ] && m_MetaData[index].Height[ c_dirHeight[dir][2] ] > work.MetaData.Height[ c_dirHeight[dir][3] ] ){
+					return true;
 				}
+				break;
+			case ENaMapBlockFace::Top:
+				if ( ( m_MetaData[index].Height[0] & m_MetaData[index].Height[1] & m_MetaData[index].Height[2] & m_MetaData[index].Height[3] ) != 0xFF ){
+					return true;
+				}
+				break;
 			}
 		}
 	}
