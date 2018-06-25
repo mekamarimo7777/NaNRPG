@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -11,13 +11,13 @@ namespace ENaBlockPhase
 {
 	enum Type
 	{
-		//! ŒÅ‘Ì
+		//! å›ºä½“
 		Solid,
-		//! ‰t‘Ì
+		//! æ¶²ä½“
 		Liquid,
-		//! ‹C‘Ì
+		//! æ°—ä½“
 		Gas,
-		//! ƒvƒ‰ƒYƒ}
+		//! ãƒ—ãƒ©ã‚ºãƒ
 		Plasma,
 
 		ENUM_MAX	UMETA(Hidden)
@@ -26,7 +26,7 @@ namespace ENaBlockPhase
 
 #include "NaBlockDataTable.generated.h"
 
-// ƒ}ƒbƒvƒ}ƒeƒŠƒAƒ‹’è‹` //
+// ãƒãƒƒãƒ—ãƒãƒ†ãƒªã‚¢ãƒ«å®šç¾© //
 USTRUCT()
 struct FNaBlockMaterialAsset : public FTableRowBase
 {
@@ -42,14 +42,14 @@ public:
 	FStringAssetReference	Material;
 };
 
-// ƒ}ƒbƒvƒuƒƒbƒN’è‹` //
+// ãƒãƒƒãƒ—ãƒ–ãƒ­ãƒƒã‚¯å®šç¾© //
 USTRUCT()
 struct FNaBlockDataAsset : public FTableRowBase
 {
 	GENERATED_BODY()
 	
 public:
-	//! IDi0`254‚Ü‚ÅB255ˆÈã‚Í–³Œøj
+	//! IDï¼ˆ0ï½254ã¾ã§ã€‚255ä»¥ä¸Šã¯ç„¡åŠ¹ï¼‰
 	UPROPERTY(EditDefaultsOnly, Category = General)
 	int32	UID;
 	UPROPERTY(EditDefaultsOnly, Category = General)
@@ -57,26 +57,26 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = General)
 	FText	DisplayName;
 
-	//! •`‰æ‚Ì—L–³
+	//! æç”»ã®æœ‰ç„¡
 	UPROPERTY(EditDefaultsOnly, Category = Rendering)
 	bool	IsRender;
-	//! ƒƒbƒVƒ…Œ`ó
+	//! ãƒ¡ãƒƒã‚·ãƒ¥å½¢çŠ¶
 	UPROPERTY(EditDefaultsOnly, Category = Rendering)
 	int32	MeshType;
-	//! ƒ}ƒbƒvƒ}ƒeƒŠƒAƒ‹ID
+	//! ãƒãƒƒãƒ—ãƒãƒ†ãƒªã‚¢ãƒ«ID
 	UPROPERTY(EditDefaultsOnly, Category = Rendering)
 	int32	MaterialID;
-	//! ƒ}ƒeƒŠƒAƒ‹ƒ^ƒCƒ‹ƒCƒ“ƒfƒbƒNƒX
+	//! ãƒãƒ†ãƒªã‚¢ãƒ«ã‚¿ã‚¤ãƒ«ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹
 	UPROPERTY(EditDefaultsOnly, Category = Rendering)
 	int32	TileID[ENaMapBlockFace::ENUM_MAX];
 
-	//! ‘Š
+	//! ç›¸
 	UPROPERTY(EditDefaultsOnly, Category = Attributes)
 	TEnumAsByte<ENaBlockPhase::Type>	Phase;
-	//! “§‰ßƒuƒƒbƒN”»’è
+	//! é€éãƒ–ãƒ­ãƒƒã‚¯åˆ¤å®š
 	UPROPERTY(EditDefaultsOnly, Category = Attributes)
 	bool	IsOpaque;
-	//! “o³“ïˆÕ“x
+	//! ç™»æ”€é›£æ˜“åº¦
 	UPROPERTY(EditDefaultsOnly, Category = Attributes)
 	bool	ClimbDiff;
 
