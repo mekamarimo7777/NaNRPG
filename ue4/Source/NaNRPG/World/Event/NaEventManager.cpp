@@ -8,9 +8,13 @@
 
 #include "Utility/Components/NaStateMachine.h"
 
+#include "Actor/World/NaWorldActor.h"
+
 #include "UI/Actor/Event/NaSkitAgent.h"
 
 #include "Database/NaGameDatabase.h"
+
+#include "Regex.h"
 
 //////////////////////////////////////////////////
 // public methods
@@ -39,12 +43,13 @@ void UNaEventManager::Tick( float DeltaTime )
 }
 
 //! 実行要求
-void UNaEventManager::PlayEvent( const UNaEventAsset* evt, int32 sheet )
+void UNaEventManager::PlayEvent( UNaEntity* entity, const UNaEventAsset* evt, int32 sheet )
 {
 	if ( !evt ){
 		return;
 	}
 
+	m_Entity		= entity;
 	m_Event			= evt;
 	m_CurrentSheet	= sheet;
 	m_PC			= -1;
@@ -188,8 +193,9 @@ bool UNaEventManager::ParseCommand( UNaStateMachine* sm, const FNaEventCommand* 
 	case ENaEventCode::GenerateWorld:
 		{
 			UNaGameDatabase*	db = UNaGameDatabase::GetDB();
-			UNaWorld*	naw;
-			FName		id;
+			FNaEventParam		dst;
+			UNaWorld*			naw;
+			FName				id;
 
 			//! マップID生成
 			do {
@@ -204,7 +210,30 @@ bool UNaEventManager::ParseCommand( UNaStateMachine* sm, const FNaEventCommand* 
 			db->RegisterWorldEntry( id, naw->GetDataID() );
 
 			//! IDを保管
+			if ( !cmd->Arg1.IsEmpty() ){
+				ParseEventParamString( cmd->Arg1, dst );
+				StoreVariable( dst, id.ToString() );
+			}
+		}
+		break;
+	//! マップ移動
+	case ENaEventCode::TravelTo:
+		{
+			UNaGameDatabase*	db = UNaGameDatabase::GetDB();
+			ANaWorldActor*		actor = m_World->GetWorldActor();
+			UNaEntity*			player = db->GetPlayer();
+			FNaEventParam		p0;
+			FName	id;
 
+			ParseEventParamString( cmd->Arg0, p0 );
+			id	= FName( *GetEventParam(p0) );
+
+			player->SetWorldID( id );
+			player->SetWorldPosition( FIntVector( 0, 0, 64 ) );
+
+			actor->ChangeWorld( id );
+
+			m_PC	= -1;
 		}
 		break;
 	}
@@ -234,28 +263,123 @@ void UNaEventManager::CloseMessage()
 	}
 }
 
-//! 
-void UNaEventManager::ParseEventParam( FString arg, FNaEventParam& outVal )
+//! パラメータ解析
+void UNaEventManager::ParseEventParamString( FString arg, FNaEventParam& outVal )
 {
-//	arg.
+	FString	tmp;
+
+	if ( arg.StartsWith( "{" ) && arg.EndsWith( "}" ) ){
+		if ( arg[1] == '*' ){
+			outVal.Type	= ENaEventParam::EntityVariable;
+			outVal.Name	= FName( *arg.Mid( 2, arg.Len() - 2 ) );
+		}
+		else if ( arg[1] == '@' ){
+			outVal.Type	= ENaEventParam::LocalVariable;
+			outVal.Name	= FName( *arg.Mid( 2, arg.Len() - 2 ) );
+		}
+		else {
+			tmp	= arg.Mid( 1, arg.Len() - 2 );
+			if ( tmp.IsNumeric() ){
+				outVal.Type	= ENaEventParam::GlobalFlag;
+				outVal.Name	= FName( *tmp );
+			}
+			else {
+				outVal.Type	= ENaEventParam::GlobalVariable;
+				outVal.Name	= FName( *tmp );
+			}
+		}
+	}
+	else if ( arg.StartsWith( "[" ) && arg.EndsWith( "]" ) ){
+		tmp	= arg.Mid( 1, arg.Len() - 2 );
+	}
+	else {
+		outVal.Type		= ENaEventParam::Literal;
+		outVal.Name		= NAME_None;
+		outVal.Value	= arg.Mid( 1, arg.Len() - 2 );
+	}
+}
+
+//! パラメータ取得（文字列）
+FString UNaEventManager::GetEventParam( FNaEventParam& param )
+{
+	UNaGameDatabase*	db = UNaGameDatabase::GetDB();
+	FString	retVal;
+
+	switch ( param.Type ){
+	case ENaEventParam::Literal:
+		retVal	= param.Value;
+		break;
+	case ENaEventParam::GlobalFlag:
+		retVal	= db->GetEventFlag( FCString::Atoi( *param.Name.ToString() ) ) ? "1" : "0";
+		break;
+	case ENaEventParam::GlobalVariable:
+		retVal	= db->GetGlobalVariable( param.Name );
+		break;
+	case ENaEventParam::EntityVariable:
+		retVal	= m_Entity->GetEntityParam( param.Name );
+		break;
+	}
+
+	//! 文字列内変数の解決
+	if ( !retVal.IsNumeric() ){
+		FRegexPattern	ptn( "({.*?})" );
+		FRegexMatcher	match( ptn, retVal );
+
+		while ( match.FindNext() ){
+			
+		}
+	}
+
+	return retVal;
+}
+
+//! パラメータ取得（整数）
+int32 UNaEventManager::GetEventParamAsInt( FNaEventParam& param )
+{
+	FString	value;
+
+	value	= GetEventParam( param );
+
+	return FCString::Atoi( *value );
+}
+
+//! パラメータ取得（実数）
+float UNaEventManager::GetEventParamAsFloat( FNaEventParam& param )
+{
+	FString	value;
+
+	value	= GetEventParam( param );
+
+	return FCString::Atof( *value );
 }
 
 //! 変数書き換え
-void UNaEventManager::StoreVariable( FNaEventParam& dst, FNaEventParam& src )
+void UNaEventManager::StoreVariable( FNaEventParam& dst, FString value )
 {
 	UNaGameDatabase*	db = UNaGameDatabase::GetDB();
 
 	switch ( dst.Type ){
 	case ENaEventParam::GlobalVariable:
+		db->SetGlobalVariable( dst.Name, value );
 		break;
 
 	case ENaEventParam::GlobalFlag:
+		db->SetEventFlag( FCString::Atoi( *dst.Name.ToString() ), value == "1" );
 		break;
 
 	case ENaEventParam::EntityVariable:
+		m_Entity->SetEntityParam( dst.Name, value );
 		break;
 
 	case ENaEventParam::LocalVariable:
 		break;
 	}
+}
+void UNaEventManager::StoreVariable( FNaEventParam& dst, FNaEventParam& src )
+{
+	FString	value;
+
+	value	= GetEventParam( src );
+
+	StoreVariable( dst, value );
 }

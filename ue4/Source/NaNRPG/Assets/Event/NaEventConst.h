@@ -52,7 +52,7 @@ enum class ENaEventCode
 	GenerateWorld,
 
 	//! マップ移動
-	TransLevel,
+	TravelTo,
 
 	ENUM_MAX	UMETA(Hidden)
 };

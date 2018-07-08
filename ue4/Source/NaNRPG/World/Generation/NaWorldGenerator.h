@@ -24,6 +24,8 @@ public:
 	//! コンストラクタ
 	UNaWorldGenerator();
 
+	//! アセット設定
+	void	SetWorldAsset( UNaWorldAsset* asset );
 	//! チャンク生成
 	void	GenerateChunk( UNaChunk* chunk );
 
@@ -33,13 +35,26 @@ protected:
 	//! 平坦な地形生成
 	void	MakeFlatland( UNaChunk* chunk );
 
+	//! ハイトマップ生成
+	void	GenerateHeightMap();
+	//! バイオーム生成
+	void	GenerateBiome();
+
 	//! マップデータ書き込み
 	void	CopyMapData( UNaChunk* chunk );
 
 public:
 	
 protected:
-	//! 
-	UNaWorld*	m_World;
+	//! ワールド
+	UNaWorld*		m_World;
+	//! 生成対象チャンク
+	UNaChunk*		m_Chunk;
+	//! ワールドアセット
+	UNaWorldAsset*	m_Asset;
 
+	//! ハイトマップ
+	TArray<int32>	m_HeightMap;
+	//! バイオーム
+	TArray<int32>	m_Biome;
 };

@@ -19,12 +19,8 @@ enum class ENaEventParam
 {
 	//! なし
 	None,
-	//! 数値
-	Number,
-	//! 文字列
-	String,
-	//! テキストID
-	TextSymbol,
+	//! 定数（数値・文字列共通）
+	Literal,
 	//! グローバル変数
 	GlobalVariable,
 	//! グローバルフラグ
@@ -80,7 +76,7 @@ public:
 	void	Tick( float DeltaTime );
 
 	//! 実行要求
-	void	PlayEvent( const UNaEventAsset* evt, int32 sheet );
+	void	PlayEvent( UNaEntity* entity, const UNaEventAsset* evt, int32 sheet );
 	//! 実行中判定
 	bool	IsPlaying() const;
 
@@ -100,9 +96,17 @@ protected:
 	//! メッセージUI消去
 	void	CloseMessage();
 
-	//! 
-	void	ParseEventParam( FString arg, FNaEventParam& outVal );
+	//! 文字列からパラメータ生成
+	void	ParseEventParamString( FString arg, FNaEventParam& outVal );
+	//! パラメータ取得（文字列）
+	FString	GetEventParam( FNaEventParam& param );
+	//! パラメータ取得（整数）
+	int32	GetEventParamAsInt( FNaEventParam& param );
+	//! パラメータ取得（実数）
+	float	GetEventParamAsFloat( FNaEventParam& param );
+
 	//! 変数書き換え
+	void	StoreVariable( FNaEventParam& dst, FString value );
 	void	StoreVariable( FNaEventParam& dst, FNaEventParam& src );
 
 public:
@@ -116,6 +120,9 @@ protected:
 	UPROPERTY(Transient)
 	UNaStateMachine*		m_SM;
 
+	//! カレントエンティティ
+	UPROPERTY(Transient)
+	UNaEntity*				m_Entity;
 	//! イベント
 	UPROPERTY(Transient)
 	const UNaEventAsset*	m_Event;

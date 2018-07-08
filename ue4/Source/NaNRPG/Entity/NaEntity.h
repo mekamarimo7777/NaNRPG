@@ -78,7 +78,11 @@ public:
 	//! エンティティ情報生成
 	virtual void	CreateFromAsset( const FNaEntityDataAsset& asset );
 	//! エンティティパラメータ設定
-	virtual void	SetEntityParameter( const TMap<FName, FString>& values );
+	void			SetEntityParam( FName key, FString value );
+	//! エンティティパラメータ設定（複数）
+	virtual void	SetEntityParams( const TMap<FName, FString>& values );
+	//! エンティティパラメータ取得
+	FString			GetEntityParam( FName key );
 
 	//! プロフィール取得
 	FNaEntityProfile*	GetProfile()		{return &m_Profile;}

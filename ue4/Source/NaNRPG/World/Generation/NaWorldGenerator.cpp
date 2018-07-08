@@ -3,6 +3,8 @@
 #include "NaNRPG.h"
 #include "NaWorldGenerator.h"
 
+#include "NaNoise.h"
+
 #include "World/NaWorld.h"
 #include "World/NaRegion.h"
 #include "World/NaChunk.h"
@@ -16,12 +18,29 @@ UNaWorldGenerator::UNaWorldGenerator()
 
 }
 
+//! アセット設定
+void UNaWorldGenerator::SetWorldAsset( UNaWorldAsset* asset )
+{
+	m_Asset	= asset;
+}
+
 //! チャンク生成
 void UNaWorldGenerator::GenerateChunk( UNaChunk* chunk )
 {
+	//! 生成対象
+	m_Chunk	= chunk;
+
+	GenerateBiome();
+
 	//! 地形生成
-	//MakeTerrain( chunk );
-	MakeFlatland( chunk );
+	switch ( m_Asset->WorldTerrain ){
+	case ENaTerrainMode::Normal:
+		MakeTerrain( chunk );
+		break;
+	case ENaTerrainMode::Flat:
+		MakeFlatland( chunk );
+		break;
+	}
 
 	//! マップ反映
 	CopyMapData( chunk );
@@ -35,6 +54,8 @@ void UNaWorldGenerator::MakeTerrain( UNaChunk* chunk )
 {
 	FIntVector			wpos,tpos,bpos;
 	FNaWorldBlockWork	block;
+
+	GenerateHeightMap();
 
 	wpos	= chunk->GetPositionInWorld();
 	tpos.X	= wpos.X << 4;
@@ -52,7 +73,7 @@ void UNaWorldGenerator::MakeTerrain( UNaChunk* chunk )
 			//
 			tpos.Z	= wpos.Z << 4;
 
-			height	= chunk->GetRegion()->GetHeightMapValue( bpos.X + ix, bpos.Y + iy ) / 4;
+			height	= m_HeightMap[ix + (iy << 4)] / 4;
 
 			for ( int32 iz = 0; iz < UNaChunk::DIM_Z; ++iz, ++tpos.Z ){
 				int32	idx = CELL_OFS(ix, iy, iz);
@@ -121,12 +142,8 @@ void UNaWorldGenerator::MakeFlatland( UNaChunk* chunk )
 		tpos.Y	= wpos.Y << 4;
 
 		for ( int32 iy = 0; iy < UNaChunk::DIM_Y; ++iy, ++tpos.Y ){
-			int32	height;
-
 			//
 			tpos.Z	= wpos.Z << 4;
-
-			height	= chunk->GetRegion()->GetHeightMapValue( bpos.X + ix, bpos.Y + iy ) / 4;
 
 			for ( int32 iz = 0; iz < UNaChunk::DIM_Z; ++iz, ++tpos.Z ){
 				int32	idx = CELL_OFS(ix, iy, iz);
@@ -152,6 +169,42 @@ void UNaWorldGenerator::MakeFlatland( UNaChunk* chunk )
 					chunk->SetBlock( idx, block );
 				}
 			}
+		}
+	}
+}
+
+//! ハイトマップ生成
+void UNaWorldGenerator::GenerateHeightMap()
+{
+	FNaNoise	noise( 0 );
+	int32		idx = 0;
+	FIntVector	bpos;
+
+	m_HeightMap.SetNum( 16 * 16 );
+	bpos	= m_Chunk->GetPositionInWorld() * 16;
+
+	for ( int32 x = 0; x < 16; ++x ){
+		for ( int32 y = 0; y < 16; ++y ){
+			idx	= x + (y << 4);
+			m_HeightMap[idx]	= noise.octaveNoise0_1( (x + bpos.X) / 64.0f, (y + bpos.Y) / 64.0f, 6 ) * 255;
+		}
+	}
+}
+
+//! バイオーム生成
+void UNaWorldGenerator::GenerateBiome()
+{
+	FNaNoise	noise( 0 );
+	int32		idx = 0;
+	FIntVector	bpos;
+
+	m_Biome.SetNum( 16 * 16 );
+	bpos	= m_Chunk->GetPositionInWorld() * 16;
+
+	for ( int32 x = 0; x < 16; ++x ){
+		for ( int32 y = 0; y < 16; ++y ){
+			idx	= x + (y << 4);
+//			m_HeightMap[idx]	= noise.octaveNoise0_1( (x + bpos.X) / 64.0f, (y + bpos.Y) / 64.0f, 6 ) * 255;
 		}
 	}
 }

@@ -10,15 +10,15 @@
 class FNaNoise
 {
 public:
-	
-public:
 	//! コンストラクタ
 	FNaNoise( int32 seed = 0 );
 
-	//! 
+	//! ノイズテーブル再生成
 	void reseed( int32 seed )
 	{
-		m_Random.Initialize( seed );
+		FRandomStream	rand;
+
+		rand.Initialize( seed );
 
 		for ( int32 i = 0; i < 256; ++i ){
 			p[i] = i;
@@ -27,7 +27,7 @@ public:
 		for ( int32 i = 0; i < 256; ++i ){
 			int32	t,tmp;
 
-			t		= m_Random.RandRange( 0, 255 );
+			t		= rand.RandRange( 0, 255 );
 			tmp		= p[i];
 			p[i]	= p[t];
 			p[t]	= tmp;
@@ -39,19 +39,19 @@ public:
 		}
 	}
 
-	//! 
+	//! ノイズ生成（一次）
 	float noise(float x) const
 	{
 		return noise(x, 0.0f, 0.0f);
 	}
 
-	//! 
+	//! ノイズ生成（二次）
 	float noise(float x, float y) const
 	{
 		return noise(x, y, 0.0f);
 	}
 
-	//! 
+	//! ノイズ生成（三次）
 	float noise(float x, float y, float z) const
 	{
 		const int32 X = FMath::FloorToInt(x) & 0xFF;
@@ -79,6 +79,7 @@ public:
 			grad(p[BB + 1], x - 1, y - 1, z - 1))));
 	}
 
+	//! オクターブノイズ生成
 	float octaveNoise( float x, int32 octaves ) const
 	{
 		float result = 0.0f;
@@ -178,8 +179,6 @@ protected:
 	}
 
 protected:
-	//! ランダム
-	FRandomStream	m_Random;
-	//! 
-	int32			p[512];
+	//! ノイズテーブル
+	int32	p[512];
 };

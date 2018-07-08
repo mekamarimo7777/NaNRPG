@@ -13,10 +13,8 @@
 //! 
 void UNaRegion::Initialize( UNaWorld* world, FIntVector rpos )
 {
-	m_pWorld	= world;
+	m_World	= world;
 	m_Location	= rpos;
-
-	CreateHeightMap();
 }
 
 //! リージョンオープン
@@ -24,7 +22,7 @@ void UNaRegion::Open()
 {
 	TArray<uint8>	buff;
 
-	if ( m_pWorld->ReadRegionData( m_Location, buff ) ){
+	if ( m_World->ReadRegionData( m_Location, buff ) ){
 		FMemoryReader	reader( buff );
 		Serialize( reader );
 	}
@@ -54,7 +52,7 @@ void UNaRegion::Close()
 
 	Serialize( ar );
 
-	m_pWorld->WriteRegionData( m_Location, ar );
+	m_World->WriteRegionData( m_Location, ar );
 }
 
 
@@ -151,8 +149,8 @@ UNaChunk* UNaRegion::CreateChunk( FIntVector cpos )
 	chunk	= NewObject<UNaChunk>();
 	chunk->Initialize( this, cpos );
 
-	if ( m_pWorld ){
-		UNaWorldGenerator*	gen = m_pWorld->GetGenerator();
+	if ( m_World ){
+		UNaWorldGenerator*	gen = m_World->GetGenerator();
 
 		if ( gen ){
 			gen->GenerateChunk( chunk );
@@ -193,33 +191,6 @@ void UNaRegion::RecalcVisibleFaces()
 	}
 }
 
-//! ハイトマップ生成
-void UNaRegion::CreateHeightMap()
-{
-	if ( m_HeightMap.Num() == 0 ){
-		FNaNoise	noise(0);
-		int32		idx = 0;
-		FIntVector	bpos;
-
-		m_HeightMap.SetNum( 256 * 256 );
-
-		bpos	= m_Location * 256;
-
-		for ( int32 x = 0; x < 256; ++x ){
-			for ( int32 y = 0; y < 256; ++y ){
-				idx	= x + (y << 8);
-				m_HeightMap[idx]	= noise.octaveNoise0_1( (x + bpos.X) / 64.0f, (y + bpos.Y) / 64.0f, 6 ) * 255;
-			}
-		}
-	}
-}
-
-//! ハイトマップ値取得
-int32 UNaRegion::GetHeightMapValue( int32 x, int32 y )
-{
-	return m_HeightMap[x + (y << 8)];
-}
-
 //
 void UNaRegion::Serialize( FArchive& ar )
 {
@@ -239,7 +210,7 @@ void UNaRegion::ConnectChunk( UNaChunk* chunk )
 
 	for ( int32 i = 0; i < 6; ++i ){
 		v			= chunk->GetPositionInWorld() + c_dir[i];
-		neighbor	= m_pWorld->GetChunk( v );
+		neighbor	= m_World->GetChunk( v );
 		if ( neighbor ){
 			chunk->ConnectNeighborChunk( i, neighbor );
 		}

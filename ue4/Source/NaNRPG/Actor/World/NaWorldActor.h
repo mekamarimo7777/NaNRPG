@@ -43,8 +43,10 @@ public:
 
 	//! ワールドオープン
 	UNaWorld*	OpenWorld( FName id, FName assetID = FName() );
-	//! ワー	ルドクローズ
+	//! ワールドクローズ
 	void		CloseWorld( FName id );
+	//! ワールド変更リクエスト
+	void		ChangeWorld( FName id );
 	//! アクティブワールド変更リクエスト
 	void		SwitchWorld( FName id );
 

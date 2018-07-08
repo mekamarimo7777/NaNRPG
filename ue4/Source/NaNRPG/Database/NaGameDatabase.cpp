@@ -32,6 +32,13 @@ FString UNaGameDatabase::GameSavedDir()
 	}
 }
 
+// コンストラクタ
+UNaGameDatabase::UNaGameDatabase( const FObjectInitializer& ObjectInitializer )
+: Super( ObjectInitializer )
+{
+	m_EventFlags.SetNum( 2048 );
+}
+
 //
 bool UNaGameDatabase::LoadDB(FString name)
 {
@@ -170,6 +177,33 @@ uint32 UNaGameDatabase::GenerateWorldDataID()
 #endif
 
 	return dataID;
+}
+
+//! イベントフラグ設定
+void UNaGameDatabase::SetEventFlag( int32 num, bool value )
+{
+	int32&	flag = m_EventFlags[num >> 5];
+
+	flag	&= ~(1 << (num & 0x1F));
+	flag	|= (value << (num & 0x1F));
+}
+
+//! イベントフラグ取得
+bool UNaGameDatabase::GetEventFlag( int32 num )
+{
+	return (m_EventFlags[num >> 5] & (1 << (num & 0x1F))) != 0;
+}
+
+//! グローバル変数設定
+void UNaGameDatabase::SetGlobalVariable( FName key, FString value )
+{
+	m_GlobalVariables.Add( key, value );
+}
+
+//! グローバル変数取得
+FString UNaGameDatabase::GetGlobalVariable( FName key )
+{
+	return m_GlobalVariables[key];
 }
 
 //

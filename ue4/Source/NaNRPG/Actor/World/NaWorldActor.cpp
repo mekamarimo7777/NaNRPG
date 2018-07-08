@@ -134,9 +134,16 @@ void ANaWorldActor::CloseWorld( FName id )
 		if ( naw == m_ActiveWorld ){
 			m_ActiveWorld	= nullptr;
 		}
-
-		m_Worlds.RemoveAt( idx );
 	}
+}
+
+//! ワールド変更リクエスト
+void ANaWorldActor::ChangeWorld( FName id )
+{
+	FName	prevID = m_ActiveWorld->GetUID();
+
+	OpenWorld( id );
+	SwitchWorld( id );
 }
 
 //! アクティブワールド変更リクエスト
@@ -273,16 +280,22 @@ void ANaWorldActor::ProcMain( UNaStateMachine* sm, float DeltaTime )
 
 	case Main:
 		//! ワールド更新
-		for ( auto& it : m_Worlds ){
-			it->Update( DeltaTime );
+		{
+			TArray<UNaWorld*>	worlds = m_Worlds;
+
+			for ( auto& it : worlds ){
+				it->Update( DeltaTime );
+			}
+
+			m_Worlds.RemoveAll( []( UNaWorld* p ){ return p->IsClosed();} );
 		}
 
 		if ( m_ActiveWorld ){
-			UNaEntityPlayer*	player;
+			UNaGameDatabase*	db = UNaGameDatabase::GetDB();
+			UNaEntityPlayer*	player = db->GetPlayer();
 			AActor*	actor;
 
-			player	= m_ActiveWorld->GetPlayer();
-			if ( player ){
+			if ( player->GetWorldID() == m_ActiveWorld->GetUID() ){
 				actor	= player->GetActor();
 
 				//! マテリアルパラメータ設定
@@ -340,6 +353,8 @@ void ANaWorldActor::ProcMain( UNaStateMachine* sm, float DeltaTime )
 		if ( m_NextWorld ){
 			m_ActiveWorld	= m_NextWorld;
 			m_NextWorld		= nullptr;
+
+			m_CurrentChunkPos.Z	= SHORT_MAX;
 		}
 		break;
 

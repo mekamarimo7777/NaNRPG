@@ -590,7 +590,7 @@ void UNaPlayerManipulator::ProcEvent( UNaStateMachine* sm, float DeltaTime )
 				if ( entities[0]->FindEvent( ENaEventTrigger::Interacted, evt, sheet ) ){
 					UNaEventManager*	em = naw->GetEventManager();
 
-					em->PlayEvent( evt, sheet );
+					em->PlayEvent( entities[0], evt, sheet );
 					sm->Advance();
 					break;
 				}

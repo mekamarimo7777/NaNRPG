@@ -9,7 +9,7 @@
 //! コンストラクタ
 ANaCameraActor::ANaCameraActor( const FObjectInitializer& ObjectInitializer )
 : Super( ObjectInitializer )
-, OrbitalPitch( 35.0f )
+, OrbitalPitch( 45.0f )
 , OrbitalRange( 100.0f )
 , m_CurrentAngle( 0.0f )
 , m_RequestAngle( 0.0f )

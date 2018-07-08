@@ -10,14 +10,12 @@
 //! 部屋接続ワーク
 struct FRoomConnect
 {
-	//! 
+	//! 開始
 	int32	Src;
-	//! 
+	//! 終了
 	int32	Dest;
-	//! 
+	//! 距離二乗
 	int32	Dist2;
-	//! 
-	bool	IsDummy;
 
 	FRoomConnect(){}
 	FRoomConnect( UNaDungeonGenerator::FRoom* src, UNaDungeonGenerator::FRoom* dst )
@@ -30,9 +28,7 @@ struct FRoomConnect
 			Src		= dst->ID;
 			Dest	= src->ID;
 		}
-
 		Dist2	= (dst->Center - src->Center).SizeSquared();
-		IsDummy	= false;
 	}
 
 	bool Equals( FRoomConnect& dst )
@@ -138,7 +134,7 @@ void UNaDungeonGenerator::Generate( const UNaMapAsset* asset )
 		DiscreteRooms( m_Rooms );
 	}
 
-	//! 接続情報構築
+	//! 部屋間接続
 	{
 		TArray<FNaTrianglation::FTriangle>	triangles;
 
@@ -236,8 +232,9 @@ void UNaDungeonGenerator::Generate( const UNaMapAsset* asset )
 			}
 		}
 
+		//! 通路生成
 		CreateCorridors();
-
+		//! サブ部屋追加
 		IncludeSubRooms();
 	}
 
@@ -431,18 +428,16 @@ void UNaDungeonGenerator::IncludeSubRooms()
 //! チャンクデータ構築
 void UNaDungeonGenerator::BuildChunkData()
 {
-	UNaChunk*	chunk = nullptr;
-	FIntVector	cpos;
-	FIntVector	pos,tpos;
+	FIntVector	pos;
 
 	//! 使用エリアを空気ブロックに変換
 	{
 		FNaWorldBlockWork	block;
 
-		block.BlockID			= 2;
-		block.MetaData.Value	= 0xFFFFFFFF;
+		block.BlockID			= 0;
+		block.MetaData.Value	= 0;
 
-		//! 
+		//! 部屋
 		for ( auto& it : m_Rooms ){
 			if ( !it.IsMain && !it.IsSub ){
 				continue;
@@ -462,29 +457,15 @@ void UNaDungeonGenerator::BuildChunkData()
 						continue;
 					}
 
-					for ( int32 z = 1; z < 2; ++z ){
+					for ( int32 z = 12; z < 16; ++z ){
 						pos.Z	= z;
-
-						cpos.X	= pos.X >> 4;
-						cpos.Y	= pos.Y >> 4;
-						cpos.Z	= pos.Z >> 4;
-						if ( !chunk || cpos != chunk->GetPosition() ){
-							chunk	= GetChunk( cpos );
-						}
-
-						tpos.X	= pos.X - (cpos.X << 4);
-						tpos.Y	= pos.Y - (cpos.Y << 4);
-						tpos.Z	= pos.Z - (cpos.Z << 4);
-
-						chunk->SetBlock( tpos, block );
+						SetBlock( pos, block );
 					}
 				}
 			}
 		}
 
-		block.BlockID			= 1;
-
-		//! 
+		//! 通路
 		for ( auto& it : m_Corridors ){
 			for ( int32 x = 0; x < it.Size.X; ++x ){
 				pos.X	= it.Pos.X + x + 32;
@@ -500,26 +481,32 @@ void UNaDungeonGenerator::BuildChunkData()
 						continue;
 					}
 
-					for ( int32 z = 1; z < 2; ++z ){
+					for ( int32 z = 12; z < 15; ++z ){
 						pos.Z	= z;
-
-						cpos.X	= pos.X >> 4;
-						cpos.Y	= pos.Y >> 4;
-						cpos.Z	= pos.Z >> 4;
-						if ( !chunk || cpos != chunk->GetPosition() ){
-							chunk	= GetChunk( cpos );
-						}
-
-						tpos.X	= pos.X - (cpos.X << 4);
-						tpos.Y	= pos.Y - (cpos.Y << 4);
-						tpos.Z	= pos.Z - (cpos.Z << 4);
-
-						chunk->SetBlock( tpos, block );
+						SetBlock( pos, block );
 					}
 				}
 			}
 		}
 	}
+}
+
+//! 
+void UNaDungeonGenerator::SetBlock( FIntVector pos, FNaWorldBlockWork& block )
+{
+	UNaChunk*	chunk;
+	FIntVector	cpos;
+
+	cpos.X	= pos.X >> 4;
+	cpos.Y	= pos.Y >> 4;
+	cpos.Z	= pos.Z >> 4;
+	chunk	= GetChunk( cpos );
+
+	pos.X	-= cpos.X << 4;
+	pos.Y	-= cpos.Y << 4;
+	pos.Z	-= cpos.Z << 4;
+
+	chunk->SetBlock( pos, block );
 }
 
 //! チャンク生成or取得

@@ -50,16 +50,11 @@ public:
 	//
 	void	RecalcVisibleFaces();
 
-	//! ハイトマップ生成
-	void	CreateHeightMap();
-	//! ハイトマップ値取得
-	int32	GetHeightMapValue( int32 x, int32 y );
-
 	// シリアライズ //
 	virtual void	Serialize( FArchive& ar ) override;
 
 	//
-	FORCEINLINE UNaWorld*	GetNaWorld() const			{return m_pWorld;}
+	FORCEINLINE UNaWorld*	GetNaWorld() const			{return m_World;}
 	//
 	FORCEINLINE FIntVector	GetRegionPos() const		{return m_Location;}
 	// 
@@ -73,7 +68,7 @@ public:
 protected:
 	//! ワールド
 	UPROPERTY(Transient)
-	UNaWorld*	m_pWorld;
+	UNaWorld*	m_World;
 
 	//! ファイルパス
 	FString		m_FilePath;
@@ -91,7 +86,4 @@ protected:
 
 	UPROPERTY(Transient)
 	TArray<UNaMap*>				m_MapData;		// 参照マップ
-
-	//! ハイトマップ
-	TArray<int32>	m_HeightMap;
 };

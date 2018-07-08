@@ -78,6 +78,8 @@ protected:
 
 	//! チャンクデータ構築
 	void		BuildChunkData();
+	//! 
+	void		SetBlock( FIntVector pos, FNaWorldBlockWork& block );
 	//! チャンク生成or取得
 	UNaChunk*	GetChunk( FIntVector cpos );
 

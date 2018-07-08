@@ -22,6 +22,9 @@ public:
 	//
 	static FString	GameSavedDir();
 
+	// コンストラクタ
+	UNaGameDatabase( const FObjectInitializer& ObjectInitializer );
+
 	//
 	bool	LoadDB(FString name);
 	//
@@ -50,7 +53,7 @@ public:
 
 	//! イベントフラグ設定
 	void	SetEventFlag( int32 num, bool value );
-	//! イベントフラグ設定
+	//! イベントフラグ取得
 	bool	GetEventFlag( int32 num );
 
 	//! グローバル変数設定
@@ -85,11 +88,11 @@ public:
 	FName					m_WorldID;
 
 	//! イベントフラグ
-//	UPROPERTY()
-//	TBitArray<FDefaultBitArrayAllocator>	m_EventFlags;
+	UPROPERTY()
+	TArray<int32>			m_EventFlags;
 	//! グローバル変数
 	UPROPERTY()
-	TMap<FName, FString>					m_GlobalVariables;
+	TMap<FName, FString>	m_GlobalVariables;
 
 protected:
 

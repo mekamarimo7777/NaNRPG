@@ -64,7 +64,7 @@ void UNaMap::Create( UNaWorld* naw, int32 uid, FIntVector pos, const UNaMapAsset
 				entity->CreateFromAsset( *t_asset );
 				entity->SetWorldPosition( t_pos + it.Position );
 				entity->SetEvent( it.EventID );
-				entity->SetEntityParameter( it.Params );
+				entity->SetEntityParams( it.Params );
 				naw->RegisterEntity( entity );
 			}
 		}

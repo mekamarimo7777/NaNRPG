@@ -26,6 +26,7 @@ public:
 	static const int	SHIFT_Y = 4;
 	static const int	SHIFT_Z = 8;
 	static const int	ELEMENTS = DIM_X * DIM_Y * DIM_Z;
+	static const int	ELEMENTS_2D = DIM_X * DIM_Y;
 	static const int	INVALID_BLOCK_ID = 255;
 
 public:
@@ -135,6 +136,9 @@ protected:
 	FNaWorldBlockMeta	m_MetaData[ELEMENTS];
 	// 明るさ
 	uint8				m_Blightness[ELEMENTS / 2];
+
+	//! バイオーム情報
+	uint8				m_Biome[ELEMENTS_2D];
 
 	// ブロックエンティティ //
 //	UPROPERTY(Transient)

@@ -8,6 +8,28 @@
 
 #include "NaWorldAsset.generated.h"
 
+//! 地形生成モード
+UENUM()
+enum class ENaTerrainMode
+{
+	//! 基本地形
+	Normal,
+	//! フラット
+	Flat,
+
+	ENUM_MAX	UMETA(Hidden)
+};
+
+//! バイオーム生成モード
+UENUM()
+enum class ENaBiomeMode
+{
+	//! 
+	Worm,
+
+	ENUM_MAX	UMETA(Hidden)
+};
+
 //! ワールド配置マップエントリ
 USTRUCT()
 struct FNaWorldMapEntry
@@ -40,6 +62,16 @@ public:
 	//! ワールド上限チャンク
 	UPROPERTY( EditDefaultsOnly, Category = "General" )
 	FIntPoint	WorldMax;
+
+	//! シード値（0でランダム）
+	UPROPERTY( EditDefaultsOnly, Category = "World" )
+	int32				WorldSeed;
+	//! 基本生成モード
+	UPROPERTY( EditDefaultsOnly, Category = "World" )
+	ENaTerrainMode		WorldTerrain;
+	//! 気候タイプ
+	UPROPERTY( EditDefaultsOnly, Category = "World" )
+	ENaBiomeMode		WorldBiome;
 
 	//! 配置マップアセット
 	UPROPERTY( EditDefaultsOnly, Category = "Map" )

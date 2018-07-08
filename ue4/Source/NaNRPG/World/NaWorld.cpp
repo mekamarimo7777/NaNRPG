@@ -63,8 +63,10 @@ bool UNaWorld::CreateWorld( FName uid, FName assetID )
 
 	//! アセットから構築
 	asset	= alib->FindWorldAsset( assetID );
+	m_Generator->SetWorldAsset( asset );
 
 	if ( asset ){
+		m_AssetID		= assetID;
 		m_DisplayName	= asset->DisplayName;
 
 		//! マップ作成
@@ -83,7 +85,7 @@ bool UNaWorld::CreateWorld( FName uid, FName assetID )
 				entity->CreateFromAsset( *entAsset );
 				entity->SetWorldPosition( it.Position );
 				entity->SetEvent( it.EventID );
-				entity->SetEntityParameter( it.Params );
+				entity->SetEntityParams( it.Params );
 
 				switch ( it.Stage ){
 				case ENaEntityStage::World:
@@ -139,6 +141,7 @@ bool UNaWorld::CreateWorld( FName uid, FName assetID )
 //
 bool UNaWorld::OpenWorld( int32 dataID )
 {
+	UNaAssetLibrary*	alib = UNaAssetLibrary::Get();
 	FString	dir,fname;
 
 	dir	= MakeWorldDirPath( dataID );
@@ -158,6 +161,7 @@ bool UNaWorld::OpenWorld( int32 dataID )
 	TArray<uint8>	buff;
 
 	if ( FFileHelper::LoadFileToArray( buff, *fname ) ){
+		UNaWorldAsset*	asset;
 		FMemoryReader	reader( buff );
 
 		Serialize( reader );
@@ -168,9 +172,15 @@ bool UNaWorld::OpenWorld( int32 dataID )
 				EnterEntity( it );
 			}
 		}*/
-	}
 
-	return true;
+		asset	= alib->FindWorldAsset( m_AssetID );
+		m_Generator->SetWorldAsset( asset );
+
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 //
@@ -644,11 +654,6 @@ bool UNaWorld::EnterEntity( UNaEntity* entity )
 	// 
 	entity->SetNaWorld( this );
 	entity->Enter();
-
-	// test
-	if ( entity->GetType() == ENaEntity::Player ){
-		m_pPlayer	= Cast<UNaEntityPlayer>( entity );
-	}
 
 	return true;
 }

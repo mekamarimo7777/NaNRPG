@@ -75,7 +75,8 @@ public:
 	FName	GetAssetID() const	{ return m_AssetID; }
 	//! データID取得
 	uint32	GetDataID() const	{ return m_DataID; }
-
+	//! クローズ判定
+	bool	IsClosed() const	{ return false; }
 
 
 
@@ -172,8 +173,6 @@ public:
 	//! 指定チャンクのエンティティ収集
 	void		GatherWorldEntities( const FIntVector& chunkPos, TArray<UNaEntity*>& outVal );
 
-	UNaEntityPlayer*	GetPlayer() const	{return m_pPlayer;}
-
 	void		SetCeilZ(int32 cz)	{m_CeilZ = cz;}
 	int32		GetCeilZ() const	{return m_CeilZ;}
 
@@ -213,7 +212,7 @@ protected:
 	//! ワールド表示名
 	FText		m_DisplayName;
 
-	//! 
+	//! ワールドジェネレータ
 	UPROPERTY(Transient)
 	UNaWorldGenerator*	m_Generator;
 
@@ -223,7 +222,7 @@ protected:
 	//! ワールド表示管理アクター
 	UPROPERTY(Transient)
 	ANaWorldActor*		m_WorldActor;
-	// ホームポジション //
+	//! ホームポジション
 	TArray<FIntVector>	m_HomePositions;
 
 	// 環境情報 //
@@ -265,8 +264,4 @@ protected:
 	TArray<UNaTurnActionComponent*>	m_ActionChain;		// アクションリスト //
 	UPROPERTY(Transient)
 	UNaTurnActionComponent*			m_CurrentAction;	//  //
-
-	// プレイヤー //
-	UPROPERTY(Transient)
-	UNaEntityPlayer*	m_pPlayer;
 };

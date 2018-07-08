@@ -97,9 +97,21 @@ void UNaEntity::CreateFromAsset( const FNaEntityDataAsset& asset )
 }
 
 //! エンティティパラメータ設定
-void UNaEntity::SetEntityParameter( const TMap<FName, FString>& values )
+void UNaEntity::SetEntityParam( FName key, FString value )
+{
+	m_Params[key]	= value;
+}
+
+//! エンティティパラメータ設定
+void UNaEntity::SetEntityParams( const TMap<FName, FString>& values )
 {
 	m_Params.Append( values );
+}
+
+//! エンティティパラメータ取得
+FString UNaEntity::GetEntityParam( FName key )
+{
+	return m_Params[key];
 }
 
 //! イベントセット
