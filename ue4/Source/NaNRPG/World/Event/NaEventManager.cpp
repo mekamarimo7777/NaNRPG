@@ -228,7 +228,7 @@ bool UNaEventManager::ParseCommand( UNaStateMachine* sm, const FNaEventCommand* 
 			ParseEventParamString( cmd->Arg0, p0 );
 			id	= FName( *GetEventParam(p0) );
 
-			player->SetWorldID( id );
+			player->TravelWorld( id );
 			player->SetWorldPosition( FIntVector( 0, 0, 64 ) );
 
 			actor->ChangeWorld( id );

@@ -6,7 +6,7 @@
 
 #include "World/NaChunk.h"
 
-#include "Assets/Map/NaMapAsset.h"
+#include "Assets/World/NaMapAsset.h"
 
 #include "NaMap.generated.h"
 

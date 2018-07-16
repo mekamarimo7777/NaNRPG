@@ -7,7 +7,7 @@
 #include "Actor/Entity/NaActorBase.h"
 
 #include "Assets/NaAssetLibrary.h"
-#include "Assets/Map/NaBlockDataTable.h"
+#include "Assets/World/NaBlockDataTable.h"
 
 #include "Entity/INaEntityFactory.h"
 
@@ -187,12 +187,12 @@ bool UNaWorld::OpenWorld( int32 dataID )
 void UNaWorld::CloseWorld( bool isSave )
 {
 	//! プレイヤー・パーティメンバーをワールドから外す
-	{
+/*	{
 		UNaGameDatabase*	db = UNaGameDatabase::GetDB();
 
 		DespawnEntity( db->GetPlayer() );
 
-	}
+	}*/
 
 	for ( auto it : m_Regions ){
 		it->CloseRegion();
@@ -687,7 +687,12 @@ void UNaWorld::AttachActionChain( UNaEntity* entity )
 void UNaWorld::DetachActionChain( UNaEntity* entity )
 {
 	if ( entity->HasTurnAction() ){
-		m_ActionChain.Remove( entity->GetTurnAction() );
+		UNaTurnActionComponent*	tac = entity->GetTurnAction();
+
+		m_ActionChain.Remove( tac );
+		if ( m_CurrentAction == tac ){
+			tac	= nullptr;
+		}
 	}
 }
 

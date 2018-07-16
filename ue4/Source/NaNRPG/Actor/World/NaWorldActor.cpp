@@ -51,6 +51,8 @@ ANaWorldActor::ANaWorldActor( const FObjectInitializer& ObjectInitializer )
 
 	m_CurrentPos.Z		= INT_MAX;
 	m_CurrentChunkPos.Z	= SHORT_MAX;
+
+	m_WM	= NewObject<UNaWorldManager>();
 }
 
 //! 
@@ -247,7 +249,8 @@ ANaActorBase* ANaWorldActor::SpawnEntityActor( UNaEntity* entity )
 		actor	= GetWorld()->SpawnActor<ANaActorBase>( asset->ActorClass );
 		check( actor );
 
-		actor->Initialize( entity->GetNaWorld(), entity );
+		actor->Initialize( this, entity );
+		m_WorldActors.Add( actor );
 
 		if ( entity == UNaGameDatabase::GetDB()->GetPlayer() ){
 			m_Camera->AttachTarget( actor );
@@ -255,6 +258,13 @@ ANaActorBase* ANaWorldActor::SpawnEntityActor( UNaEntity* entity )
 	}
 
 	return actor;
+}
+
+//! エンティティアクター削除
+void ANaWorldActor::DestroyEntityActor( ANaActorBase* actor )
+{
+	m_WorldActors.Remove( actor );
+	actor->Destroy();
 }
 
 //////////////////////////////////////////////////
@@ -355,6 +365,11 @@ void ANaWorldActor::ProcMain( UNaStateMachine* sm, float DeltaTime )
 			m_NextWorld		= nullptr;
 
 			m_CurrentChunkPos.Z	= SHORT_MAX;
+
+			//! アクター表示状態変更
+			for ( auto& it : m_WorldActors ){
+				it->SetActorHiddenInGame( it->GetNaWorld() != m_ActiveWorld );
+			}
 		}
 		break;
 

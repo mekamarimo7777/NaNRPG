@@ -6,7 +6,7 @@
 
 #include "ProceduralMeshComponent.h"
 
-#include "Assets/Map/NaBlockDataTable.h"
+#include "Assets/World/NaBlockDataTable.h"
 #include "World/NaWorld.h"
 
 #include "NaMapChunkActor.generated.h"

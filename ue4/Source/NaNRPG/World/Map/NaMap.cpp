@@ -6,7 +6,7 @@
 #include "Actor/Entity/NaActorBase.h"
 
 #include "Assets/NaAssetLibrary.h"
-#include "Assets/Map/NaMapAsset.h"
+#include "Assets/World/NaMapAsset.h"
 
 #include "Entity/INaEntityFactory.h"
 

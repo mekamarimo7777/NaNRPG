@@ -95,12 +95,12 @@ void UNaAIManipulator::ProcAction( UNaStateMachine* sm, float DeltaTime )
 		break;
 	case Attack:
 		if ( !actor->IsMoving() ){
-			actor->ChangeState( ANaActorBase::EState::Attack );
+			actor->RequestAction( "Attack" );
 			sm->Advance();
 		}
 		break;
 	case WaitAttack:
-		if ( actor->IsWaiting() ){
+		if ( !actor->IsAction() ){
 			m_Target->Attack();
 			sm->SetPhase( End );
 		}

@@ -10,7 +10,7 @@
 
 #include "NaMapChunkActor.h"
 
-#include "World/NaWorld.h"
+#include "World/NaWorldManager.h"
 
 #include "Utility/Components/NaStateMachine.h"
 
@@ -18,7 +18,7 @@
 
 class ANaActorBase;
 
-// ワールドアクター
+// ワールド表示アクター
 // 役割：マップデータ管理、各チャンクアクター、オブジェクトアクターの管理
 UCLASS()
 class NANRPG_API ANaWorldActor : public AActor
@@ -62,6 +62,11 @@ public:
 
 	//! エンティティアクター生成
 	ANaActorBase*	SpawnEntityActor( UNaEntity* entity );
+	//! エンティティアクター削除
+	void			DestroyEntityActor( ANaActorBase* actor );
+
+	//! ワールドマネージャ取得
+	UNaWorldManager*	GetWM() const	{ return m_WM; }
 
 protected:
 	//! メイン
@@ -80,12 +85,16 @@ protected:
 	UPROPERTY()
 	UNaStateMachine*	m_SM;
 
+	//! ワールドマネージャ
+	UPROPERTY()
+	UNaWorldManager*	m_WM;
+	//! アクティブワールド（アクター表示中のワールド）
+	UPROPERTY()
+	UNaWorld*			m_ActiveWorld;
+
 	//! オープン中のワールド
 	UPROPERTY()
 	TArray<UNaWorld*>	m_Worlds;
-	//! アクティブワールド（表示中のワールド）
-	UPROPERTY()
-	UNaWorld*			m_ActiveWorld;
 	//! トランジション予約先ワールド
 	UPROPERTY()
 	UNaWorld*			m_NextWorld;
@@ -109,13 +118,13 @@ protected:
 	//! カレントチャンク
 	FIntVector		m_CurrentChunkPos;
 
-	// ワールドアクター実体（プレイヤー、敵、その他動くもの） //
+	//! ワールドアクター実体（プレイヤー、敵、その他動くもの）
 	UPROPERTY()
 	TArray<ANaActorBase*>	m_WorldActors;
-	// 行動中アクター //
+	//! 行動中アクター
 	UPROPERTY()
-	ANaActorBase*			m_pCurrentActor;
-	// 行動待ちキュー //
+	ANaActorBase*			m_CurrentActor;
+	//! 行動待ちキュー
 	UPROPERTY()
 	TArray<ANaActorBase*>	m_ActionActors;
 	//! カメラ
@@ -132,7 +141,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 	UPostProcessComponent*		m_PostProcess;
 
-	// マテリアル //
+	//! マテリアル
 	UPROPERTY()
 	TMap<int32, UMaterialInstanceDynamic*>	m_MIDMap;
 	//! ポストプロセスマテリアル

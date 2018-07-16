@@ -56,8 +56,10 @@ public:
 	// 退場処理（チャンク消去時の退避処理）
 	void	Leave();
 
+	//! ワールド間移動
+	void		TravelWorld( FName wid );
 	// Naワールド設定
-	void		SetNaWorld( UNaWorld* world )	{ m_pWorld = world; }
+	void		SetNaWorld( UNaWorld* world );
 	// Naワールド取得
 	UNaWorld*	GetNaWorld() const				{ return m_pWorld; }
 
@@ -69,11 +71,6 @@ public:
 	void		SetMapID( int32 id )			{ m_MapID = id; }
 	//! 所属マップID取得
 	int32		GetMapID() const				{ return m_MapID; }
-
-	// UEワールド取得
-	UWorld*		GetWorldContext() const			{ return m_pWorld ? m_pWorld->GetWorldContext() : nullptr; }
-	// UEHUD取得
-	ANaGameHUD*	GetHUD() const					{ return Cast<ANaGameHUD>( GWorld->GetFirstPlayerController()->GetHUD() ); }
 
 	//! エンティティ情報生成
 	virtual void	CreateFromAsset( const FNaEntityDataAsset& asset );
@@ -94,8 +91,6 @@ public:
 	//! アイテム情報取得
 	virtual UNaItem*	GetItemProperty()					{ return nullptr; }
 
-	//! スポーン判定
-	bool	IsSpawned() const	{ return m_Spawned; }
 	//! 生存判定
 	bool	IsAlive() const		{ return !m_IsKill; }
 
@@ -103,6 +98,11 @@ public:
 	void	SetEvent( FName eventID );
 	//! イベント取得
 	bool	FindEvent( ENaEventTrigger trigger, const UNaEventAsset*& outEvent, int32& outSheet );
+
+	//! UEワールド取得
+	UWorld*		GetWorldContext() const	{ return m_pWorld ? m_pWorld->GetWorldContext() : nullptr; }
+	//! UEHUD取得
+	ANaGameHUD*	GetHUD() const			{ return Cast<ANaGameHUD>( GWorld->GetFirstPlayerController()->GetHUD() ); }
 
 
 
@@ -189,7 +189,7 @@ protected:
 	virtual void	OnSerialize( FArchive& ar );
 
 	//! 一時情報の更新
-	void	UpdateTransientData( const FNaEntityDataAsset* asset );
+	void	PostLoadProcess( const FNaEntityDataAsset* asset );
 
 public:
 	//! アクションしない（アクションチェインに繋がない）
@@ -203,11 +203,11 @@ protected:
 	//*** Serialize ***//
 	//! エンティティ種別
 	TEnumAsByte<ENaEntity::Type>	m_Type;
-	//! アセットID
+	//! 使用アセットID
 	FName							m_AssetID;
 	//! 固有ID
 	uint32							m_ID;
-	//! エンティティ情報
+	//! エンティティ基本情報
 	FNaEntityProfile				m_Profile;
 
 	//! 所属レベル
@@ -216,18 +216,20 @@ protected:
 	FName								m_WorldID;
 	//! 所属マップID（-1で未所属）
 	int32								m_MapID;
-	//! 
-	bool								m_Spawned;
 
-	FIntVector		m_WorldPos;		// ワールド座標 //
-	ENaDirection	m_Direction;	// 向き //
+	//! ワールド座標
+	FIntVector		m_WorldPos;
+	//! 向き
+	ENaDirection	m_Direction;
 
-	//
-	int32	m_Speed;			// 行動速度 //
-	int32	m_WaitTime;			// 待ち時間 //
-	uint32	m_TotalTurn;		// 累計ターン //
-
-	int32	m_Group;		// 所属勢力（仮） //
+	//! 行動速度
+	int32	m_Speed;
+	//! 待ち時間
+	int32	m_WaitTime;
+	//! 累計ターン数
+	uint32	m_TotalTurn;
+	//! 所属勢力
+	int32	m_Group;
 
 	//
 	int32	m_LastUpdateTime;	// 前回の行動時間 //
@@ -237,7 +239,6 @@ protected:
 	FName					m_EventID;
 	//! エンティティパラメータ
 	TMap<FName, FString>	m_Params;
-
 	//*** Serialize End ***//
 
 protected:

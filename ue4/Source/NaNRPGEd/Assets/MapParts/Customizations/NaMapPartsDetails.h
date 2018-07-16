@@ -6,7 +6,7 @@
 
 #include "IDetailCustomization.h"
 
-#include "Assets/Map/NaMapPartsAsset.h"
+#include "Assets/World/NaMapPartsAsset.h"
 
 /**
  * 

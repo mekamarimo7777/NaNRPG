@@ -7,7 +7,7 @@
 #include "EditorUndoClient.h"
 
 #include "Assets/NaAssetLibrary.h"
-#include "Assets/Map/NaMapAsset.h"
+#include "Assets/World/NaMapAsset.h"
 #include "Assets/Map/World/NaEditorWorld.h"
 #include "Assets/Map/Actor/NaEditorWorldActor.h"
 

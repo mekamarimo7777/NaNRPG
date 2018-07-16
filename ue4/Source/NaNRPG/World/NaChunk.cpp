@@ -6,7 +6,7 @@
 #include "NaRegion.h"
 
 #include "Assets/NaAssetLibrary.h"
-#include "Assets/Map/NaBlockDataTable.h"
+#include "Assets/World/NaBlockDataTable.h"
 
 #include "Entity/INaEntityFactory.h"
 

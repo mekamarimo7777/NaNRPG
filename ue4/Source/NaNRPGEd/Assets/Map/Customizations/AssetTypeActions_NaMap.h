@@ -4,7 +4,7 @@
 
 #include "AssetTypeActions_Base.h"
 
-#include "Assets/Map/NaMapAsset.h"
+#include "Assets/World/NaMapAsset.h"
 
 /**
  * 

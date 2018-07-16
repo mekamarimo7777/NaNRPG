@@ -16,6 +16,21 @@ class NANRPG_API ANaCharacter : public ANaActorBase
 {
 	GENERATED_BODY()
 	
+	//! ステート
+	enum EState
+	{
+		//! 
+		Waiting,
+		//! 
+		Action,
+		//! 
+		Attack,
+		//! 
+		Damage,
+		//! 
+		Death
+	};
+
 public:	
 	// Sets default values for this actor's properties
 	ANaCharacter(const FObjectInitializer& ObjectInitializer);
@@ -29,28 +44,28 @@ public:
 	//! アイテム情報取得
 	UFUNCTION( BlueprintCallable, Category = "EntityActor" )
 	UNaItem*	GetItemProperty() const;
+
+	//! アクション要求
+	virtual void	RequestAction( FName action );
+	//! アクション中判定
+	virtual bool	IsAction() const;
 	
 public:
-	//
+	//! アニメーション設定
 	bool	SetAnimation( ENaActorAnimation::Type anim );
-	//
+	//! アニメーション実行判定
 	bool	IsAnimationPlaying() const;
 
 protected:
 	//
 	virtual void	OnInitialize() override;
 
-	//
-	void	ProcWaiting(float DeltaTime);
-	//
-	void	ProcAction(float DeltaTime);
-	//
-	void	ProcAttack(float DeltaTime);
-	//
-	void	ProcDeath(float DeltaTime);
-
-	//
-	void	CreateActor( FName assetID );
+	//! 待機中
+	void	ProcWaiting( UNaStateMachine* sm, float DeltaTime );
+	//! 攻撃中
+	void	ProcAttack( UNaStateMachine* sm, float DeltaTime );
+	//! 死亡中
+	void	ProcDeath( UNaStateMachine* sm, float DeltaTime );
 
 public:
 	//! アニメーション
@@ -75,4 +90,7 @@ protected:
 
 	UPROPERTY()
 	UParticleSystemComponent*	m_pParticle;
+
+	//! 
+	int32	m_Param;
 };

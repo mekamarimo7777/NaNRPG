@@ -6,8 +6,6 @@
 
 #include "Blueprint/UserWidget.h"
 
-#include "Map/NaBlockDataTable.h"
-
 #include "Item/NaItemDataTable.h"
 #include "Item/NaMatterDataTable.h"
 
@@ -17,8 +15,9 @@
 #include "Entity/NaEntityDataTable.h"
 #include "Entity/NaRaceDataTable.h"
 
-#include "Map/NaWorldAsset.h"
-#include "Map/NaMapAsset.h"
+#include "World/NaBlockDataTable.h"
+#include "World/NaWorldAsset.h"
+#include "World/NaMapAsset.h"
 
 #include "Event/NaEventAsset.h"
 

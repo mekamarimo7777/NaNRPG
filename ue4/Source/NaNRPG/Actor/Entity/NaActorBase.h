@@ -8,7 +8,11 @@
 
 #include "Entity/NaEntity.h"
 
+#include "Utility/Components/NaStateMachine.h"
+
 #include "NaActorBase.generated.h"
+
+class ANaWorldActor;
 
 UCLASS()
 class NANRPG_API ANaActorBase : public AActor
@@ -16,16 +20,6 @@ class NANRPG_API ANaActorBase : public AActor
 	GENERATED_BODY()
 
 public:
-	enum EState
-	{
-		None,
-
-		Waiting,
-		Action,
-		Attack,
-		Damage,
-		Death
-	};
 	
 public:	
 	// Sets default values for this actor's properties
@@ -38,36 +32,34 @@ public:
 	virtual void Tick( float DeltaSeconds ) override;
 	
 public:
-	// 初期化
-	void	Initialize( UNaWorld* world, UNaEntity* entity );
-
-	//
-	void	ChangeState(EState state, int32 param = 0, bool immediate = false);
-
-	// 移動処理関連 //
-	// 
-	bool		SetWorldPosition( const FIntVector& pos, bool teleport = false );
-	// 
-	FIntVector	GetWorldPosition() const	{return m_pEntity->GetWorldPosition();}
-	// 
-//	bool		FindMovePosition( int32 dir, FIntVector& outPos );
-
-	//
-	UFUNCTION(BlueprintCallable, Category = "Action")
-	bool	IsMoving() const	{return m_bMoving;}
-	//
-	bool	IsWaiting() const	{return m_State == EState::Waiting;}
-
-	void	Kill()	{m_bKill = true;}
+	//! 初期化
+	void	Initialize( ANaWorldActor* worldActor, UNaEntity* entity );
 
 	// 
-	void			SetDirection( ENaDirection dir )	{m_pEntity->SetDirection( dir );}
-	ENaDirection	GetDirection()						{return m_pEntity->GetDirection();}
-//	int32	GetWaitTime() const						{return m_pEntity->GetWaitTime();}
-//	void	ResetWaitTime()							{m_pEntity->ResetWaitTime();}
-//	void	DecreaseWaitTime(int32 value)			{m_pEntity->DecreaseWaitTime( value );}
-
+	bool			SetWorldPosition( const FIntVector& pos, bool teleport = false );
+	// 
+	FIntVector		GetWorldPosition() const	{ return m_Entity->GetWorldPosition(); }
 	//!
+	void			SetDirection( ENaDirection dir )	{ m_Entity->SetDirection( dir ); }
+	//! 
+	ENaDirection	GetDirection() const				{ return m_Entity->GetDirection(); }
+
+	//! アクション要求
+	virtual void	RequestAction( FName action )	{}
+	//! アクション中判定
+	virtual bool	IsAction() const				{ return false; }
+
+	//! 
+	UFUNCTION(BlueprintCallable, Category = "Action")
+	bool	IsMoving() const	{ return m_bMoving; }
+
+	//! キル要求
+	void	Kill()	{ m_bKill = true; }
+
+	//! 所属ワールド取得
+	UNaWorld*		GetNaWorld() const	{ return m_World; }
+
+	//! アクター初期化イベント
 	UFUNCTION(BlueprintImplementableEvent, Category = "Actor")
 	void	OnInitializeActor();
 
@@ -79,16 +71,19 @@ protected:
 	virtual void	OnInitialize()	{}
 
 protected:
-	// 基本情報 //
-	UPROPERTY()
-	UNaWorld*	m_pWorld;		// Naワールド
-	UPROPERTY()
-	UNaEntity*	m_pEntity;		// エンティティ
+	//! ワールドアクター
+	UPROPERTY(Transient)
+	ANaWorldActor*	m_WorldActor;
+	//! ゲームワールド
+	UPROPERTY(Transient)
+	UNaWorld*		m_World;
+	//! エンティティ本体
+	UPROPERTY(Transient)
+	UNaEntity*		m_Entity;
 
-	//
-	EState	m_State;
-	int32	m_StateParam;
-	int32	m_StateStep;
+	//! 状態管理
+	UPROPERTY()
+	UNaStateMachine*	m_SM;
 
 	// 移動
 	FVector			m_DestLocation;
@@ -96,6 +91,8 @@ protected:
 	TArray<FVector>	m_DestList;
 	float			m_FallSpeed;
 
-	bool	m_bKill;
+	//! 
 	bool	m_bMoving;
+	//! 
+	bool	m_bKill;
 };

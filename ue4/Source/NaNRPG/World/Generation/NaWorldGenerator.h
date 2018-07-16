@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Assets/Map/NaWorldAsset.h"
+#include "Assets/World/NaWorldAsset.h"
 
 #include "NaWorldGenerator.generated.h"
 

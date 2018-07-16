@@ -4,31 +4,10 @@
 
 #include "Assets/NaDataAsset.h"
 
-#include "Assets/Map/NaMapAsset.h"
+#include "NaWorldAssetConst.h"
+#include "NaMapAsset.h"
 
 #include "NaWorldAsset.generated.h"
-
-//! 地形生成モード
-UENUM()
-enum class ENaTerrainMode
-{
-	//! 基本地形
-	Normal,
-	//! フラット
-	Flat,
-
-	ENUM_MAX	UMETA(Hidden)
-};
-
-//! バイオーム生成モード
-UENUM()
-enum class ENaBiomeMode
-{
-	//! 
-	Worm,
-
-	ENUM_MAX	UMETA(Hidden)
-};
 
 //! ワールド配置マップエントリ
 USTRUCT()
@@ -72,6 +51,9 @@ public:
 	//! 気候タイプ
 	UPROPERTY( EditDefaultsOnly, Category = "World" )
 	ENaBiomeMode		WorldBiome;
+	//! 標高基準高さ
+	UPROPERTY( EditDefaultsOnly, Category = "World" )
+	int32				WorldBaseHeight;
 
 	//! 配置マップアセット
 	UPROPERTY( EditDefaultsOnly, Category = "Map" )

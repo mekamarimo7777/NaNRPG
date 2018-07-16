@@ -3,20 +3,13 @@
 #include "NaNRPG.h"
 #include "NaActorBase.h"
 
+#include "Actor/World/NaWorldActor.h"
 
 // Sets default values
 ANaActorBase::ANaActorBase()
+: m_bKill( false )
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
-	/*
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> SphereVisualAsset(TEXT("/Game/StarterContent/Shapes/Shape_Sphere.Shape_Sphere"));
-	if ( SphereVisualAsset.Succeeded() ){
-		SphereVisual->SetStaticMesh(SphereVisualAsset.Object);
-		SphereVisual->SetRelativeLocation(FVector(0.0f, 0.0f, -40.0f));
-		SphereVisual->SetWorldScale3D(FVector(0.8f));
-	}*/
+	PrimaryActorTick.bCanEverTick	= true;
 }
 
 // Called when the game starts or when spawned
@@ -24,7 +17,8 @@ void ANaActorBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	m_bKill	= false;
+	//! ステート管理
+	m_SM	= NewObject<UNaStateMachine>();
 }
 
 // Called every frame
@@ -32,12 +26,15 @@ void ANaActorBase::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
-	{// move
+	//! 状態更新
+	m_SM->Execute( DeltaTime );
+
+	{// 移動（仮）
 		FVector		loc = GetActorLocation();
 		FRotator	rot = GetActorRotation();
 
 		if ( loc != m_DestLocation ){
-			float	spd = m_pEntity->GetSpeed() / 150.0f;
+			float	spd = m_Entity->GetSpeed() / 150.0f;
 
 			if ( loc.X < m_DestLocation.X ){
 				loc.X	= FMath::Min( loc.X + spd, m_DestLocation.X );
@@ -79,7 +76,7 @@ void ANaActorBase::Tick( float DeltaTime )
 				m_DestList.RemoveAt( 0 );
 			}
 			else {
-				m_DestRotate.Yaw	= int32( m_pEntity->GetDirection() ) * 45.0f - 90.0f;
+				m_DestRotate.Yaw	= int32( m_Entity->GetDirection() ) * 45.0f - 90.0f;
 				if ( rot.Equals( m_DestRotate, 0.1f ) ){
 					m_bMoving	= false;
 				}
@@ -91,28 +88,26 @@ void ANaActorBase::Tick( float DeltaTime )
 			SetActorRotation( rot );
 		}
 	}
+
+	//! 削除処理
+	if ( m_bKill ){
+		m_WorldActor->DestroyEntityActor( this );
+	}
 }
 
 //////////////////////////////////////////////////
 // public methods
 //////////////////////////////////////////////////
-//
-void ANaActorBase::Initialize( UNaWorld* world, UNaEntity* entity )
+//! 初期化
+void ANaActorBase::Initialize( ANaWorldActor* worldActor, UNaEntity* entity )
 {
-	m_pWorld	= world;
-	m_pEntity	= entity;
+	m_WorldActor	= worldActor;
+	m_Entity		= entity;
+	m_World			= m_Entity->GetNaWorld();
 
 	OnInitialize();
 
 	OnInitializeActor();
-}
-
-//
-void ANaActorBase::ChangeState(EState state, int32 param, bool immediate)
-{
-	m_State			= state;
-	m_StateParam	= param;
-	m_StateStep		= 0;
 }
 
 // 座標設定 //
@@ -144,7 +139,7 @@ FVector	ANaActorBase::GetWorldLocation() const
 	loc.Y	= wpos.Y * 10.0f + 5.0f;
 	loc.Z	= wpos.Z * 10.0f;
 
-	chunk	= m_pWorld->GetChunkFromWorld( wpos );
+	chunk	= m_World->GetChunkFromWorld( wpos );
 	if ( chunk ){
 		FNaWorldBlockWork	block;
 		FIntVector	pos = wpos - chunk->GetPositionInWorld() * 16;

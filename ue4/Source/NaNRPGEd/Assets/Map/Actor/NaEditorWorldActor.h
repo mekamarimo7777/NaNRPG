@@ -4,7 +4,7 @@
 
 #include "ProceduralMeshComponent.h"
 
-#include "Assets/Map/NaMapAsset.h"
+#include "Assets/World/NaMapAsset.h"
 #include "Assets/Map/World/NaEditorWorld.h"
 
 #include "Actor/World/NaMapChunkActor.h"

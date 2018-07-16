@@ -4,7 +4,7 @@
 
 #include "Factories/Factory.h"
 
-#include "Assets/Map/NaMapPartsAsset.h"
+#include "Assets/World/NaMapPartsAsset.h"
 
 #include "NaMapPartsFactory.generated.h"
 

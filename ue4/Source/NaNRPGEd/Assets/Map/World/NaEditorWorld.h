@@ -4,7 +4,7 @@
 
 #include "GameFramework/Actor.h"
 
-#include "Assets/Map/NaMapAsset.h"
+#include "Assets/World/NaMapAsset.h"
 
 #include "World/NaWorld.h"
 

@@ -20,7 +20,6 @@ UNaEntity::UNaEntity()
 , m_Speed( 500 )
 , m_ID( -1 )
 , m_Stage( ENaEntityStage::Chunk )
-, m_Spawned( false )
 {
 }
 
@@ -51,8 +50,6 @@ void UNaEntity::Spawn()
 {
 	OnSpawn();
 
-	m_Spawned	= true;
-
 //	UpdateCurrentChunk();
 }
 
@@ -60,8 +57,6 @@ void UNaEntity::Spawn()
 void UNaEntity::Despawn()
 {
 	OnDespawn();
-
-	m_Spawned	= false;
 }
 
 //
@@ -70,6 +65,8 @@ void UNaEntity::Enter()
 	UpdateCurrentChunk();
 
 	OnEnter();
+
+	m_IsKill	= false;
 }
 
 //
@@ -84,6 +81,19 @@ void UNaEntity::Leave()
 	m_pWorld	= nullptr;
 }
 
+//! ワールド間移動
+void UNaEntity::TravelWorld( FName wid )
+{
+	m_IsKill	= true;
+	SetWorldID( wid );
+}
+
+// Naワールド設定
+void UNaEntity::SetNaWorld( UNaWorld* world )
+{
+	m_pWorld	= world;
+}
+
 //! エンティティ情報生成
 void UNaEntity::CreateFromAsset( const FNaEntityDataAsset& asset )
 {
@@ -93,7 +103,7 @@ void UNaEntity::CreateFromAsset( const FNaEntityDataAsset& asset )
 
 	m_EventID	= asset.DefaultEvent;
 
-	UpdateTransientData( &asset );
+	PostLoadProcess( &asset );
 }
 
 //! エンティティパラメータ設定
@@ -266,7 +276,7 @@ void UNaEntity::Serialize( FArchive& ar )
 		
 		asset	= alib->FindEntityAsset( m_AssetID );
 		if ( asset ){
-			UpdateTransientData( asset );
+			PostLoadProcess( asset );
 		}
 	}
 }
@@ -276,11 +286,10 @@ void UNaEntity::OnSerialize( FArchive& ar )
 {
 	ar << m_Type;
 	SerializeFName( ar, m_AssetID );
-
+	ar << m_ID;
 	ar << m_Profile;
 
 	ar << m_Stage;
-	ar << m_Spawned;
 
 	ar << m_WorldID;
 	ar << m_WorldPos;
@@ -293,7 +302,7 @@ void UNaEntity::OnSerialize( FArchive& ar )
 }
 
 //! 一時データの更新
-void UNaEntity::UpdateTransientData( const FNaEntityDataAsset* asset )
+void UNaEntity::PostLoadProcess( const FNaEntityDataAsset* asset )
 {
 	m_Asset			= asset;
 	m_Size			= asset->EntitySize;

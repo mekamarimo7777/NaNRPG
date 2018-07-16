@@ -10,6 +10,9 @@
 
 #include "GameMode/NaMainGameMode.h"
 
+//////////////////////////////////////////////////
+// public methods
+//////////////////////////////////////////////////
 // Sets default values
 ANaCharacter::ANaCharacter(const FObjectInitializer& ObjectInitializer)
 {
@@ -30,39 +33,40 @@ void ANaCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ChangeState( EState::Waiting );
+	if ( m_SM ){
+		m_SM->RegisterState( EState::Waiting, this, &ANaCharacter::ProcWaiting );
+		m_SM->RegisterState( EState::Attack, this, &ANaCharacter::ProcAttack );
+		m_SM->RegisterState( EState::Death, this, &ANaCharacter::ProcDeath );
+	}
+	m_SM->ChangeState( EState::Waiting );
 }
 
 // Called every frame
 void ANaCharacter::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
-
-	switch ( m_State ){
-	case EState::Waiting:
-		ProcWaiting( DeltaTime );
-		break;
-	case EState::Action:
-		ProcAction( DeltaTime );
-		break;
-	case EState::Attack:
-		ProcAttack( DeltaTime );
-		break;
-	case EState::Death:
-		ProcDeath( DeltaTime );
-		break;
-	}
 }
 
 //! アイテム情報取得
 UNaItem* ANaCharacter::GetItemProperty() const
 {
-	return m_pEntity->GetItemProperty();
+	return m_Entity->GetItemProperty();
 }
 
-//////////////////////////////////////////////////
-// public methods
-//////////////////////////////////////////////////
+//! アクション要求
+void ANaCharacter::RequestAction( FName action )
+{
+	if ( action == "Attack" ){
+		m_SM->ChangeState( EState::Attack );
+	}
+}
+
+//! アクション中判定
+bool ANaCharacter::IsAction() const
+{
+	return m_SM->GetState() != EState::Waiting;
+}
+
 //
 bool ANaCharacter::SetAnimation( ENaActorAnimation::Type anim )
 {
@@ -102,7 +106,7 @@ bool ANaCharacter::IsAnimationPlaying() const
 void ANaCharacter::OnInitialize()
 {
 	UNaAssetLibrary*		alib = UNaAssetLibrary::Get();
-	const FNaEntityProfile*	prof = m_pEntity->GetProfile();
+	const FNaEntityProfile*	prof = m_Entity->GetProfile();
 	FNaActorDataAsset*		asset;
 
 	asset	= alib->FindActorAsset( prof->ActorName );
@@ -128,14 +132,11 @@ void ANaCharacter::OnInitialize()
 		m_Capsule->SetWorldScale3D( asset->Scale );
 	}
 	
-	SetWorldPosition( m_pEntity->GetWorldPosition(), true );
-
-//	m_Capture[0]->TextureTarget			= m_pWorld->DataAsset->RenderTarget;
-//	m_Capture[0]->AddOrUpdateBlendable( m_pWorld->DataAsset->RenderTargetShader );
+	SetWorldPosition( m_Entity->GetWorldPosition(), true );
 }
 
-//
-void ANaCharacter::ProcWaiting(float DeltaTime)
+//! 待機中
+void ANaCharacter::ProcWaiting( UNaStateMachine* sm, float DeltaTime )
 {
 	enum StateStep
 	{
@@ -145,29 +146,29 @@ void ANaCharacter::ProcWaiting(float DeltaTime)
 		End
 	};
 
-	switch ( m_StateStep ){
+	switch ( sm->GetPhase() ){
 	case Start:
 		SetAnimation( ENaActorAnimation::Idle );
-		m_StateStep++;
+		sm->Advance();
 		break;
 	case Idle:
-		if ( m_bKill ){
-			ChangeState( EState::Death );
+		if ( !m_Entity->IsAlive() ){
+			sm->ChangeState( EState::Death );
 			break;
 		}
 		if ( IsMoving() ){
 			SetAnimation( ENaActorAnimation::Walk );
-			m_StateStep		= Walk;
+			sm->SetPhase( StateStep::Walk );
 		}
 		break;
 	case Walk:
 		if ( IsMoving() ){
-			m_StateParam	= 10;
+			m_Param	= 10;
 		}
 		else {
-			if ( --m_StateParam < 0 ){
+			if ( --m_Param < 0 ){
 				SetAnimation( ENaActorAnimation::Idle );
-				m_StateStep		= Idle;
+				sm->SetPhase( StateStep::Idle );
 			}
 		}
 		break;
@@ -176,31 +177,8 @@ void ANaCharacter::ProcWaiting(float DeltaTime)
 	}
 }
 
-//
-void ANaCharacter::ProcAction(float DeltaTime)
-{
-	enum StateStep
-	{
-		Start,
-		Main,
-		End
-	};
-
-	switch ( m_StateStep ){
-	case Start:
-		m_StateStep++;
-		break;
-	case Main:
-		m_StateStep++;
-		break;
-	case End:
-		ChangeState( EState::Waiting );
-		break;
-	}
-}
-
-//
-void ANaCharacter::ProcAttack(float DeltaTime)
+//! 攻撃中
+void ANaCharacter::ProcAttack( UNaStateMachine* sm, float DeltaTime )
 {
 	enum StateStep
 	{
@@ -210,7 +188,7 @@ void ANaCharacter::ProcAttack(float DeltaTime)
 	};
 	UWorld*	world = GetWorld();
 
-	switch ( m_StateStep ){
+	switch ( sm->GetPhase() ){
 	case Start:
 		{
 			const FVector	c_dirPos[8] = 
@@ -227,7 +205,7 @@ void ANaCharacter::ProcAttack(float DeltaTime)
 			FVector	pos;
 
 			pos	= GetActorLocation();
-			pos	+= c_dirPos[int32(m_pEntity->GetDirection())] * 10.0f;
+			pos	+= c_dirPos[int32(m_Entity->GetDirection())] * 10.0f;
 
 //			m_pParticle	= UGameplayStatics::SpawnEmitterAtLocation( world, m_pWorld->DataAsset->TestAttackParticle, pos );
 //			m_pParticle->SetWorldScale3D( FVector( 0.5f, 0.5f, 0.5f ) );
@@ -235,7 +213,7 @@ void ANaCharacter::ProcAttack(float DeltaTime)
 			SetAnimation( ENaActorAnimation::Attack );
 
 //			m_StateParam	= 30;
-			m_StateStep++;
+			sm->Advance();
 		}
 		break;
 	case Main:
@@ -244,18 +222,17 @@ void ANaCharacter::ProcAttack(float DeltaTime)
 				m_pParticle->DestroyComponent();
 				m_pParticle	= nullptr;
 			}
-
-			m_StateStep++;
+			sm->Advance();
 		}
 		break;
 	case End:
-		ChangeState( EState::Waiting );
+		sm->ChangeState( EState::Waiting );
 		break;
 	}
 }
 
-//
-void ANaCharacter::ProcDeath(float DeltaTime)
+//! 死亡中
+void ANaCharacter::ProcDeath( UNaStateMachine* sm, float DeltaTime )
 {
 	enum StateStep
 	{
@@ -265,22 +242,22 @@ void ANaCharacter::ProcDeath(float DeltaTime)
 	};
 	UWorld*	world = GetWorld();
 
-	switch ( m_StateStep ){
+	switch ( sm->GetPhase() ){
 	case Start:
 		if ( SetAnimation( ENaActorAnimation::KnockDown ) ){
-			m_StateStep++;
+			sm->Advance();
 		}
 		else {
-			m_StateStep	= End;
+			sm->SetPhase( StateStep::End );
 		}
 		break;
 	case Main:
 		if ( !IsAnimationPlaying() ){
-			m_StateStep++;
+			sm->Advance();
 		}
 		break;
 	case End:
-		Destroy();
+		Kill();
 		break;
 	}
 }

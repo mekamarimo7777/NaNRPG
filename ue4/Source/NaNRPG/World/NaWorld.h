@@ -16,6 +16,7 @@
 
 class ANaWorldActor;
 class UNaWorldAsset;
+class UNaWorldManager;
 class UNaEntity;
 class UNaEntityPlayer;
 class UNaTurnActionComponent;
@@ -37,6 +38,7 @@ struct FNaMapEntry
 	FIntVector	Range;
 };
 
+//! 
 class INaWorldDataAccessor
 {
 	//! リージョンデータ読み込み

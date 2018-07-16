@@ -267,11 +267,11 @@ void UNaPlayerManipulator::ProcAction( UNaStateMachine* sm, float DeltaTime )
 	case Contact:
 		break;
 	case Attack:
-		actor->ChangeState( ANaActorBase::EState::Attack );
+		actor->RequestAction( "Attack" );
 		sm->Advance();
 		break;
 	case WaitAttack:
-		if ( actor->IsWaiting() ){
+		if ( !actor->IsAction() ){
 			m_Target->Attack();
 			sm->SetPhase( End );
 		}

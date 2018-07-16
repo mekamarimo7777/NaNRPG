@@ -8,7 +8,7 @@
 
 #include "NaMapEditorViewportClient.h"
 
-#include "Assets/Map/NaMapAsset.h"
+#include "Assets/World/NaMapAsset.h"
 
 #include "Assets/MapParts/Actor/NaMapPartsActor.h"
 #include "Assets/MapParts/Viewport/SNaMapPartsEditorViewport.h"

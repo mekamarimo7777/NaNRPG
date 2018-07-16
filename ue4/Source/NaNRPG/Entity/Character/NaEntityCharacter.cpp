@@ -52,7 +52,7 @@ void UNaEntityCharacter::OnEnter()
 {
 	ANaWorldActor*	wact = m_pWorld->GetWorldActor();
 
-	// アクター生成
+	//! アクター生成
 	if ( wact ){
 		m_Actor	= wact->SpawnEntityActor( this );
 	}
