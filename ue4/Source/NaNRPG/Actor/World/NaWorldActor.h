@@ -102,7 +102,6 @@ protected:
 	//! 管理チャンクアクター
 	UPROPERTY()
 	TArray<ANaMapChunkActor*>	m_ChunkActors;
-//	TMap<FIntVector, ANaMapChunkActor*>	m_ChunkActors;
 	//! 描画チャンク距離
 	UPROPERTY()
 	FIntVector		m_RenderSize;
