@@ -25,7 +25,6 @@ UNaWorldManager::UNaWorldManager()
 , m_WorldActor( nullptr )
 , m_WorldContext( nullptr )
 {
-	m_Generator	= NewObject<UNaWorldGenerator>();
 }
 
 //! 初期化
@@ -35,20 +34,43 @@ void UNaWorldManager::Initialize( ANaWorldActor* actor )
 	m_WorldContext	= m_WorldActor->GetWorld();
 
 	m_EventManager	= NewObject<UNaEventManager>();
-	//m_EventManager->Initialize( this );
+	m_EventManager->Initialize( this );
 }
 
 //! 更新処理
 void UNaWorldManager::Update( float DeltaTime )
 {
+	UNaEntity*	focusEntity = GetFocusEntity();
+
+	//! クローズ済みワールドの削除
+	m_Worlds.RemoveAll( []( const UNaWorld* p )
+	{
+		return p->IsClosed();
+	});
+
+	//! 各ワールド更新
+	for ( auto& it : m_Worlds ){
+		if ( focusEntity->GetWorldID() == it->GetUID() ){
+			it->SetViewOrigin( focusEntity->GetWorldPosition() );
+		}
+		else {
+			it->SetViewOrigin( FIntVector::ZeroValue );
+		}
+		it->Update( DeltaTime );
+	}
+
+	//! アクティブワールド変更
+	if ( m_RequestWorld != nullptr ){
+		m_ActiveWorld	= m_RequestWorld;
+		m_RequestWorld	= nullptr;
+	}
+
 	//! ターンアクション
 	while ( true ){
 		// 削除待ちエンティティ削除
-/*		for ( int32 i = m_SpawnEntities.Num() - 1; i >= 0; --i ){
-			if ( m_SpawnEntities[i]->IsPendingKill() ){
-				DespawnEntity( m_SpawnEntities[i] );
-			}
-		}*/
+		for ( auto& it : m_Worlds ){
+			it->SweepEntities();
+		}
 
 		// ターンアクション開始
 		if ( !m_CurrentAction && m_ActionChain.Num() > 0 ){
@@ -99,7 +121,28 @@ void UNaWorldManager::InsertActionChain( UNaTurnActionComponent* tac )
 
 	m_ActionChain.Insert( tac, idx );
 }
+void UNaWorldManager::InsertActionChain( UNaEntity* entity )
+{
+	if ( entity->HasTurnAction() ){
+		InsertActionChain( entity->GetTurnAction() );
+	}
+}
 
+//! アクションチェインから除去
+void UNaWorldManager::RemoveActionChain( UNaTurnActionComponent* tac )
+{
+	m_ActionChain.Remove( tac );
+
+	if ( m_CurrentAction == tac ){
+		m_CurrentAction	= nullptr;
+	}
+}
+void UNaWorldManager::RemoveActionChain( UNaEntity* entity )
+{
+	if ( entity->HasTurnAction() ){
+		RemoveActionChain( entity->GetTurnAction() );
+	}
+}
 
 //! ワールドオープン
 UNaWorld* UNaWorldManager::OpenWorld( FName id, FName assetID )
@@ -158,7 +201,6 @@ void UNaWorldManager::CloseWorld( FName id )
 		if ( naw == m_ActiveWorld ){
 			m_ActiveWorld	= nullptr;
 		}
-		m_Worlds.RemoveAt( idx );
 	}
 }
 
@@ -181,3 +223,11 @@ void UNaWorldManager::ChangeWorld( FName id )
 //////////////////////////////////////////////////
 // protected methods
 //////////////////////////////////////////////////
+//! 表示ターゲット取得
+UNaEntity* UNaWorldManager::GetFocusEntity() const
+{
+	UNaGameDatabase*	db = UNaGameDatabase::GetDB();
+	UNaEntity*			player = db->GetPlayer();
+
+	return player;
+}

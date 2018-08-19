@@ -57,7 +57,7 @@ public:
 	void	Leave();
 
 	//! ワールド間移動
-	void		TravelWorld( FName wid );
+	void		TravelWorld( FName wid, const FIntVector& pos = FIntVector::ZeroValue );
 	// Naワールド設定
 	void		SetNaWorld( UNaWorld* world );
 	// Naワールド取得

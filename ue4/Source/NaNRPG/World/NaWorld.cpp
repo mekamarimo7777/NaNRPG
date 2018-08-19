@@ -3,6 +3,8 @@
 #include "NaNRPG.h"
 #include "NaWorld.h"
 
+#include "World/NaWorldManager.h"
+
 #include "Actor/World/NaWorldActor.h"
 #include "Actor/Entity/NaActorBase.h"
 
@@ -13,7 +15,7 @@
 
 #include "Database/NaGameDatabase.h"
 
-//
+//! コンストラクタ
 UNaWorld::UNaWorld()
 : m_CurrentChunkPos( 0, 0, SHORT_MAX )
 , m_ChunkRange( 9, 9, 9 )
@@ -28,22 +30,12 @@ UNaWorld::UNaWorld()
 void UNaWorld::Setup( ANaWorldActor* actor )
 {
 	m_WorldActor	= actor;
-	m_WorldContext	= m_WorldActor->GetWorld();
+	m_WM			= m_WorldActor->GetWM();
 }
 
-//! 
+//! 更新
 void UNaWorld::Update( float DeltaTime )
 {
-	UNaGameDatabase*	db = UNaGameDatabase::GetDB();
-
-	if ( UNaEntity* player = db->GetPlayer() ){
-		if ( player->GetWorldID() == GetUID() ){
-			SetCurrentPosition( player->GetWorldPosition() );
-		}
-	}
-
-	//! ターン進行
-	AdvanceTurn();
 }
 
 //! ワールドデータ構築
@@ -138,7 +130,7 @@ bool UNaWorld::CreateWorld( FName uid, FName assetID )
 	return true;
 }
 
-//
+//! ワールドデータオープン
 bool UNaWorld::OpenWorld( int32 dataID )
 {
 	UNaAssetLibrary*	alib = UNaAssetLibrary::Get();
@@ -183,25 +175,19 @@ bool UNaWorld::OpenWorld( int32 dataID )
 	}
 }
 
-//
+//! ワールドクローズ
 void UNaWorld::CloseWorld( bool isSave )
 {
-	//! プレイヤー・パーティメンバーをワールドから外す
-/*	{
-		UNaGameDatabase*	db = UNaGameDatabase::GetDB();
-
-		DespawnEntity( db->GetPlayer() );
-
-	}*/
-
 	for ( auto it : m_Regions ){
 		it->CloseRegion();
 	}
 	m_Regions.Empty();
 	m_RegionMap.Empty();
+
+	m_WM	= nullptr;
 }
 
-//
+//! シリアライズ
 void UNaWorld::Serialize( FArchive& ar )
 {
 	//! ID関連
@@ -226,19 +212,19 @@ void UNaWorld::SetChunkRange( FIntVector range )
 }
 
 // 
-void UNaWorld::SetCurrentPosition( const FIntVector& pos )
+void UNaWorld::SetViewOrigin( const FIntVector& pos )
 {
 	FIntVector	cpos_prev;
 
-	m_CurrentWorldPos	= pos;
+	m_ViewOrigin	= pos;
 
-	cpos_prev			= m_CurrentChunkPos;
-	m_CurrentChunkPos.X	= m_CurrentWorldPos.X >> 4;
-	m_CurrentChunkPos.Y	= m_CurrentWorldPos.Y >> 4;
-	m_CurrentChunkPos.Z	= m_CurrentWorldPos.Z >> 4;
+	cpos_prev			= m_ViewOrigin;
+	m_CurrentChunkPos.X	= m_ViewOrigin.X >> 4;
+	m_CurrentChunkPos.Y	= m_ViewOrigin.Y >> 4;
+	m_CurrentChunkPos.Z	= m_ViewOrigin.Z >> 4;
 
 	if ( m_CurrentChunkPos != cpos_prev ){
-		UpdateWorld();
+		Evaluate();
 	}
 
 	//! 天井セル計算
@@ -259,8 +245,8 @@ void UNaWorld::SetCurrentPosition( const FIntVector& pos )
 	}
 }
 
-//! アクティブチャンクの更新
-void UNaWorld::UpdateWorld()
+//! 内部情報の再評価
+void UNaWorld::Evaluate()
 {
 	TArray<UNaChunk*>	chunks;
 	TArray<UNaChunk*>	new_chunks;
@@ -369,74 +355,18 @@ void UNaWorld::UpdateWorld()
 	}
 }
 
-//! ターン進行
-void UNaWorld::AdvanceTurn()
-{
-	while ( true ){
-		// 削除待ちエンティティ削除
-		for ( int32 i = m_SpawnEntities.Num() - 1; i >= 0; --i ){
-			if ( m_SpawnEntities[i]->IsPendingKill() ){
-				DespawnEntity( m_SpawnEntities[i] );
-			}
-		}
-
-		// ターンアクション開始
-		if ( !m_CurrentAction && m_ActionChain.Num() > 0 ){
-			m_CurrentAction	= m_ActionChain[0];
-			m_ActionChain.RemoveAt( 0 );
-
-			for ( auto it : m_ActionChain ){
-				it->DecreaseWaitTime( m_CurrentAction->GetWaitTime() );
-			}
-			m_CurrentAction->BeginTurn();
-		}
-
-		// ターン処理
-		if ( m_CurrentAction ){
-			m_CurrentAction->ExecuteTurn( 0.0f );
-
-			// 終了しなかった場合は次フレームへ
-			if ( !m_CurrentAction->IsEndTurn() ){
-				break;
-			}
-
-			InsertActionChain( m_CurrentAction );
-			m_CurrentAction	= nullptr;
-		}
-		else {
-			break;
-		}
-	}
-}
-
-//
-void UNaWorld::InsertActionChain( UNaTurnActionComponent* tac )
-{
-	int32	i;
-
-	tac->ResetWaitTime();
-
-	for ( i = 0; i < m_ActionChain.Num(); ++i ){
-		if ( tac->GetWaitTime() < m_ActionChain[i]->GetWaitTime() ){
-			break;
-		}
-	}
-
-	m_ActionChain.Insert( tac, i );
-}
-
-//
+//! リージョン取得
 UNaRegion* UNaWorld::GetRegion( const FIntVector& worldPos )
 {
 	return nullptr;
 }
 
-// 
+//! チャンク取得
 UNaChunk* UNaWorld::GetChunk( const FIntVector& chunkPos )
 {
 	return m_ChunkMap.FindRef( chunkPos );
 }
-//
+//! チャンク取得
 UNaChunk* UNaWorld::GetChunkFromWorld( FIntVector worldPos )
 {
 	worldPos.X	>>= 4;
@@ -488,7 +418,7 @@ bool UNaWorld::GetBlock( FIntVector worldPos, FNaWorldBlockWork& outVal )
 	return false;
 }
 
-// 接地セル検索 //
+//! 接地セル検索
 bool UNaWorld::FindGroundPos( FIntVector startPos, FIntVector& outPos )
 {
 	UNaAssetLibrary*	alib = UNaAssetLibrary::Get();
@@ -514,7 +444,7 @@ bool UNaWorld::FindGroundPos( FIntVector startPos, FIntVector& outPos )
 	return true;
 }
 
-// 天井セル検索
+//! 天井セル検索
 bool UNaWorld::FindCeilPos( FIntVector startPos, FIntVector& outPos )
 {
 	UNaAssetLibrary*	alib = UNaAssetLibrary::Get();
@@ -606,6 +536,16 @@ uint32 UNaWorld::IssueEntityID()
 	return m_NextEntityID++;
 }
 
+//! 無効エンティティの削除
+void UNaWorld::SweepEntities()
+{
+	for ( int32 i = m_SpawnEntities.Num() - 1; i >= 0; --i ){
+		if ( m_SpawnEntities[i]->IsPendingKill() ){
+			DespawnEntity( m_SpawnEntities[i] );
+		}
+	}
+}
+
 // エンティティスポーン
 bool UNaWorld::SpawnEntity( UNaEntity* entity, FIntVector pos )
 {
@@ -649,7 +589,7 @@ bool UNaWorld::EnterEntity( UNaEntity* entity )
 	m_SpawnEntities.Add( entity );
 
 	//! 実行チェインに追加
-	AttachActionChain( entity );
+	m_WM->InsertActionChain( entity );
 
 	// 
 	entity->SetNaWorld( this );
@@ -669,31 +609,16 @@ void UNaWorld::LeaveEntity( UNaEntity* entity )
 	entity->Leave();
 
 	//! アクションチェインから除去
-	DetachActionChain( entity );
+	m_WM->RemoveActionChain( entity );
 
 	//! スポーンリストから除去
 	m_SpawnEntities.RemoveSwap( entity );
 }
 
-//! アクションチェインに追加
-void UNaWorld::AttachActionChain( UNaEntity* entity )
+//! UEワールド取得
+UWorld* UNaWorld::GetWorldContext() const
 {
-	if ( entity->HasTurnAction() ){
-		InsertActionChain( entity->GetTurnAction() );
-	}
-}
-
-//! アクションチェインから除去
-void UNaWorld::DetachActionChain( UNaEntity* entity )
-{
-	if ( entity->HasTurnAction() ){
-		UNaTurnActionComponent*	tac = entity->GetTurnAction();
-
-		m_ActionChain.Remove( tac );
-		if ( m_CurrentAction == tac ){
-			tac	= nullptr;
-		}
-	}
+	return m_WM->GetWorldContext();
 }
 
 //! マップ登録

@@ -32,8 +32,8 @@ public:
 	//! ブロック更新
 	virtual void	SetBlock( FIntVector pos, FNaWorldBlockWork& block ) override;
 
-	//! アクティブワールド更新
-	virtual void	UpdateWorld() override;
+	//! 再評価
+	virtual void	Evaluate() override;
 
 	//! ランダム地形生成
 	void	GenerateRandomTerrain();

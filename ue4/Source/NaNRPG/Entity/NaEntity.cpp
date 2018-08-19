@@ -82,10 +82,12 @@ void UNaEntity::Leave()
 }
 
 //! ワールド間移動
-void UNaEntity::TravelWorld( FName wid )
+void UNaEntity::TravelWorld( FName wid, const FIntVector& pos )
 {
 	m_IsKill	= true;
+
 	SetWorldID( wid );
+	SetWorldPosition( pos );
 }
 
 // Naワールド設定

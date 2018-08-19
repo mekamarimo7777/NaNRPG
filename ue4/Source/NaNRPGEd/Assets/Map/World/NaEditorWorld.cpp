@@ -34,7 +34,7 @@ void UNaEditorWorld::SetupFromMap( UNaMapAsset* asset )
 		}
 	}
 
-	UpdateWorld();
+	Evaluate();
 }
 
 //! マップサイズ変更
@@ -44,7 +44,7 @@ void UNaEditorWorld::ResizeWorld(FIntVector size )
 
 	SetChunkLimit( FIntVector(0, 0, 0), size - FIntVector( 1, 1, 1 ) );
 
-	UpdateWorld();
+	Evaluate();
 }
 
 //! 
@@ -87,7 +87,7 @@ void UNaEditorWorld::GenerateRandomTerrain()
 }
 
 // 
-void UNaEditorWorld::UpdateWorld()
+void UNaEditorWorld::Evaluate()
 {
 	TArray<UNaChunk*>	chunks;
 	UNaRegion*			region;

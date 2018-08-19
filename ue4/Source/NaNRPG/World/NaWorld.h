@@ -78,30 +78,20 @@ public:
 	//! データID取得
 	uint32	GetDataID() const	{ return m_DataID; }
 	//! クローズ判定
-	bool	IsClosed() const	{ return false; }
+	bool	IsClosed() const	{ return m_WM == nullptr; }
 
-
-
-	//! ワールドジェネレータ取得
-	UNaWorldGenerator*	GetGenerator() const	{ return m_Generator; }
-
-	// シリアライズ //
+	//! シリアライズ
 	virtual void	Serialize( FArchive& ar ) override;
 
 	//! 
 	void		SetChunkRange( FIntVector range );
 	// カレント座標設定
-	void		SetCurrentPosition( const FIntVector& pos );
+	void		SetViewOrigin( const FIntVector& pos );
 	// カレント座標取得
-	FIntVector	GetCurrentPosition() const	{return m_CurrentWorldPos;}
+	FIntVector	GetViewOrigin() const	{ return m_ViewOrigin; }
 
-	// 更新
-	virtual void	UpdateWorld();
-
-	//! ターン進行
-	void	AdvanceTurn();
-	//! アクションチェインに追加
-	void	InsertActionChain( UNaTurnActionComponent* tac );
+	//! 内部情報再評価
+	virtual void	Evaluate();
 
 	// リージョン取得
 	UNaRegion*	GetRegion( const FIntVector& worldPos );
@@ -136,6 +126,8 @@ public:
 	void		UnregisterEntity( UNaEntity* entity );
 	//! エンティティID発行
 	uint32		IssueEntityID();
+	//! 無効エンティティの削除
+	void		SweepEntities();
 
 	// エンティティスポーン（実体の生成）
 	bool		SpawnEntity( UNaEntity* entity, FIntVector pos );
@@ -147,16 +139,15 @@ public:
 	// ワールドから除去
 	void		LeaveEntity( UNaEntity* entity );
 
-	// アクションチェインに追加
-	void		AttachActionChain( UNaEntity* entity );
-	// アクションチェインから除去
-	void		DetachActionChain( UNaEntity* entity );
-
-	//! UEワールド取得
-	UWorld*			GetWorldContext() const	{ return m_WorldContext; }
 	//! ワールドアクター取得
-	ANaWorldActor*	GetWorldActor() const	{ return m_WorldActor; }
-
+	ANaWorldActor*		GetWorldActor() const	{ return m_WorldActor; }
+	//! ワールドマネージャ取得
+	UNaWorldManager*	GetWM() const			{ return m_WM; }
+	//! ワールドジェネレータ取得
+	UNaWorldGenerator*	GetGenerator() const	{ return m_Generator; }
+	//! UEワールド取得
+	UWorld*				GetWorldContext() const;
+	
 	//
 	void		SetChunkLimit( FIntVector min, FIntVector max )	{m_ChunkMin = min; m_ChunkMax = max;}
 	//! 
@@ -181,9 +172,6 @@ public:
 	void			SetWorldDirection(ENaDirection dir)	{m_WorldDirection = dir;}
 	ENaDirection	GetWorldDirection() const			{return m_WorldDirection;}
 
-	//! イベントマネージャ取得
-	virtual UNaEventManager*	GetEventManager()	{ return nullptr; }
-
 protected:
 	//
 	FString		MakeWorldDirPath( int32 worldID ) const;
@@ -194,8 +182,6 @@ protected:
 	//
 	FString		GetMapDirPath() const;
 
-public:
-	
 protected:
 	//! 固有ID
 	FName		m_UID;
@@ -214,16 +200,16 @@ protected:
 	//! ワールド表示名
 	FText		m_DisplayName;
 
+	//! ワールドマネージャ
+	UPROPERTY(Transient)
+	UNaWorldManager*	m_WM;
+	//! ワールド表示管理アクター
+	UPROPERTY(Transient)
+	ANaWorldActor*		m_WorldActor;
 	//! ワールドジェネレータ
 	UPROPERTY(Transient)
 	UNaWorldGenerator*	m_Generator;
 
-	//! UEワールド
-	UPROPERTY(Transient)
-	UWorld*				m_WorldContext;
-	//! ワールド表示管理アクター
-	UPROPERTY(Transient)
-	ANaWorldActor*		m_WorldActor;
 	//! ホームポジション
 	TArray<FIntVector>	m_HomePositions;
 
@@ -232,8 +218,8 @@ protected:
 	int32	m_Humidity;			// 湿度
 	int32	m_AtmosPressure;	// 気圧
 
-	// カレント
-	FIntVector			m_CurrentWorldPos;	// 
+	//! 表示原点
+	FIntVector			m_ViewOrigin;
 	FIntVector			m_CurrentChunkPos;	// 
 	int32				m_CeilZ;			// 
 	ENaDirection		m_WorldDirection;	// ワールド表示方角
@@ -259,11 +245,4 @@ protected:
 	int32							m_NextEntityID;			// 次回ワールドエンティティID //
 	UPROPERTY(Transient)
 	TArray<UNaEntity*>				m_SpawnEntities;		// スポーン中のエンティティ（ステージ共通） //
-	
-
-	// ターン処理 //
-	UPROPERTY(Transient)
-	TArray<UNaTurnActionComponent*>	m_ActionChain;		// アクションリスト //
-	UPROPERTY(Transient)
-	UNaTurnActionComponent*			m_CurrentAction;	//  //
 };

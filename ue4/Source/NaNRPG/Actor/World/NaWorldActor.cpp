@@ -8,7 +8,7 @@
 #include "Actor/Entity/NaActorBase.h"
 #include "Actor/Entity/Character/NaCharacter.h"
 
-#include "World/NaGameWorld.h"
+#include "World/NaWorld.h"
 #include "World/Map/NaMap.h"
 
 #include "Entity/INaEntityFactory.h"
@@ -22,6 +22,7 @@
 //! 
 ANaWorldActor::ANaWorldActor( const FObjectInitializer& ObjectInitializer )
 : Super( ObjectInitializer )
+, m_DisplayWorld( nullptr )
 {
  	//! 
 	PrimaryActorTick.bCanEverTick = true;
@@ -53,6 +54,7 @@ ANaWorldActor::ANaWorldActor( const FObjectInitializer& ObjectInitializer )
 	m_CurrentChunkPos.Z	= SHORT_MAX;
 
 	m_WM	= NewObject<UNaWorldManager>();
+	m_WM->Initialize( this );
 }
 
 //! 
@@ -83,84 +85,6 @@ void ANaWorldActor::Tick( float DeltaSeconds )
 	Super::Tick( DeltaSeconds );
 
 	m_SM->Execute( DeltaSeconds );
-}
-
-//! ワールドオープン
-UNaWorld* ANaWorldActor::OpenWorld( FName id, FName assetID )
-{
-	UNaGameDatabase*	db = UNaGameDatabase::GetDB();
-	UWorld*	const		world = GetWorld();
-	UNaWorld*			naw;
-
-	naw	= NewObject<UNaGameWorld>();
-
-	//! エントリ問い合わせ
-	if ( FNaWorldRecord* rec = db->FindWorldEntry( id ) ){
-		naw->OpenWorld( rec->DataID );
-	}
-	else {
-		//! 新規生成
-		naw->CreateWorld( id, assetID );
-		db->RegisterWorldEntry( id, naw->GetDataID() );
-	}
-
-	naw->Setup( this );
-
-	m_Worlds.Add( naw );
-
-	if ( !m_ActiveWorld ){
-		m_NextWorld	= naw;
-	}
-
-	return naw;
-}
-
-//! ワールドクローズ
-void ANaWorldActor::CloseWorld( FName id )
-{
-	int32	idx;
-
-	idx	= m_Worlds.IndexOfByPredicate( [id]( UNaWorld* p )
-	{
-		return p->GetUID() == id;
-	});
-
-	if ( idx >= 0 ){
-		UNaWorld*	naw = m_Worlds[idx];
-
-		naw->CloseWorld();
-
-		if ( naw == m_NextWorld ){
-			m_NextWorld		= nullptr;
-		}
-		if ( naw == m_ActiveWorld ){
-			m_ActiveWorld	= nullptr;
-		}
-	}
-}
-
-//! ワールド変更リクエスト
-void ANaWorldActor::ChangeWorld( FName id )
-{
-	FName	prevID = m_ActiveWorld->GetUID();
-
-	OpenWorld( id );
-	SwitchWorld( id );
-}
-
-//! アクティブワールド変更リクエスト
-void ANaWorldActor::SwitchWorld( FName id )
-{
-	int32	idx;
-
-	idx	= m_Worlds.IndexOfByPredicate( [id]( UNaWorld* p )
-	{
-		return p->GetUID() == id;
-	});
-
-	if ( idx >= 0 ){
-		m_NextWorld	= m_Worlds[idx];
-	}
 }
 
 //! 表示チャンク範囲設定
@@ -289,35 +213,42 @@ void ANaWorldActor::ProcMain( UNaStateMachine* sm, float DeltaTime )
 		break;
 
 	case Main:
-		//! ワールド更新
 		{
-			TArray<UNaWorld*>	worlds = m_Worlds;
+			UNaWorld*	naw;
 
-			for ( auto& it : worlds ){
-				it->Update( DeltaTime );
+			//! ワールド更新
+			m_WM->Update( DeltaTime );
+
+			naw	= m_WM->GetActiveWorld();
+
+			//! 表示ワールド変更
+			if ( naw != m_DisplayWorld ){
+				m_DisplayWorld		= naw;
+				m_CurrentChunkPos.Z	= SHORT_MAX;
+
+				//! アクター表示状態変更
+				for ( auto& it : m_WorldActors ){
+					it->SetActorHiddenInGame( it->GetNaWorld() != m_DisplayWorld );
+				}
 			}
 
-			m_Worlds.RemoveAll( []( UNaWorld* p ){ return p->IsClosed();} );
-		}
+			if ( m_DisplayWorld ){
+				UNaGameDatabase*	db = UNaGameDatabase::GetDB();
+				UNaEntityPlayer*	player = db->GetPlayer();
+				AActor*				actor = player->GetActor();
 
-		if ( m_ActiveWorld ){
-			UNaGameDatabase*	db = UNaGameDatabase::GetDB();
-			UNaEntityPlayer*	player = db->GetPlayer();
-			AActor*	actor;
-
-			if ( player->GetWorldID() == m_ActiveWorld->GetUID() ){
-				actor	= player->GetActor();
-
-				//! マテリアルパラメータ設定
-				for ( auto& it : m_MIDMap ){
-					if ( actor ){
-						it.Value->SetVectorParameterValue( "PlayerLocation", actor->GetActorLocation() );
+				if ( player->GetWorldID() == m_DisplayWorld->GetUID() ){
+					//! マテリアルパラメータ設定
+					for ( auto& it : m_MIDMap ){
+						if ( actor ){
+							it.Value->SetVectorParameterValue( "PlayerLocation", actor->GetActorLocation() );
+						}
+						it.Value->SetScalarParameterValue( "CeilZ", m_DisplayWorld->GetCeilZ() );
 					}
-					it.Value->SetScalarParameterValue( "CeilZ", m_ActiveWorld->GetCeilZ() );
 				}
 
 				//! カメラアングル設定
-				int32	dir = int32( m_ActiveWorld->GetWorldDirection() );
+				int32	dir = int32( m_DisplayWorld->GetWorldDirection() );
 				m_Camera->SetAngle( dir * 45.0f );
 
 				//! 視界表示更新
@@ -325,7 +256,7 @@ void ANaWorldActor::ProcMain( UNaStateMachine* sm, float DeltaTime )
 					FIntVector	cpos;
 					FVector		v;
 
-					cpos	= m_ActiveWorld->GetCurrentPosition();
+					cpos	= m_DisplayWorld->GetViewOrigin();
 					if ( cpos != m_CurrentPos ){
 						FNaWorldBlockWork	work;
 
@@ -333,7 +264,7 @@ void ANaWorldActor::ProcMain( UNaStateMachine* sm, float DeltaTime )
 						v.Y	= cpos.Y * 10.0f + 5.0f;
 						v.Z	= cpos.Z * 10.0f + 7.5f;
 
-						if ( m_ActiveWorld->GetBlock( cpos, work ) ){
+						if ( m_DisplayWorld->GetBlock( cpos, work ) ){
 							v.Z	+= work.GetCenterHeight() / 256.0f * 10.0f;
 						}
 
@@ -356,19 +287,6 @@ void ANaWorldActor::ProcMain( UNaStateMachine* sm, float DeltaTime )
 						}
 					}
 				}
-			}
-		}
-
-		//! 表示ワールド変更
-		if ( m_NextWorld ){
-			m_ActiveWorld	= m_NextWorld;
-			m_NextWorld		= nullptr;
-
-			m_CurrentChunkPos.Z	= SHORT_MAX;
-
-			//! アクター表示状態変更
-			for ( auto& it : m_WorldActors ){
-				it->SetActorHiddenInGame( it->GetNaWorld() != m_ActiveWorld );
 			}
 		}
 		break;
@@ -398,7 +316,7 @@ void ANaWorldActor::UpdateChunkActor()
 				UNaChunk*			chunk;
 				ANaMapChunkActor*	actor;
 
-				chunk	= m_ActiveWorld->GetChunk( chunkPos );
+				chunk	= m_DisplayWorld->GetChunk( chunkPos );
 				if ( chunk ){
 					actor	= GetChunkActor( chunkPos );
 

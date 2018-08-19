@@ -71,7 +71,7 @@ public:
 	UNaEventManager();
 
 	//！初期化
-	void	Initialize( UNaWorld* world );
+	void	Initialize( UNaWorldManager* wm );
 	//! 更新
 	void	Tick( float DeltaTime );
 
@@ -112,10 +112,9 @@ protected:
 public:
 	
 protected:
-	//! 
+	//! ワールドマネージャ
 	UPROPERTY()
-	UNaWorld*	m_World;
-
+	UNaWorldManager*		m_WM;
 	// ステート管理
 	UPROPERTY(Transient)
 	UNaStateMachine*		m_SM;

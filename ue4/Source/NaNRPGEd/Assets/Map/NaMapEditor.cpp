@@ -117,7 +117,7 @@ void FNaMapEditor::InitEditor( const EToolkitMode::Type Mode, const TSharedPtr< 
 	m_PrevWorld	= NewObject<UNaEditorWorld>();
 	if ( m_PrevWorld ){
 		m_PrevWorld->SetupFromMap( m_CurrentObject );
-		m_PrevWorld->SetCurrentPosition( FIntVector( 0, 0, 0 ) );
+		m_PrevWorld->SetViewOrigin( FIntVector( 0, 0, 0 ) );
 	}
 
 	//! 

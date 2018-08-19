@@ -35,8 +35,13 @@ public:
 
 	//! 更新処理
 	void	Update( float DeltaTime );
+
 	//! アクションチェインに追加
 	void	InsertActionChain( UNaTurnActionComponent* tac );
+	void	InsertActionChain( UNaEntity* entity );
+	//! アクションチェインから除去
+	void	RemoveActionChain( UNaTurnActionComponent* tac );
+	void	RemoveActionChain( UNaEntity* entity );
 
 	//! ワールドオープン
 	UNaWorld*	OpenWorld( FName id, FName assetID = FName() );
@@ -45,17 +50,20 @@ public:
 	//! ワールド変更リクエスト
 	void		ChangeWorld( FName id );
 
-	//! ワールドジェネレータ取得
-	UNaWorldGenerator*	GetGenerator() const	{ return m_Generator; }
+	//! 準備完了判定
+	bool				IsReady() const			{ return m_WorldActor != nullptr; }
+	//! イベントマネージャ取得
+	UNaEventManager*	GetEventManager() const	{ return m_EventManager; }
 	//! アクティブワールド取得
 	UNaWorld*			GetActiveWorld() const	{ return m_ActiveWorld; }
+	//! UEワールド取得
+	UWorld*				GetWorldContext() const	{ return m_WorldContext; }
 
 protected:
+	//! 表示ターゲット取得
+	UNaEntity*	GetFocusEntity() const;
 	
 protected:
-	//! ワールドジェネレータ
-	UPROPERTY(Transient)
-	UNaWorldGenerator*	m_Generator;
 	//! イベントマネージャ
 	UPROPERTY()
 	UNaEventManager*	m_EventManager;

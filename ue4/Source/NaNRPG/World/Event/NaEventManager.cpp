@@ -8,6 +8,8 @@
 
 #include "Utility/Components/NaStateMachine.h"
 
+#include "World/NaWorldManager.h"
+
 #include "Actor/World/NaWorldActor.h"
 
 #include "UI/Actor/Event/NaSkitAgent.h"
@@ -31,9 +33,9 @@ UNaEventManager::UNaEventManager()
 }
 
 //！初期化
-void UNaEventManager::Initialize( UNaWorld* world )
+void UNaEventManager::Initialize( UNaWorldManager* wm )
 {
-	m_World	= world;
+	m_WM	= wm;
 }
 
 //! 更新
@@ -220,7 +222,6 @@ bool UNaEventManager::ParseCommand( UNaStateMachine* sm, const FNaEventCommand* 
 	case ENaEventCode::TravelTo:
 		{
 			UNaGameDatabase*	db = UNaGameDatabase::GetDB();
-			ANaWorldActor*		actor = m_World->GetWorldActor();
 			UNaEntity*			player = db->GetPlayer();
 			FNaEventParam		p0;
 			FName	id;
@@ -228,10 +229,10 @@ bool UNaEventManager::ParseCommand( UNaStateMachine* sm, const FNaEventCommand* 
 			ParseEventParamString( cmd->Arg0, p0 );
 			id	= FName( *GetEventParam(p0) );
 
-			player->TravelWorld( id );
-			player->SetWorldPosition( FIntVector( 0, 0, 64 ) );
+//@			player->TravelWorld( id, FIntVector( 0, 0, 64 ) );
 
-			actor->ChangeWorld( id );
+			m_WM->OpenWorld( id );
+			m_WM->ChangeWorld( id );
 
 			m_PC	= -1;
 		}
@@ -244,13 +245,13 @@ bool UNaEventManager::ParseCommand( UNaStateMachine* sm, const FNaEventCommand* 
 //! SkitAgent生成
 void UNaEventManager::SpawnSkitAgent()
 {
-	UNaGameInstance*	gi = UNaGameInstance::Get( m_World->GetWorldContext() );
+	UNaGameInstance*	gi = UNaGameInstance::Get( m_WM->GetWorldContext() );
 
 	if ( !m_UIASkit ){
 		UClass*	cls = gi->FindUI( "Skit" );
 
 		if ( cls ){
-			m_UIASkit	= m_World->GetWorldContext()->SpawnActor<ANaSkitAgent>( cls );
+			m_UIASkit	= m_WM->GetWorldContext()->SpawnActor<ANaSkitAgent>( cls );
 		}
 	}
 }

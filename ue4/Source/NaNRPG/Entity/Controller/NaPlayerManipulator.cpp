@@ -279,7 +279,7 @@ void UNaPlayerManipulator::ProcAction( UNaStateMachine* sm, float DeltaTime )
 
 	case End:
 		// @test プレイヤー移動位置を更新（暫定）
-//		naw->SetCurrentPosition( m_Target->GetWorldPosition() );
+//		naw->SetViewOrigin( m_Target->GetWorldPosition() );
 
 		sm->ChangeState( UNaEntityCharacter::EState::EndTurn );
 		break;
@@ -572,8 +572,9 @@ void UNaPlayerManipulator::ProcEvent( UNaStateMachine* sm, float DeltaTime )
 		//! 終了
 		End
 	};
-	ANaActorBase*	actor = m_Target->GetActor();
-	UNaWorld*		naw = m_Target->GetNaWorld();
+	ANaActorBase*		actor = m_Target->GetActor();
+	UNaWorld*			naw = m_Target->GetNaWorld();
+	UNaWorldManager*	wm = naw->GetWM();
 
 	switch ( sm->GetPhase() ){
 	//! 
@@ -588,7 +589,7 @@ void UNaPlayerManipulator::ProcEvent( UNaStateMachine* sm, float DeltaTime )
 				int32	sheet;
 
 				if ( entities[0]->FindEvent( ENaEventTrigger::Interacted, evt, sheet ) ){
-					UNaEventManager*	em = naw->GetEventManager();
+					UNaEventManager*	em = wm->GetEventManager();
 
 					em->PlayEvent( entities[0], evt, sheet );
 					sm->Advance();
@@ -603,7 +604,7 @@ void UNaPlayerManipulator::ProcEvent( UNaStateMachine* sm, float DeltaTime )
 
 	case Main:
 		{
-			UNaEventManager*	em = naw->GetEventManager();
+			UNaEventManager*	em = wm->GetEventManager();
 			
 			if ( !em->IsPlaying() ){
 				sm->Advance();

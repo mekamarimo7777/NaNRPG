@@ -41,15 +41,6 @@ public:
 	//! 更新
 	virtual void Tick( float DeltaSeconds ) override;
 
-	//! ワールドオープン
-	UNaWorld*	OpenWorld( FName id, FName assetID = FName() );
-	//! ワールドクローズ
-	void		CloseWorld( FName id );
-	//! ワールド変更リクエスト
-	void		ChangeWorld( FName id );
-	//! アクティブワールド変更リクエスト
-	void		SwitchWorld( FName id );
-
 	//! カメラ設定
 	void	BindCamera( ANaCameraActor* camera )	{ m_Camera = camera; }
 
@@ -88,16 +79,9 @@ protected:
 	//! ワールドマネージャ
 	UPROPERTY()
 	UNaWorldManager*	m_WM;
-	//! アクティブワールド（アクター表示中のワールド）
+	//! 表示中のワールド
 	UPROPERTY()
-	UNaWorld*			m_ActiveWorld;
-
-	//! オープン中のワールド
-	UPROPERTY()
-	TArray<UNaWorld*>	m_Worlds;
-	//! トランジション予約先ワールド
-	UPROPERTY()
-	UNaWorld*			m_NextWorld;
+	UNaWorld*			m_DisplayWorld;
 
 	//! 管理チャンクアクター
 	UPROPERTY()

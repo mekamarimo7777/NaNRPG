@@ -5,7 +5,7 @@
 
 #include "Actor/NaPawn.h"
 
-#include "World/NaGameWorld.h"
+#include "World/NaWorld.h"
 
 #include "Assets/NaAssetLibrary.h"
 #include "Database/NaGameDatabase.h"
@@ -110,8 +110,12 @@ void ANaMainGameMode::ProcMain( UNaStateMachine* sm, float DeltaTime )
 {
 	enum EPhase
 	{
+		//! 開始処理
 		Start,
+		StartWait,
+		//! メイン
 		Main,
+		//! 終了
 		End
 	};
 
@@ -119,17 +123,18 @@ void ANaMainGameMode::ProcMain( UNaStateMachine* sm, float DeltaTime )
 	case Start:
 		//! ワールドアクタ生成
 		CreateWorldActor();
-
+		sm->Advance();
+		break;
+	case StartWait:
 		//! ワールド読み込み
-		{
+		if ( UNaWorldManager* wm = m_WorldActor->GetWM() ){
 			UNaGameDatabase*	db = UNaGameDatabase::GetDB();
 			UNaEntityPlayer*	player = db->GetPlayer();
-			UNaWorld*			naw;
 
-			naw	= m_WorldActor->OpenWorld( player->GetWorldID() );
+			wm->OpenWorld( player->GetWorldID() );
+			wm->ChangeWorld( player->GetWorldID() );
+			sm->Advance();
 		}
-
-		sm->Advance();
 		break;
 
 	case Main:
