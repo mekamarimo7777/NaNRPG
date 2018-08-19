@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "NaNRPG.h"
 #include "NaWorld.h"
@@ -15,7 +15,7 @@
 
 #include "Database/NaGameDatabase.h"
 
-//! ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+//! ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 UNaWorld::UNaWorld()
 : m_CurrentChunkPos( 0, 0, SHORT_MAX )
 , m_ChunkRange( 9, 9, 9 )
@@ -26,19 +26,19 @@ UNaWorld::UNaWorld()
 	m_Generator	= NewObject<UNaWorldGenerator>();
 }
 
-//! g—pŠJn€”õ
+//! ä½¿ç”¨é–‹å§‹æº–å‚™
 void UNaWorld::Setup( ANaWorldActor* actor )
 {
 	m_WorldActor	= actor;
 	m_WM			= m_WorldActor->GetWM();
 }
 
-//! XV
+//! æ›´æ–°
 void UNaWorld::Update( float DeltaTime )
 {
 }
 
-//! ƒ[ƒ‹ƒhƒf[ƒ^\’z
+//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ãƒ‡ãƒ¼ã‚¿æ§‹ç¯‰
 bool UNaWorld::CreateWorld( FName uid, FName assetID )
 {
 	UNaGameDatabase*	db = UNaGameDatabase::GetDB();
@@ -48,12 +48,12 @@ bool UNaWorld::CreateWorld( FName uid, FName assetID )
 	m_UID		= uid;
 	m_DataID	= db->GenerateWorldDataID();
 
-	//! ƒAƒZƒbƒgID–¢w’è‚ÍUID‚ÅŒŸõ
+	//! ã‚¢ã‚»ãƒƒãƒˆIDæœªæŒ‡å®šã¯UIDã§æ¤œç´¢
 	if ( assetID.IsNone() ){
 		assetID	= uid;
 	}
 
-	//! ƒAƒZƒbƒg‚©‚ç\’z
+	//! ã‚¢ã‚»ãƒƒãƒˆã‹ã‚‰æ§‹ç¯‰
 	asset	= alib->FindWorldAsset( assetID );
 	m_Generator->SetWorldAsset( asset );
 
@@ -61,12 +61,12 @@ bool UNaWorld::CreateWorld( FName uid, FName assetID )
 		m_AssetID		= assetID;
 		m_DisplayName	= asset->DisplayName;
 
-		//! ƒ}ƒbƒvì¬
+		//! ãƒãƒƒãƒ—ä½œæˆ
 		for ( auto& it : asset->MapEntries ){
 			CreateMap( it.Location, it.Map );
 		}
 
-		// ƒ[ƒ‹ƒh’è‹`ƒGƒ“ƒeƒBƒeƒB¶¬
+		// ãƒ¯ãƒ¼ãƒ«ãƒ‰å®šç¾©ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ç”Ÿæˆ
 		for ( auto& it : asset->Entities ){
 			const FNaEntityDataAsset*	entAsset;
 
@@ -81,22 +81,23 @@ bool UNaWorld::CreateWorld( FName uid, FName assetID )
 
 				switch ( it.Stage ){
 				case ENaEntityStage::World:
+					//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ã¯è‡ªåˆ†ã®ç®¡ç†ä¸‹ã«è¿½åŠ 
 					RegisterEntity( entity );
 					break;
 				case ENaEntityStage::Global:
+					//! ã‚°ãƒ­ãƒ¼ãƒãƒ«ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ã¯DBã«è¿½åŠ 
 					db->RegisterGlobalEntity( entity );
 					break;
 				case ENaEntityStage::Chunk:
-					//! ƒ[ƒ‹ƒh’è‹`‚Å‚Íƒ`ƒƒƒ“ƒNŠÇ—ƒGƒ“ƒeƒBƒeƒB‚Íì‚ê‚È‚¢
-					//! ‚à‚µ‚­‚ÍˆêƒXƒ|[ƒ“‘Ò‚¿ƒŠƒXƒg‚É“ü‚ê‚Ä‚¨‚­H
-					check( false );
+					//! ãƒãƒ£ãƒ³ã‚¯æŒ‡å®šã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ã¯ã‚¹ãƒãƒ¼ãƒ³å¾…ã¡ãƒªã‚¹ãƒˆã«è¿½åŠ 
+					m_LazyEntities.Add( entity );
 					break;
 				}
 			}
 		}
 	}
 
-	//! •Û‘¶ˆ—
+	//! ä¿å­˜å‡¦ç†
 	{
 		IPlatformFile&	pf = FPlatformFileManager::Get().GetPlatformFile();
 		FString			dir,region_dir,map_dir,fname;
@@ -109,13 +110,13 @@ bool UNaWorld::CreateWorld( FName uid, FName assetID )
 		pf.CreateDirectoryTree( *dir );
 		m_WorldPath	= dir;
 
-		// ƒŠ[ƒWƒ‡ƒ“ƒtƒHƒ‹ƒ_¶¬
+		// ãƒªãƒ¼ã‚¸ãƒ§ãƒ³ãƒ•ã‚©ãƒ«ãƒ€ç”Ÿæˆ
 		region_dir	= GetRegionDirPath();
 		if ( !FPaths::DirectoryExists( region_dir ) ){
 			pf.CreateDirectoryTree( *region_dir );
 		}
 
-		// ƒ}ƒbƒvƒtƒHƒ‹ƒ_¶¬
+		// ãƒãƒƒãƒ—ãƒ•ã‚©ãƒ«ãƒ€ç”Ÿæˆ
 		map_dir	= GetMapDirPath();
 		if ( !FPaths::DirectoryExists( region_dir ) ){
 			pf.CreateDirectoryTree( *region_dir );
@@ -130,7 +131,7 @@ bool UNaWorld::CreateWorld( FName uid, FName assetID )
 	return true;
 }
 
-//! ƒ[ƒ‹ƒhƒf[ƒ^ƒI[ƒvƒ“
+//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ãƒ‡ãƒ¼ã‚¿ã‚ªãƒ¼ãƒ—ãƒ³
 bool UNaWorld::OpenWorld( int32 dataID )
 {
 	UNaAssetLibrary*	alib = UNaAssetLibrary::Get();
@@ -158,7 +159,7 @@ bool UNaWorld::OpenWorld( int32 dataID )
 
 		Serialize( reader );
 
-		// –³Œ`ƒGƒ“ƒeƒBƒeƒB‚ğ“o˜^
+		// ç„¡å½¢ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ã‚’ç™»éŒ²
 /*		for( auto& it : m_Entities ){
 			if ( it->IsIntangible() ){
 				EnterEntity( it );
@@ -175,7 +176,7 @@ bool UNaWorld::OpenWorld( int32 dataID )
 	}
 }
 
-//! ƒ[ƒ‹ƒhƒNƒ[ƒY
+//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚¯ãƒ­ãƒ¼ã‚º
 void UNaWorld::CloseWorld( bool isSave )
 {
 	for ( auto it : m_Regions ){
@@ -187,10 +188,10 @@ void UNaWorld::CloseWorld( bool isSave )
 	m_WM	= nullptr;
 }
 
-//! ƒVƒŠƒAƒ‰ƒCƒY
+//! ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚º
 void UNaWorld::Serialize( FArchive& ar )
 {
-	//! IDŠÖ˜A
+	//! IDé–¢é€£
 	ar << m_UID;
 	ar << m_AssetID;
 	ar << m_DataID;
@@ -227,7 +228,7 @@ void UNaWorld::SetViewOrigin( const FIntVector& pos )
 		Evaluate();
 	}
 
-	//! “VˆäƒZƒ‹ŒvZ
+	//! å¤©äº•ã‚»ãƒ«è¨ˆç®—
 	{
 		FIntVector	tpos;
 		int32		cz;
@@ -245,7 +246,7 @@ void UNaWorld::SetViewOrigin( const FIntVector& pos )
 	}
 }
 
-//! “à•”î•ñ‚ÌÄ•]‰¿
+//! å†…éƒ¨æƒ…å ±ã®å†è©•ä¾¡
 void UNaWorld::Evaluate()
 {
 	TArray<UNaChunk*>	chunks;
@@ -275,7 +276,7 @@ void UNaWorld::Evaluate()
 					continue;
 				}
 
-				//! ƒ`ƒƒƒ“ƒNŒŸo
+				//! ãƒãƒ£ãƒ³ã‚¯æ¤œå‡º
 				chunk	= m_ChunkMap.FindRef( tpos );
 
 				if ( chunk ){
@@ -310,19 +311,19 @@ void UNaWorld::Evaluate()
 		}
 	}
 	
-	// ”ÍˆÍŠOƒ`ƒƒƒ“ƒNƒNƒ[ƒY //
+	// ç¯„å›²å¤–ãƒãƒ£ãƒ³ã‚¯ã‚¯ãƒ­ãƒ¼ã‚º //
 	for ( auto it : m_ChunkMap ){
 		region = it.Value->GetRegion();
 		region->CloseChunk( it.Value->GetPosition() );
 	}
 	m_ChunkMap.Reset();
 
-	//! Šù‘¶ƒ`ƒƒƒ“ƒNƒZƒbƒg
+	//! æ—¢å­˜ãƒãƒ£ãƒ³ã‚¯ã‚»ãƒƒãƒˆ
 	for ( auto it : chunks ){
 		m_ChunkMap.Add( it->GetPositionInWorld(), it );
 	}
 
-	//! V‹Kƒ`ƒƒƒ“ƒNƒI[ƒvƒ“
+	//! æ–°è¦ãƒãƒ£ãƒ³ã‚¯ã‚ªãƒ¼ãƒ—ãƒ³
 	{
 		TArray<UNaEntity*>	entities;
 
@@ -330,7 +331,7 @@ void UNaWorld::Evaluate()
 			m_ChunkMap.Add( it->GetPositionInWorld(), it );
 			it->Open();
 
-			//! ãˆÊŠÇ—ƒGƒ“ƒeƒBƒeƒB‚Ì¶¬
+			//! ä¸Šä½ç®¡ç†ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ã®ç”Ÿæˆ
 			GatherWorldEntities( it->GetPositionInWorld(), entities );
 			for ( auto& it2 : entities ){
 				SpawnEntity( it2, it2->GetWorldPosition() );
@@ -338,7 +339,7 @@ void UNaWorld::Evaluate()
 		}
 	}
 
-	// ‹óƒŠ[ƒWƒ‡ƒ“ƒNƒ[ƒY //
+	// ç©ºãƒªãƒ¼ã‚¸ãƒ§ãƒ³ã‚¯ãƒ­ãƒ¼ã‚º //
 	for ( int32 i = m_Regions.Num() - 1; i >= 0; --i ){
 		region = m_Regions[i];
 
@@ -349,24 +350,24 @@ void UNaWorld::Evaluate()
 		}
 	}
 
-	// ì‹Æ—pƒ}ƒbƒvƒNƒ[ƒY //
+	// ä½œæ¥­ç”¨ãƒãƒƒãƒ—ã‚¯ãƒ­ãƒ¼ã‚º //
 	for ( auto& it : m_MapData ){
 		it.Value->CloseMap();
 	}
 }
 
-//! ƒŠ[ƒWƒ‡ƒ“æ“¾
+//! ãƒªãƒ¼ã‚¸ãƒ§ãƒ³å–å¾—
 UNaRegion* UNaWorld::GetRegion( const FIntVector& worldPos )
 {
 	return nullptr;
 }
 
-//! ƒ`ƒƒƒ“ƒNæ“¾
+//! ãƒãƒ£ãƒ³ã‚¯å–å¾—
 UNaChunk* UNaWorld::GetChunk( const FIntVector& chunkPos )
 {
 	return m_ChunkMap.FindRef( chunkPos );
 }
-//! ƒ`ƒƒƒ“ƒNæ“¾
+//! ãƒãƒ£ãƒ³ã‚¯å–å¾—
 UNaChunk* UNaWorld::GetChunkFromWorld( FIntVector worldPos )
 {
 	worldPos.X	>>= 4;
@@ -375,7 +376,7 @@ UNaChunk* UNaWorld::GetChunkFromWorld( FIntVector worldPos )
 	return GetChunk( worldPos );
 }
 
-//! ƒuƒƒbƒNİ’è
+//! ãƒ–ãƒ­ãƒƒã‚¯è¨­å®š
 void UNaWorld::SetBlock( FIntVector pos, FNaWorldBlockWork& block )
 {
 	UNaChunk*	chunk;
@@ -394,7 +395,7 @@ void UNaWorld::SetBlock( FIntVector pos, FNaWorldBlockWork& block )
 	}
 }
 
-//! ƒuƒƒbƒNæ“¾
+//! ãƒ–ãƒ­ãƒƒã‚¯å–å¾—
 bool UNaWorld::GetBlock( FIntVector worldPos, FNaWorldBlockWork& outVal )
 {
 	UNaChunk*	chunk;
@@ -418,7 +419,7 @@ bool UNaWorld::GetBlock( FIntVector worldPos, FNaWorldBlockWork& outVal )
 	return false;
 }
 
-//! Ú’nƒZƒ‹ŒŸõ
+//! æ¥åœ°ã‚»ãƒ«æ¤œç´¢
 bool UNaWorld::FindGroundPos( FIntVector startPos, FIntVector& outPos )
 {
 	UNaAssetLibrary*	alib = UNaAssetLibrary::Get();
@@ -437,14 +438,14 @@ bool UNaWorld::FindGroundPos( FIntVector startPos, FIntVector& outPos )
 		startPos.Z--;
 	}
 
-	// Œ©‚Â‚©‚ç‚È‚©‚Á‚½‚Ì‚Å‰ºŒÀÀ•W‚ğİ’è //
+	// è¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸã®ã§ä¸‹é™åº§æ¨™ã‚’è¨­å®š //
 	outPos	= startPos;
 	outPos.Z++;
 
 	return true;
 }
 
-//! “VˆäƒZƒ‹ŒŸõ
+//! å¤©äº•ã‚»ãƒ«æ¤œç´¢
 bool UNaWorld::FindCeilPos( FIntVector startPos, FIntVector& outPos )
 {
 	UNaAssetLibrary*	alib = UNaAssetLibrary::Get();
@@ -462,13 +463,13 @@ bool UNaWorld::FindCeilPos( FIntVector startPos, FIntVector& outPos )
 		startPos.Z++;
 	}
 
-	// Œ©‚Â‚©‚ç‚È‚©‚Á‚½‚Ì‚ÅãŒÀÀ•W‚ğİ’è //
+	// è¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸã®ã§ä¸Šé™åº§æ¨™ã‚’è¨­å®š //
 	outPos	= startPos;
 
 	return false;
 }
 
-//! ƒŠ[ƒWƒ‡ƒ“ƒf[ƒ^“Ç‚İ‚İ
+//! ãƒªãƒ¼ã‚¸ãƒ§ãƒ³ãƒ‡ãƒ¼ã‚¿èª­ã¿è¾¼ã¿
 bool UNaWorld::ReadRegionData( FIntVector pos, TArray<uint8>& outVal )
 {
 	FString	regionPath = FPaths::Combine( *m_WorldPath, TEXT( "regions" ) );
@@ -480,7 +481,7 @@ bool UNaWorld::ReadRegionData( FIntVector pos, TArray<uint8>& outVal )
 
 	return false;
 }
-//! ƒŠ[ƒWƒ‡ƒ“ƒf[ƒ^‘‚«‚İ
+//! ãƒªãƒ¼ã‚¸ãƒ§ãƒ³ãƒ‡ãƒ¼ã‚¿æ›¸ãè¾¼ã¿
 bool UNaWorld::WriteRegionData( FIntVector pos, const TArray<uint8>& inVal )
 {
 	FString	regionPath = FPaths::Combine( *m_WorldPath, TEXT( "regions" ) );
@@ -507,7 +508,7 @@ bool UNaWorld::FindEntity( FIntVector worldPos, TArray<UNaEntity*>& outVal )
 	return outVal.Num() > 0;
 }
 
-// ƒGƒ“ƒeƒBƒeƒBŠÇ—“o˜^
+// ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ç®¡ç†ç™»éŒ²
 bool UNaWorld::RegisterEntity( UNaEntity* entity )
 {
 	if ( m_Entities.Contains( entity ) ){
@@ -521,7 +522,7 @@ bool UNaWorld::RegisterEntity( UNaEntity* entity )
 	return true;
 }
 
-// ƒGƒ“ƒeƒBƒeƒBŠÇ—œ‹
+// ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ç®¡ç†é™¤å»
 void UNaWorld::UnregisterEntity( UNaEntity* entity )
 {
 	if ( m_Entities.Contains( entity ) ){
@@ -530,13 +531,13 @@ void UNaWorld::UnregisterEntity( UNaEntity* entity )
 	}
 }
 
-//! ƒGƒ“ƒeƒBƒeƒBID”­s
+//! ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£IDç™ºè¡Œ
 uint32 UNaWorld::IssueEntityID()
 {
 	return m_NextEntityID++;
 }
 
-//! –³ŒøƒGƒ“ƒeƒBƒeƒB‚Ìíœ
+//! ç„¡åŠ¹ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ã®å‰Šé™¤
 void UNaWorld::SweepEntities()
 {
 	for ( int32 i = m_SpawnEntities.Num() - 1; i >= 0; --i ){
@@ -546,35 +547,35 @@ void UNaWorld::SweepEntities()
 	}
 }
 
-// ƒGƒ“ƒeƒBƒeƒBƒXƒ|[ƒ“
+// ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ã‚¹ãƒãƒ¼ãƒ³
 bool UNaWorld::SpawnEntity( UNaEntity* entity, FIntVector pos )
 {
 	if ( m_SpawnEntities.Contains( entity ) ){
 		return false;
 	}
 
-	// ƒXƒ|[ƒ“ˆ—
+	// ã‚¹ãƒãƒ¼ãƒ³å‡¦ç†
 	entity->SetNaWorld( this );
 	entity->SetWorldPosition( pos );
 	entity->Spawn();
 
-	//! •\¦
+	//! è¡¨ç¤º
 	EnterEntity( entity );
 
 	return true;
 }
 
-// ƒGƒ“ƒeƒBƒeƒBƒfƒXƒ|[ƒ“
+// ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ãƒ‡ã‚¹ãƒãƒ¼ãƒ³
 void UNaWorld::DespawnEntity( UNaEntity* entity )
 {
 	if ( !m_SpawnEntities.Contains( entity ) ){
 		return;
 	}
 
-	//! Á‹
+	//! æ¶ˆå»
 	LeaveEntity( entity );
 
-	//! ƒfƒXƒ|[ƒ“ˆ—
+	//! ãƒ‡ã‚¹ãƒãƒ¼ãƒ³å‡¦ç†
 	entity->Despawn();
 }
 
@@ -585,10 +586,10 @@ bool UNaWorld::EnterEntity( UNaEntity* entity )
 		return false;
 	}
 
-	//! ƒXƒ|[ƒ“ƒŠƒXƒg‚Ö’Ç‰Á
+	//! ã‚¹ãƒãƒ¼ãƒ³ãƒªã‚¹ãƒˆã¸è¿½åŠ 
 	m_SpawnEntities.Add( entity );
 
-	//! Àsƒ`ƒFƒCƒ“‚É’Ç‰Á
+	//! å®Ÿè¡Œãƒã‚§ã‚¤ãƒ³ã«è¿½åŠ 
 	m_WM->InsertActionChain( entity );
 
 	// 
@@ -608,20 +609,20 @@ void UNaWorld::LeaveEntity( UNaEntity* entity )
 	//
 	entity->Leave();
 
-	//! ƒAƒNƒVƒ‡ƒ“ƒ`ƒFƒCƒ“‚©‚çœ‹
+	//! ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ãƒã‚§ã‚¤ãƒ³ã‹ã‚‰é™¤å»
 	m_WM->RemoveActionChain( entity );
 
-	//! ƒXƒ|[ƒ“ƒŠƒXƒg‚©‚çœ‹
+	//! ã‚¹ãƒãƒ¼ãƒ³ãƒªã‚¹ãƒˆã‹ã‚‰é™¤å»
 	m_SpawnEntities.RemoveSwap( entity );
 }
 
-//! UEƒ[ƒ‹ƒhæ“¾
+//! UEãƒ¯ãƒ¼ãƒ«ãƒ‰å–å¾—
 UWorld* UNaWorld::GetWorldContext() const
 {
 	return m_WM->GetWorldContext();
 }
 
-//! ƒ}ƒbƒv“o˜^
+//! ãƒãƒƒãƒ—ç™»éŒ²
 void UNaWorld::CreateMap( FIntVector location, const UNaMapAsset* mapAsset )
 {
 	FNaMapEntry	entry;
@@ -666,38 +667,34 @@ void UNaWorld::FindMap( FIntVector location, TArray<UNaMap*>& outArray )
 	}
 }
 
-//! w’èƒ`ƒƒƒ“ƒN‚ÌƒGƒ“ƒeƒBƒeƒBûW
+//! æŒ‡å®šãƒãƒ£ãƒ³ã‚¯ã®ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£åé›†
 void UNaWorld::GatherWorldEntities( const FIntVector& chunkPos, TArray<UNaEntity*>& outVal )
 {
 	outVal.Reset();
 
-	//! ƒOƒ[ƒoƒ‹ƒGƒ“ƒeƒBƒeƒBŒŸõ
+	//! ã‚°ãƒ­ãƒ¼ãƒãƒ«ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£æ¤œç´¢
 	if ( UNaGameDatabase* db = UNaGameDatabase::GetDB() ){
 		TArray<UNaEntity*>	entities;
 
 		db->GatherEntities( m_UID, entities );
 
 		for ( auto& it : entities ){
-			//! ¶‘¶”»’è
 			if ( !it->IsAlive() ){
 				continue;
 			}
-
-			//! ƒ`ƒƒƒ“ƒN“àE‚Ü‚½‚Í–³Œ`ƒGƒ“ƒeƒBƒeƒB
+			//! ãƒãƒ£ãƒ³ã‚¯å†…ãƒ»ã¾ãŸã¯ç„¡å½¢ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£
 			if ( it->GetChunkPosition() == chunkPos || it->IsIntangible() ){
 				outVal.Add( it );
 			}
 		}
 	}
 
-	//! ƒ[ƒ‹ƒhƒGƒ“ƒeƒBƒeƒBŒŸõ
+	//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£æ¤œç´¢
 	for ( auto& it : m_Entities ){
-		//! ¶‘¶”»’è
 		if ( !it->IsAlive() ){
 			continue;
 		}
-
-		//! ƒ`ƒƒƒ“ƒN“àE‚Ü‚½‚Í–³Œ`ƒGƒ“ƒeƒBƒeƒB
+		//! ãƒãƒ£ãƒ³ã‚¯å†…ãƒ»ã¾ãŸã¯ç„¡å½¢ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£
 		if ( it->GetChunkPosition() == chunkPos || it->IsIntangible() ){
 			outVal.Add( it );
 		}

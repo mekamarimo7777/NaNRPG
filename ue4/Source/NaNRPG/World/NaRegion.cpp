@@ -55,10 +55,6 @@ void UNaRegion::Close()
 	m_World->WriteRegionData( m_Location, ar );
 }
 
-
-
-
-
 //
 bool UNaRegion::OpenRegion( const FString& path, FIntVector rpos )
 {

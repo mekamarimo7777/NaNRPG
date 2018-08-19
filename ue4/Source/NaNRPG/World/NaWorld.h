@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -27,13 +27,13 @@ struct FNaMapEntry
 {
 	GENERATED_BODY()
 
-	//! ŒÅ—LID
+	//! å›ºæœ‰ID
 	UPROPERTY()
 	int32		MapID;
-	//! ”z’uƒ`ƒƒƒ“ƒNÀ•W
+	//! é…ç½®ãƒãƒ£ãƒ³ã‚¯åº§æ¨™
 	UPROPERTY()
 	FIntVector	Location;
-	//! ”z’u”ÍˆÍ
+	//! é…ç½®ç¯„å›²
 	UPROPERTY()
 	FIntVector	Range;
 };
@@ -41,14 +41,14 @@ struct FNaMapEntry
 //! 
 class INaWorldDataAccessor
 {
-	//! ƒŠ[ƒWƒ‡ƒ“ƒf[ƒ^“Ç‚İ‚İ
+	//! ãƒªãƒ¼ã‚¸ãƒ§ãƒ³ãƒ‡ãƒ¼ã‚¿èª­ã¿è¾¼ã¿
 	virtual bool	ReadRegionData( FIntVector pos, TArray<uint8>& outVal )			{ return false; }
-	//! ƒŠ[ƒWƒ‡ƒ“ƒf[ƒ^‘‚«‚İ
+	//! ãƒªãƒ¼ã‚¸ãƒ§ãƒ³ãƒ‡ãƒ¼ã‚¿æ›¸ãè¾¼ã¿
 	virtual bool	WriteRegionData( FIntVector pos, const TArray<uint8>& inVal )	{ return false; }
 };
 
 /**
- * ƒ[ƒ‹ƒhƒCƒ“ƒXƒ^ƒ“ƒX
+ * ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
  */
 UCLASS()
 class NANRPG_API UNaWorld : public UObject, public INaWorldDataAccessor
@@ -56,96 +56,96 @@ class NANRPG_API UNaWorld : public UObject, public INaWorldDataAccessor
 	GENERATED_BODY()
 
 public:
-	// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+	// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 	UNaWorld();
 
-	//! g—pŠJn€”õ
+	//! ä½¿ç”¨é–‹å§‹æº–å‚™
 	virtual void	Setup( ANaWorldActor* actor );
-	//! XV
+	//! æ›´æ–°
 	virtual void	Update( float DeltaTime );
 
-	//! V‹Kì¬
+	//! æ–°è¦ä½œæˆ
 	virtual bool	CreateWorld( FName uid, FName assetID );
-	//! ŠJ‚­
+	//! é–‹ã
 	bool			OpenWorld( int32 dataID );
-	//! •Â‚¶‚é
+	//! é–‰ã˜ã‚‹
 	void			CloseWorld( bool isSave = true );
 
-	//! ŒÅ—LIDæ“¾
+	//! å›ºæœ‰IDå–å¾—
 	FName	GetUID() const		{ return m_UID; }
-	//! ƒAƒZƒbƒgIDæ“¾
+	//! ã‚¢ã‚»ãƒƒãƒˆIDå–å¾—
 	FName	GetAssetID() const	{ return m_AssetID; }
-	//! ƒf[ƒ^IDæ“¾
+	//! ãƒ‡ãƒ¼ã‚¿IDå–å¾—
 	uint32	GetDataID() const	{ return m_DataID; }
-	//! ƒNƒ[ƒY”»’è
+	//! ã‚¯ãƒ­ãƒ¼ã‚ºåˆ¤å®š
 	bool	IsClosed() const	{ return m_WM == nullptr; }
 
-	//! ƒVƒŠƒAƒ‰ƒCƒY
+	//! ã‚·ãƒªã‚¢ãƒ©ã‚¤ã‚º
 	virtual void	Serialize( FArchive& ar ) override;
 
 	//! 
 	void		SetChunkRange( FIntVector range );
-	// ƒJƒŒƒ“ƒgÀ•Wİ’è
+	// ã‚«ãƒ¬ãƒ³ãƒˆåº§æ¨™è¨­å®š
 	void		SetViewOrigin( const FIntVector& pos );
-	// ƒJƒŒƒ“ƒgÀ•Wæ“¾
+	// ã‚«ãƒ¬ãƒ³ãƒˆåº§æ¨™å–å¾—
 	FIntVector	GetViewOrigin() const	{ return m_ViewOrigin; }
 
-	//! “à•”î•ñÄ•]‰¿
+	//! å†…éƒ¨æƒ…å ±å†è©•ä¾¡
 	virtual void	Evaluate();
 
-	// ƒŠ[ƒWƒ‡ƒ“æ“¾
+	// ãƒªãƒ¼ã‚¸ãƒ§ãƒ³å–å¾—
 	UNaRegion*	GetRegion( const FIntVector& worldPos );
-	// ƒ`ƒƒƒ“ƒNæ“¾
+	// ãƒãƒ£ãƒ³ã‚¯å–å¾—
 	UNaChunk*	GetChunk( const FIntVector& chunkPos );
-	// ƒ`ƒƒƒ“ƒNæ“¾iƒ[ƒ‹ƒhÀ•Wj
+	// ãƒãƒ£ãƒ³ã‚¯å–å¾—ï¼ˆãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ï¼‰
 	UNaChunk*	GetChunkFromWorld( FIntVector worldPos );
 
-	//! ƒuƒƒbƒNİ’è
+	//! ãƒ–ãƒ­ãƒƒã‚¯è¨­å®š
 	virtual void	SetBlock( FIntVector pos, FNaWorldBlockWork& block );
-	//! ƒuƒƒbƒNî•ñæ“¾
+	//! ãƒ–ãƒ­ãƒƒã‚¯æƒ…å ±å–å¾—
 	bool			GetBlock( FIntVector worldPos, FNaWorldBlockWork& outVal );
-	// Ú’nƒZƒ‹ŒŸõ
+	// æ¥åœ°ã‚»ãƒ«æ¤œç´¢
 	bool			FindGroundPos( FIntVector startPos, FIntVector& outPos );
-	// “VˆäƒZƒ‹ŒŸõ
+	// å¤©äº•ã‚»ãƒ«æ¤œç´¢
 	bool			FindCeilPos( FIntVector startPos, FIntVector& outPos );
 
-	//! ƒŠ[ƒWƒ‡ƒ“ƒf[ƒ^“Ç‚İ‚İ
+	//! ãƒªãƒ¼ã‚¸ãƒ§ãƒ³ãƒ‡ãƒ¼ã‚¿èª­ã¿è¾¼ã¿
 	virtual bool	ReadRegionData( FIntVector pos, TArray<uint8>& outVal ) override;
-	//! ƒŠ[ƒWƒ‡ƒ“ƒf[ƒ^‘‚«‚İ
+	//! ãƒªãƒ¼ã‚¸ãƒ§ãƒ³ãƒ‡ãƒ¼ã‚¿æ›¸ãè¾¼ã¿
 	virtual bool	WriteRegionData( FIntVector pos, const TArray<uint8>& inVal ) override;
 
 
-	// ƒGƒ“ƒeƒBƒeƒBŒŸõ
+	// ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£æ¤œç´¢
 	bool		FindEntity( FIntVector worldPos, TArray<UNaEntity*>& outVal );
-	// ƒGƒ“ƒeƒBƒeƒBƒŠƒXƒgæ“¾
+	// ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ãƒªã‚¹ãƒˆå–å¾—
 	const TArray<UNaEntity*>&	GetEntities() const	{return m_SpawnEntities;}
 
-	// ƒ[ƒ‹ƒhƒXƒe[ƒW‚ÉƒGƒ“ƒeƒBƒeƒB“o˜^
+	// ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚¹ãƒ†ãƒ¼ã‚¸ã«ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ç™»éŒ²
 	bool		RegisterEntity( UNaEntity* entity );
-	// ƒ[ƒ‹ƒhƒXƒe[ƒW‚©‚çƒGƒ“ƒeƒBƒeƒBœ‹
+	// ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚¹ãƒ†ãƒ¼ã‚¸ã‹ã‚‰ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£é™¤å»
 	void		UnregisterEntity( UNaEntity* entity );
-	//! ƒGƒ“ƒeƒBƒeƒBID”­s
+	//! ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£IDç™ºè¡Œ
 	uint32		IssueEntityID();
-	//! –³ŒøƒGƒ“ƒeƒBƒeƒB‚Ìíœ
+	//! ç„¡åŠ¹ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ã®å‰Šé™¤
 	void		SweepEntities();
 
-	// ƒGƒ“ƒeƒBƒeƒBƒXƒ|[ƒ“iÀ‘Ì‚Ì¶¬j
+	// ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ã‚¹ãƒãƒ¼ãƒ³ï¼ˆå®Ÿä½“ã®ç”Ÿæˆï¼‰
 	bool		SpawnEntity( UNaEntity* entity, FIntVector pos );
-	// ƒGƒ“ƒeƒBƒeƒBƒfƒXƒ|[ƒ“iÀ‘Ì‚Ìíœj
+	// ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ãƒ‡ã‚¹ãƒãƒ¼ãƒ³ï¼ˆå®Ÿä½“ã®å‰Šé™¤ï¼‰
 	void		DespawnEntity( UNaEntity* entity );
 
-	// ƒ[ƒ‹ƒh‚É”z’u
+	// ãƒ¯ãƒ¼ãƒ«ãƒ‰ã«é…ç½®
 	bool		EnterEntity( UNaEntity* entity );
-	// ƒ[ƒ‹ƒh‚©‚çœ‹
+	// ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‹ã‚‰é™¤å»
 	void		LeaveEntity( UNaEntity* entity );
 
-	//! ƒ[ƒ‹ƒhƒAƒNƒ^[æ“¾
+	//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚¢ã‚¯ã‚¿ãƒ¼å–å¾—
 	ANaWorldActor*		GetWorldActor() const	{ return m_WorldActor; }
-	//! ƒ[ƒ‹ƒhƒ}ƒl[ƒWƒƒæ“¾
+	//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ãƒãƒãƒ¼ã‚¸ãƒ£å–å¾—
 	UNaWorldManager*	GetWM() const			{ return m_WM; }
-	//! ƒ[ƒ‹ƒhƒWƒFƒlƒŒ[ƒ^æ“¾
+	//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚¸ã‚§ãƒãƒ¬ãƒ¼ã‚¿å–å¾—
 	UNaWorldGenerator*	GetGenerator() const	{ return m_Generator; }
-	//! UEƒ[ƒ‹ƒhæ“¾
+	//! UEãƒ¯ãƒ¼ãƒ«ãƒ‰å–å¾—
 	UWorld*				GetWorldContext() const;
 	
 	//
@@ -155,15 +155,15 @@ public:
 	//! 
 	FIntVector	GetChunkMax() const	{ return m_ChunkMax; }
 
-	//! ƒ}ƒbƒv¶¬
+	//! ãƒãƒƒãƒ—ç”Ÿæˆ
 	void		CreateMap( FIntVector location, const UNaMapAsset* mapAsset );
 	void		CreateMap( FIntVector location, const FStringAssetReference& mapAsset );
 	//! 
 	void		FindMap( FIntVector location, TArray<UNaMap*>& outArray );
-	//! ƒ}ƒbƒvæ“¾
+	//! ãƒãƒƒãƒ—å–å¾—
 //	UNaMap*		GetMap( int32 idx ) const	{return m_MapData.IsValidIndex(idx) ? m_MapData[idx] : nullptr;}
 
-	//! w’èƒ`ƒƒƒ“ƒN‚ÌƒGƒ“ƒeƒBƒeƒBûW
+	//! æŒ‡å®šãƒãƒ£ãƒ³ã‚¯ã®ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£åé›†
 	void		GatherWorldEntities( const FIntVector& chunkPos, TArray<UNaEntity*>& outVal );
 
 	void		SetCeilZ(int32 cz)	{m_CeilZ = cz;}
@@ -183,66 +183,71 @@ protected:
 	FString		GetMapDirPath() const;
 
 protected:
-	//! ŒÅ—LID
+	//! å›ºæœ‰ID
 	FName		m_UID;
-	//! ƒAƒZƒbƒgID
+	//! ã‚¢ã‚»ãƒƒãƒˆID
 	FName		m_AssetID;
-	//! ƒf[ƒ^ID
+	//! ãƒ‡ãƒ¼ã‚¿ID
 	uint32		m_DataID;
 
 	//!
 	FString		m_WorldPath;
-	//! ƒ[ƒ‹ƒhƒ`ƒƒƒ“ƒN”ÍˆÍ‰ºŒÀ
+	//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ãƒãƒ£ãƒ³ã‚¯ç¯„å›²ä¸‹é™
 	FIntVector	m_ChunkMin;
-	//! ƒ[ƒ‹ƒhƒ`ƒƒƒ“ƒN”ÍˆÍãŒÀ
+	//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ãƒãƒ£ãƒ³ã‚¯ç¯„å›²ä¸Šé™
 	FIntVector	m_ChunkMax;
 
-	//! ƒ[ƒ‹ƒh•\¦–¼
+	//! ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡¨ç¤ºå
 	FText		m_DisplayName;
 
-	//! ƒ[ƒ‹ƒhƒ}ƒl[ƒWƒƒ
+	//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ãƒãƒãƒ¼ã‚¸ãƒ£
 	UPROPERTY(Transient)
 	UNaWorldManager*	m_WM;
-	//! ƒ[ƒ‹ƒh•\¦ŠÇ—ƒAƒNƒ^[
+	//! ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡¨ç¤ºç®¡ç†ã‚¢ã‚¯ã‚¿ãƒ¼
 	UPROPERTY(Transient)
 	ANaWorldActor*		m_WorldActor;
-	//! ƒ[ƒ‹ƒhƒWƒFƒlƒŒ[ƒ^
+	//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚¸ã‚§ãƒãƒ¬ãƒ¼ã‚¿
 	UPROPERTY(Transient)
 	UNaWorldGenerator*	m_Generator;
 
-	//! ƒz[ƒ€ƒ|ƒWƒVƒ‡ƒ“
+	//! ãƒ›ãƒ¼ãƒ ãƒã‚¸ã‚·ãƒ§ãƒ³
 	TArray<FIntVector>	m_HomePositions;
 
-	// ŠÂ‹«î•ñ //
-	int32	m_Temperature;		// ‹C‰·
-	int32	m_Humidity;			// ¼“x
-	int32	m_AtmosPressure;	// ‹Cˆ³
+	// ç’°å¢ƒæƒ…å ± //
+	int32	m_Temperature;		// æ°—æ¸©
+	int32	m_Humidity;			// æ¹¿åº¦
+	int32	m_AtmosPressure;	// æ°—åœ§
 
-	//! •\¦Œ´“_
+	//! è¡¨ç¤ºåŸç‚¹
 	FIntVector			m_ViewOrigin;
 	FIntVector			m_CurrentChunkPos;	// 
 	int32				m_CeilZ;			// 
-	ENaDirection		m_WorldDirection;	// ƒ[ƒ‹ƒh•\¦•ûŠp
-	//! ƒAƒNƒeƒBƒuƒ`ƒƒƒ“ƒN”ÍˆÍ
+	ENaDirection		m_WorldDirection;	// ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡¨ç¤ºæ–¹è§’
+	//! ã‚¢ã‚¯ãƒ†ã‚£ãƒ–ãƒãƒ£ãƒ³ã‚¯ç¯„å›²
 	FIntVector			m_ChunkRange;
 
-	// ƒƒCƒ“’nŒ`î•ñ
+	// ãƒ¡ã‚¤ãƒ³åœ°å½¢æƒ…å ±
 	UPROPERTY(Transient)
-	TArray<UNaRegion*>				m_Regions;		// ƒŠ[ƒWƒ‡ƒ“À‘Ì
-	TMap<FIntVector, UNaRegion*>	m_RegionMap;	// ƒŠ[ƒWƒ‡ƒ“ƒAƒNƒZƒX—pƒ}ƒbƒv
-	TMap<FIntVector, UNaChunk*>		m_ChunkMap;		// ƒ`ƒƒƒ“ƒNƒAƒNƒZƒX—pƒ}ƒbƒviÀ‘Ì‚ÍƒŠ[ƒWƒ‡ƒ““àŠÇ—j
+	TArray<UNaRegion*>				m_Regions;		// ãƒªãƒ¼ã‚¸ãƒ§ãƒ³å®Ÿä½“
+	TMap<FIntVector, UNaRegion*>	m_RegionMap;	// ãƒªãƒ¼ã‚¸ãƒ§ãƒ³ã‚¢ã‚¯ã‚»ã‚¹ç”¨ãƒãƒƒãƒ—
+	TMap<FIntVector, UNaChunk*>		m_ChunkMap;		// ãƒãƒ£ãƒ³ã‚¯ã‚¢ã‚¯ã‚»ã‚¹ç”¨ãƒãƒƒãƒ—ï¼ˆå®Ÿä½“ã¯ãƒªãƒ¼ã‚¸ãƒ§ãƒ³å†…ç®¡ç†ï¼‰
 
-	// ’†ŠÔƒf[ƒ^ƒ}ƒbƒv
+	// ä¸­é–“ãƒ‡ãƒ¼ã‚¿ãƒãƒƒãƒ—
 	UPROPERTY()
-	TArray<FNaMapEntry>				m_MapEntries;	// ƒ}ƒbƒvƒGƒ“ƒgƒŠ
+	TArray<FNaMapEntry>				m_MapEntries;	// ãƒãƒƒãƒ—ã‚¨ãƒ³ãƒˆãƒª
 	UPROPERTY(Transient)
-	TMap<int32, UNaMap*>			m_MapData;		// “WŠJ’†‚Ìƒ}ƒbƒvÀ‘Ì
+	TMap<int32, UNaMap*>			m_MapData;		// å±•é–‹ä¸­ã®ãƒãƒƒãƒ—å®Ÿä½“
 
-	// ƒGƒ“ƒeƒBƒeƒB //
+	//! ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚¹ãƒ†ãƒ¼ã‚¸ç®¡ç†ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£å®Ÿä½“
 	UPROPERTY()
-	TArray<UNaEntity*>				m_Entities;				// ƒ[ƒ‹ƒhƒXƒe[ƒW‚ÌƒGƒ“ƒeƒBƒeƒBÀ‘Ì //
+	TArray<UNaEntity*>				m_Entities;
+	//! è¿½åŠ å¾…ã¡ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£
 	UPROPERTY()
-	int32							m_NextEntityID;			// Ÿ‰ñƒ[ƒ‹ƒhƒGƒ“ƒeƒBƒeƒBID //
+	TArray<UNaEntity*>				m_LazyEntities;
+	//! æ¬¡å›ãƒ¯ãƒ¼ãƒ«ãƒ‰ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ID
+	UPROPERTY()
+	int32							m_NextEntityID;
+	//! ã‚¹ãƒãƒ¼ãƒ³ä¸­ã®ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£ï¼ˆã‚¹ãƒ†ãƒ¼ã‚¸å…±é€šï¼‰
 	UPROPERTY(Transient)
-	TArray<UNaEntity*>				m_SpawnEntities;		// ƒXƒ|[ƒ“’†‚ÌƒGƒ“ƒeƒBƒeƒBiƒXƒe[ƒW‹¤’Êj //
+	TArray<UNaEntity*>				m_SpawnEntities;
 };

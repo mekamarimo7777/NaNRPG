@@ -55,22 +55,24 @@ public:
 	void	Enter();
 	// 退場処理（チャンク消去時の退避処理）
 	void	Leave();
+	//! スポーン中判定
+	bool	IsSpawned() const	{ return m_IsSpawned; }
 
 	//! ワールド間移動
 	void		TravelWorld( FName wid, const FIntVector& pos = FIntVector::ZeroValue );
 	// Naワールド設定
 	void		SetNaWorld( UNaWorld* world );
 	// Naワールド取得
-	UNaWorld*	GetNaWorld() const				{ return m_pWorld; }
+	UNaWorld*	GetNaWorld() const		{ return m_pWorld; }
 
 	//! 所属ワールドID設定
-	void		SetWorldID( FName id )			{ m_WorldID = id; }
+	void		SetWorldID( FName id )	{ m_WorldID = id; }
 	//! 所属ワールドID取得
-	FName		GetWorldID() const				{ return m_WorldID; }
+	FName		GetWorldID() const		{ return m_WorldID; }
 	//! 所属マップID設定
-	void		SetMapID( int32 id )			{ m_MapID = id; }
+	void		SetMapID( int32 id )	{ m_MapID = id; }
 	//! 所属マップID取得
-	int32		GetMapID() const				{ return m_MapID; }
+	int32		GetMapID() const		{ return m_MapID; }
 
 	//! エンティティ情報生成
 	virtual void	CreateFromAsset( const FNaEntityDataAsset& asset );
@@ -91,9 +93,6 @@ public:
 	//! アイテム情報取得
 	virtual UNaItem*	GetItemProperty()					{ return nullptr; }
 
-	//! 生存判定
-	bool	IsAlive() const		{ return !m_IsKill; }
-
 	//! イベントセット
 	void	SetEvent( FName eventID );
 	//! イベント取得
@@ -103,6 +102,14 @@ public:
 	UWorld*		GetWorldContext() const	{ return m_pWorld ? m_pWorld->GetWorldContext() : nullptr; }
 	//! UEHUD取得
 	ANaGameHUD*	GetHUD() const			{ return Cast<ANaGameHUD>( GWorld->GetFirstPlayerController()->GetHUD() ); }
+
+	//! 削除要求
+	void			Kill()					{ m_IsKill = true; }
+	//! 削除待ち
+	virtual bool	IsPendingKill() const	{ return m_IsKill; }
+
+	//! 生存判定
+	virtual bool	IsAlive() const			{ return true; }
 
 
 
@@ -150,11 +157,6 @@ public:
 	//!
 	FORCEINLINE bool	HasTurnAction() const	{ return GetTurnAction() != nullptr; }
 
-	// 削除
-	void			Kill()					{ m_IsKill = true; }
-	// 削除待ち
-	virtual bool	IsPendingKill() const	{ return m_IsKill; }
-
 	//!
 	virtual UNaEntityManipulator*	GetManipulator() const			{ return nullptr; }
 
@@ -190,14 +192,6 @@ protected:
 
 	//! 一時情報の更新
 	void	PostLoadProcess( const FNaEntityDataAsset* asset );
-
-public:
-	//! アクションしない（アクションチェインに繋がない）
-	bool	m_IsStationary;
-	//! 座標管理しないエンティティ（チャンクに属さない）
-	bool	m_IsAbstract;
-	//! キルフラグ
-	bool	m_IsKill;
 	
 protected:
 	//*** Serialize ***//
@@ -260,4 +254,13 @@ protected:
 	FIntVector					m_Size;
 	//! コリジョン有無
 	bool						m_Collidable;
+
+	//! アクションしない（アクションチェインに繋がない）
+	bool	m_IsStationary;
+	//! 座標管理しないエンティティ（チャンクに属さない）
+	bool	m_IsAbstract;
+	//! スポーン中
+	bool	m_IsSpawned;
+	//! キルフラグ
+	bool	m_IsKill;
 };

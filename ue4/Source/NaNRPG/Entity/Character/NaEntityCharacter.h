@@ -99,6 +99,9 @@ public:
 	//! 装備リスト取得
 	const TArray<FNaCharacterEquipPart>&	GetEquipments() const	{ return m_Equipments; }
 
+	//! 生存判定
+	virtual bool	IsAlive() const override;
+
 protected:
 	// 生成後の初期化
 	virtual void	OnAwake() override;
@@ -118,8 +121,6 @@ protected:
 
 	//! シリアライズ処理
 	virtual void	OnSerialize( FArchive& ar ) override;
-
-public:
 
 protected:
 	// マップアクター

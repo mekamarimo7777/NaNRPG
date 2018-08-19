@@ -288,6 +288,12 @@ void UNaEntityCharacter::SetItemProperty( UNaItem* item )
 	m_ItemProperty	= item;
 }
 
+//! 生存判定
+bool UNaEntityCharacter::IsAlive() const
+{
+	return true;
+}
+
 // ターン開始
 void UNaEntityCharacter::OnBeginTurn()
 {

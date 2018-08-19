@@ -14,12 +14,13 @@
 
 // 
 UNaEntity::UNaEntity()
-: m_IsAbstract( false )
-, m_IsKill( false )
-, m_Direction( ENaDirection::South )
+: m_Direction( ENaDirection::South )
 , m_Speed( 500 )
 , m_ID( -1 )
 , m_Stage( ENaEntityStage::Chunk )
+, m_IsAbstract( false )
+, m_IsSpawned( false )
+, m_IsKill( false )
 {
 }
 
@@ -48,15 +49,17 @@ void UNaEntity::ResetID()
 // スポーン時処理
 void UNaEntity::Spawn()
 {
-	OnSpawn();
+	m_IsSpawned	= true;
 
-//	UpdateCurrentChunk();
+	OnSpawn();
 }
 
 // デスポーン時処理
 void UNaEntity::Despawn()
 {
 	OnDespawn();
+
+	m_IsSpawned	= false;
 }
 
 //
